@@ -1,0 +1,202 @@
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { BookOpen, Users, Clock, Award, CheckCircle } from 'lucide-react';
+
+export function Training() {
+  const programs = [
+    {
+      id: 1,
+      title: 'Structural Engineering Fundamentals',
+      duration: '12 weeks',
+      level: 'Beginner',
+      description: 'Comprehensive introduction to structural engineering principles and practices.',
+      topics: [
+        'Load analysis and distribution',
+        'Material properties and selection',
+        'Design codes and standards',
+        'Structural software training',
+      ],
+    },
+    {
+      id: 2,
+      title: 'Advanced Project Management',
+      duration: '8 weeks',
+      level: 'Intermediate',
+      description: 'Master the art of managing complex engineering projects from conception to completion.',
+      topics: [
+        'Project planning and scheduling',
+        'Risk management',
+        'Budget control and optimization',
+        'Team leadership and communication',
+      ],
+    },
+    {
+      id: 3,
+      title: 'Sustainable Engineering Practices',
+      duration: '6 weeks',
+      level: 'All Levels',
+      description: 'Learn to integrate sustainability principles into engineering design and execution.',
+      topics: [
+        'Green building standards',
+        'Energy-efficient design',
+        'Environmental impact assessment',
+        'Sustainable materials',
+      ],
+    },
+    {
+      id: 4,
+      title: 'BIM and Digital Construction',
+      duration: '10 weeks',
+      level: 'Intermediate',
+      description: 'Hands-on training in Building Information Modeling and digital construction technologies.',
+      topics: [
+        'BIM software proficiency',
+        '3D modeling and coordination',
+        'Clash detection and resolution',
+        'Digital project delivery',
+      ],
+    },
+  ];
+
+  return (
+    <div>
+      {/* Header Section */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-bold mb-4">Training Programs</h1>
+          <p className="text-xl text-blue-100 max-w-3xl">
+            Enhance your engineering skills with our comprehensive professional development programs
+          </p>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Why Train With Us</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Our training programs are designed by industry experts to provide practical,
+              real-world knowledge
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-blue-100 p-3 rounded-full mb-4">
+                    <BookOpen className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Expert Instructors</h3>
+                  <p className="text-sm text-gray-600">
+                    Learn from experienced engineers with decades of industry experience
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-blue-100 p-3 rounded-full mb-4">
+                    <Users className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Small Class Sizes</h3>
+                  <p className="text-sm text-gray-600">
+                    Personalized attention with limited enrollment per program
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-blue-100 p-3 rounded-full mb-4">
+                    <Clock className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Flexible Scheduling</h3>
+                  <p className="text-sm text-gray-600">
+                    Evening and weekend options to fit your busy schedule
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-blue-100 p-3 rounded-full mb-4">
+                    <Award className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Certification</h3>
+                  <p className="text-sm text-gray-600">
+                    Receive industry-recognized certificates upon completion
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Programs Section */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Available Programs</h2>
+            <p className="text-gray-600">
+              Choose from our range of specialized training courses
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {programs.map((program) => (
+              <Card key={program.id}>
+                <CardHeader>
+                  <div className="flex justify-between items-start mb-2">
+                    <CardTitle>{program.title}</CardTitle>
+                    <span className="px-3 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
+                      {program.level}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">{program.description}</p>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+                    <Clock className="h-4 w-4" />
+                    <span>{program.duration}</span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <h4 className="font-semibold mb-3">Key Topics Covered:</h4>
+                  <ul className="space-y-2 mb-6">
+                    {program.topics.map((topic, index) => (
+                      <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span>{topic}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button className="w-full">Enroll Now</Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Advance Your Career?</h2>
+          <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
+            Join our training programs and gain the skills you need to excel in the engineering industry.
+          </p>
+          <Button size="lg" variant="secondary">
+            Contact Us for More Information
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+}
