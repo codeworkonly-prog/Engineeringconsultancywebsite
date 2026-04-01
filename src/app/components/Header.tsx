@@ -19,6 +19,7 @@ export function Header() {
     { path: '/about', label: 'About Us' },
     { path: '/training', label: 'Training' },
     { path: '/projects', label: 'Projects' },
+    { path: '/contact', label: 'Contact Us' },
   ];
 
   return (
@@ -26,7 +27,7 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <Link to="/" className="flex items-center">
-            <h1 className="text-2xl font-bold text-blue-600">DCP</h1>
+            <img src="/src/imports/DCP_logo.png" alt="DCP Logo" className="h-12" />
           </Link>
 
           {/* Desktop Navigation */}

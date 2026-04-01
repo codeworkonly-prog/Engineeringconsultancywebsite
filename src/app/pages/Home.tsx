@@ -22,7 +22,7 @@ export function Home() {
               to bring your vision to life.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/about">
+              <Link to="/contact">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
                   Learn More
                 </Button>
@@ -155,7 +155,7 @@ export function Home() {
           <p className="text-xl mb-8 text-blue-100">
             Let's work together to bring your engineering vision to life.
           </p>
-          <Link to="/about">
+          <Link to="/contact">
             <Button size="lg" variant="secondary">
               Contact Us Today
             </Button>

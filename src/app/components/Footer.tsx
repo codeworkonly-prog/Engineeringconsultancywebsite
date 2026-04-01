@@ -14,7 +14,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">Diksha Consultancy and Projects</h3>
+            <h3 className="text-xl font-bold mb-4">DIKSHA CONSULTING & PROJECTS Pvt. Ltd.</h3>
             <p className="text-gray-400">
               Leading engineering consultancy providing innovative solutions for complex projects.
             </p>
@@ -29,11 +29,11 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <Mail className="h-5 w-5" />
-                <span>info@engiconsult.com</span>
+                <span>consultingdiksha@gmail.com</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <MapPin className="h-5 w-5" />
-                <span>123 Engineering Plaza, Tech City</span>
+                <span>Ghattekulo-32, Kathmandu</span>
               </div>
             </div>
           </div>
@@ -56,12 +56,17 @@ export function Footer() {
                   Our Projects
                 </a>
               </li>
+              <li>
+                <a href="/contact" className="hover:text-white transition-colors">
+                  Contact Us
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Diksha Consultancy and Projects. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} DIKSHA CONSULTING & PROJECTS Pvt. Ltd. All rights reserved.</p>
         </div>
       </div>
     </footer>
