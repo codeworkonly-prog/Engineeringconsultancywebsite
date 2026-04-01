@@ -6,6 +6,8 @@ import { Training } from './pages/Training';
 import { Projects } from './pages/Projects';
 import { Contact } from './pages/Contact';
 import { Dashboard } from './pages/admin/Dashboard';
+import { AdminLogin } from './components/AdminLogin';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
@@ -20,7 +22,15 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    path: '/admin/login',
+    Component: AdminLogin,
+  },
+  {
     path: '/admin',
-    Component: Dashboard,
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
   },
 ]);

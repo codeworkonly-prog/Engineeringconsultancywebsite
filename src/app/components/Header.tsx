@@ -47,14 +47,6 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="hidden md:block">
-            <Link to="/admin">
-              <Button variant="outline" size="sm">
-                Admin Portal
-              </Button>
-            </Link>
-          </div>
-
           {/* Mobile Menu Button */}
           <button
             className="md:hidden"
@@ -80,11 +72,6 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
-              <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" size="sm" className="w-full">
-                  Admin Portal
-                </Button>
-              </Link>
             </nav>
           </div>
         )}

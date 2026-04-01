@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -7,10 +7,13 @@ import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { useContent } from '../../contexts/ContentContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Trash2, Home, ImagePlus, Users as UsersIcon, Briefcase } from 'lucide-react';
+import { Trash2, Home, ImagePlus, Users as UsersIcon, Briefcase, LogOut, Key } from 'lucide-react';
 
 export function Dashboard() {
+  const navigate = useNavigate();
+  const { logout, changePassword } = useAuth();
   const {
     teamMembers,
     projects,
@@ -46,6 +49,42 @@ export function Dashboard() {
     imageUrl: '',
     category: '',
   });
+
+  // Password Change Form State
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  const handleLogout = () => {
+    logout();
+    navigate('/admin/login');
+    toast.success('Logged out successfully');
+  };
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
+
+    if (changePassword(passwordForm.oldPassword, passwordForm.newPassword)) {
+      toast.success('Password changed successfully');
+      setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      setShowPasswordChange(false);
+    } else {
+      toast.error('Current password is incorrect');
+    }
+  };
 
   const handleAddTeamMember = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,12 +132,30 @@ export function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-            <Link to="/">
-              <Button variant="outline" size="sm">
-                <Home className="h-4 w-4 mr-2" />
-                Back to Website
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPasswordChange(!showPasswordChange)}
+              >
+                <Key className="h-4 w-4 mr-2" />
+                Change Password
               </Button>
-            </Link>
+              <Link to="/">
+                <Button variant="outline" size="sm">
+                  <Home className="h-4 w-4 mr-2" />
+                  Back to Website
+                </Button>
+              </Link>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -409,6 +466,48 @@ export function Dashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Password Change Form */}
+        {showPasswordChange && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Change Password</CardTitle>
+              <CardDescription>Update your account password</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div>
+                  <Label htmlFor="old-password">Current Password</Label>
+                  <Input
+                    id="old-password"
+                    type="password"
+                    value={passwordForm.oldPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, oldPassword: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="new-password">New Password</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  />
+                </div>
+                <Button type="submit" className="w-full">Change Password</Button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
