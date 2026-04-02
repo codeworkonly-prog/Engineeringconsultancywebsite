@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
+import logoImage from '../../imports/DCP_logo-1.png';
 
 export function Header() {
   const location = useLocation();
@@ -27,7 +28,7 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <Link to="/" className="flex items-center">
-            <img src="/src/imports/DCP_logo.png" alt="DCP Logo" className="h-12" />
+            <img src={logoImage} alt="DCP Logo" className="h-12" />
           </Link>
 
           {/* Desktop Navigation */}

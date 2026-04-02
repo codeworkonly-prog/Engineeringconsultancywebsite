@@ -25,7 +25,7 @@ export function About() {
             <div>
               <h2 className="text-3xl font-bold mb-6">Who We Are</h2>
               <p className="text-gray-600 mb-4">
-                DIKSHA CONSULTING & PROJECTS Pvt. Ltd. is a premier engineering consultancy firm with over two decades of
+                Diksha Consulting and Projects Pvt. Ltd. is a premier engineering consultancy firm with over two decades of
                 experience in delivering complex engineering projects across various sectors.
                 We specialize in structural, mechanical, and environmental engineering solutions.
               </p>

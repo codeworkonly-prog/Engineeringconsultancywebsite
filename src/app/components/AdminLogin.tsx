@@ -33,7 +33,7 @@ export function AdminLogin() {
             </div>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Admin Portal</h1>
-          <p className="text-gray-600 mt-2">DIKSHA CONSULTING & PROJECTS</p>
+          <p className="text-gray-600 mt-2">Diksha Consulting and Projects</p>
         </div>
 
         {!showResetForm ? (
