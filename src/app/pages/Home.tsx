@@ -22,7 +22,7 @@ export function Home() {
               to bring your vision to life.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/contact">
+              <Link to="/about">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
                   Learn More
                 </Button>

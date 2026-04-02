@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router';
+import { useLocation, Link } from 'react-router';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
 export function Footer() {
@@ -42,24 +42,24 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-gray-400">
               <li>
-                <a href="/about" className="hover:text-white transition-colors">
+                <Link to="/about" className="hover:text-white transition-colors">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/training" className="hover:text-white transition-colors">
+                <Link to="/training" className="hover:text-white transition-colors">
                   Training Programs
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/projects" className="hover:text-white transition-colors">
+                <Link to="/projects" className="hover:text-white transition-colors">
                   Our Projects
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/contact" className="hover:text-white transition-colors">
+                <Link to="/contact" className="hover:text-white transition-colors">
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

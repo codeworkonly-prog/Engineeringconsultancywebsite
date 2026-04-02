@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { BookOpen, Users, Clock, Award, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router';
 
 export function Training() {
   const programs = [
@@ -192,9 +193,11 @@ export function Training() {
           <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
             Join our training programs and gain the skills you need to excel in the engineering industry.
           </p>
-          <Button size="lg" variant="secondary">
-            Contact Us for More Information
-          </Button>
+          <Link to="/contact">
+            <Button size="lg" variant="secondary">
+              Contact Us for More Information
+            </Button>
+          </Link>
         </div>
       </section>
     </div>
