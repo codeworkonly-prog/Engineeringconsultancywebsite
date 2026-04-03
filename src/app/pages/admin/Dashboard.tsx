@@ -331,7 +331,7 @@ export function Dashboard() {
                       />
                       <div className="flex-1">
                         <h3 className="font-semibold">{member.name}</h3>
-                        <p className="text-sm text-blue-600">{member.position}</p>
+                        <p className="text-sm text-brand-600">{member.position}</p>
                         <p className="text-sm text-gray-600 mt-1">{member.bio}</p>
                       </div>
                       <Button
@@ -440,7 +440,7 @@ export function Dashboard() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold">{project.title}</h3>
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded">
+                          <span className="px-2 py-0.5 bg-brand-100 text-brand-600 text-xs rounded">
                             {project.category}
                           </span>
                         </div>

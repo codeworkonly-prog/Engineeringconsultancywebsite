@@ -49,10 +49,10 @@ export function Contact() {
   return (
     <div>
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl text-blue-100 max-w-3xl">
+          <p className="text-xl text-brand-50 max-w-3xl">
             Get in touch with us for any inquiries or project consultations
           </p>
         </div>
@@ -74,8 +74,8 @@ export function Contact() {
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
-                      <div className="bg-blue-100 p-3 rounded-full">
-                        <MapPin className="h-6 w-6 text-blue-600" />
+                      <div className="bg-brand-100 p-3 rounded-full">
+                        <MapPin className="h-6 w-6 text-brand-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">Office Address</h3>
@@ -91,14 +91,14 @@ export function Contact() {
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
-                      <div className="bg-blue-100 p-3 rounded-full">
-                        <Mail className="h-6 w-6 text-blue-600" />
+                      <div className="bg-brand-100 p-3 rounded-full">
+                        <Mail className="h-6 w-6 text-brand-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">Email</h3>
                         <a
                           href="mailto:consultingdiksha@gmail.com"
-                          className="text-blue-600 hover:underline"
+                          className="text-brand-600 hover:underline"
                         >
                           consultingdiksha@gmail.com
                         </a>
@@ -110,8 +110,8 @@ export function Contact() {
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
-                      <div className="bg-blue-100 p-3 rounded-full">
-                        <Phone className="h-6 w-6 text-blue-600" />
+                      <div className="bg-brand-100 p-3 rounded-full">
+                        <Phone className="h-6 w-6 text-brand-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">Phone</h3>
@@ -124,8 +124,8 @@ export function Contact() {
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
-                      <div className="bg-blue-100 p-3 rounded-full">
-                        <Clock className="h-6 w-6 text-blue-600" />
+                      <div className="bg-brand-100 p-3 rounded-full">
+                        <Clock className="h-6 w-6 text-brand-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">Business Hours</h3>

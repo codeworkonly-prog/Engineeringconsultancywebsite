@@ -24,11 +24,11 @@ export function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-indigo-100 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-blue-600 p-3 rounded-full">
+            <div className="bg-brand-600 p-3 rounded-full">
               <Lock className="h-8 w-8 text-white" />
             </div>
           </div>
@@ -83,7 +83,7 @@ export function AdminLogin() {
               <button
                 type="button"
                 onClick={() => setShowResetForm(true)}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-brand-600 hover:text-brand-800"
               >
                 Forgot password?
               </button>

@@ -11,13 +11,13 @@ export function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+      <section className="relative bg-gradient-to-r from-brand-500 to-brand-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="max-w-3xl">
             <h1 className="text-5xl font-bold mb-6">
               Engineering Excellence for Your Projects
             </h1>
-            <p className="text-xl mb-8 text-blue-100">
+            <p className="text-xl mb-8 text-brand-50">
               We provide comprehensive engineering consultancy and project management services
               to bring your vision to life.
             </p>
@@ -31,7 +31,7 @@ export function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto bg-transparent border-white text-white hover:bg-white hover:text-blue-600"
+                  className="w-full sm:w-auto bg-transparent border-white text-white hover:bg-white hover:text-brand-600"
                 >
                   View Projects
                 </Button>
@@ -55,8 +55,8 @@ export function Home() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <CheckCircle className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <CheckCircle className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Quality Assurance</h3>
                   <p className="text-sm text-gray-600">
@@ -69,8 +69,8 @@ export function Home() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Users className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Users className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Expert Team</h3>
                   <p className="text-sm text-gray-600">
@@ -83,8 +83,8 @@ export function Home() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Award className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Award className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Award Winning</h3>
                   <p className="text-sm text-gray-600">
@@ -97,8 +97,8 @@ export function Home() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Briefcase className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Briefcase className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Full Service</h3>
                   <p className="text-sm text-gray-600">
@@ -130,7 +130,7 @@ export function Home() {
                   className="w-full h-48 object-cover"
                 />
                 <CardContent className="pt-6">
-                  <div className="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs rounded-full mb-3">
+                  <div className="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full mb-3">
                     {project.category}
                   </div>
                   <h3 className="font-semibold mb-2">{project.title}</h3>
@@ -149,10 +149,10 @@ export function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Project?</h2>
-          <p className="text-xl mb-8 text-blue-100">
+          <p className="text-xl mb-8 text-brand-50">
             Let's work together to bring your engineering vision to life.
           </p>
           <Link to="/contact">

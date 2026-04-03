@@ -62,10 +62,10 @@ export function Training() {
   return (
     <div>
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Training Programs</h1>
-          <p className="text-xl text-blue-100 max-w-3xl">
+          <p className="text-xl text-brand-50 max-w-3xl">
             Enhance your engineering skills with our comprehensive professional development programs
           </p>
         </div>
@@ -86,8 +86,8 @@ export function Training() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <BookOpen className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <BookOpen className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Expert Instructors</h3>
                   <p className="text-sm text-gray-600">
@@ -100,8 +100,8 @@ export function Training() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Users className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Users className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Small Class Sizes</h3>
                   <p className="text-sm text-gray-600">
@@ -114,8 +114,8 @@ export function Training() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Clock className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Clock className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Flexible Scheduling</h3>
                   <p className="text-sm text-gray-600">
@@ -128,8 +128,8 @@ export function Training() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Award className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Award className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Certification</h3>
                   <p className="text-sm text-gray-600">
@@ -158,7 +158,7 @@ export function Training() {
                 <CardHeader>
                   <div className="flex justify-between items-start mb-2">
                     <CardTitle>{program.title}</CardTitle>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
+                    <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full">
                       {program.level}
                     </span>
                   </div>
@@ -187,10 +187,10 @@ export function Training() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Advance Your Career?</h2>
-          <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl mb-8 text-brand-50 max-w-2xl mx-auto">
             Join our training programs and gain the skills you need to excel in the engineering industry.
           </p>
           <Link to="/contact">

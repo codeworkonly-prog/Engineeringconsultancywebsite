@@ -39,8 +39,8 @@ export function Header() {
                 to={link.path}
                 className={`text-sm font-medium transition-colors ${
                   isActive(link.path)
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? 'text-brand-600'
+                    : 'text-gray-700 hover:text-brand-600'
                 }`}
               >
                 {link.label}
@@ -66,7 +66,7 @@ export function Header() {
                   key={link.path}
                   to={link.path}
                   className={`text-sm font-medium ${
-                    isActive(link.path) ? 'text-blue-600' : 'text-gray-700'
+                    isActive(link.path) ? 'text-brand-600' : 'text-gray-700'
                   }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >

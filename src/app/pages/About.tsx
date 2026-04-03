@@ -8,10 +8,10 @@ export function About() {
   return (
     <div>
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">About Us</h1>
-          <p className="text-xl text-blue-100 max-w-3xl">
+          <p className="text-xl text-brand-50 max-w-3xl">
             We are a leading engineering consultancy dedicated to delivering innovative solutions
             and exceptional project management services.
           </p>
@@ -57,8 +57,8 @@ export function About() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Target className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Target className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-3">Our Mission</h3>
                   <p className="text-sm text-gray-600">
@@ -72,8 +72,8 @@ export function About() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Eye className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Eye className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-3">Our Vision</h3>
                   <p className="text-sm text-gray-600">
@@ -87,8 +87,8 @@ export function About() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-blue-100 p-3 rounded-full mb-4">
-                    <Award className="h-8 w-8 text-blue-600" />
+                  <div className="bg-brand-100 p-3 rounded-full mb-4">
+                    <Award className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-3">Our Values</h3>
                   <p className="text-sm text-gray-600">
@@ -122,7 +122,7 @@ export function About() {
                 />
                 <CardContent className="pt-6">
                   <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
-                  <p className="text-blue-600 text-sm mb-3">{member.position}</p>
+                  <p className="text-brand-600 text-sm mb-3">{member.position}</p>
                   <p className="text-sm text-gray-600">{member.bio}</p>
                 </CardContent>
               </Card>

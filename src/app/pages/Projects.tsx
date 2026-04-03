@@ -15,10 +15,10 @@ export function Projects() {
   return (
     <div>
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Our Projects</h1>
-          <p className="text-xl text-blue-100 max-w-3xl">
+          <p className="text-xl text-brand-50 max-w-3xl">
             Explore our portfolio of successful engineering projects and see how we deliver excellence
           </p>
         </div>
@@ -47,7 +47,7 @@ export function Projects() {
                 />
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
+                    <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full">
                       {project.category}
                     </span>
                     <div className="flex items-center text-xs text-gray-500">
