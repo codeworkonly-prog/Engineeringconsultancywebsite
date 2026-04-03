@@ -1,60 +1,64 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { BookOpen, Users, Clock, Award, CheckCircle } from 'lucide-react';
+import { BookOpen, Users, Clock, Award, CheckCircle, Calendar } from 'lucide-react';
 import { Link } from 'react-router';
 
 export function Training() {
-  const programs = [
+  const events = [
     {
       id: 1,
-      title: 'Structural Engineering Fundamentals',
-      duration: '12 weeks',
-      level: 'Beginner',
-      description: 'Comprehensive introduction to structural engineering principles and practices.',
+      title: 'Public Procurement & Contract Management Workshop',
+      date: '2024-05-15',
+      duration: '3 days',
+      type: 'Workshop',
+      description: 'Comprehensive training on public procurement processes, contract administration, and compliance with national and international standards.',
       topics: [
-        'Load analysis and distribution',
-        'Material properties and selection',
-        'Design codes and standards',
-        'Structural software training',
+        'Procurement planning and documentation',
+        'Bid evaluation procedures',
+        'Contract negotiation and management',
+        'Compliance and quality control',
       ],
     },
     {
       id: 2,
-      title: 'Advanced Project Management',
-      duration: '8 weeks',
-      level: 'Intermediate',
-      description: 'Master the art of managing complex engineering projects from conception to completion.',
+      title: 'Project Planning & Management Tools Training',
+      date: '2024-06-20',
+      duration: '5 days',
+      type: 'Training',
+      description: 'Hands-on training in project management software including Primavera P6, MS Project, and other essential planning tools.',
       topics: [
-        'Project planning and scheduling',
-        'Risk management',
-        'Budget control and optimization',
-        'Team leadership and communication',
+        'Schedule development and tracking',
+        'Resource allocation and optimization',
+        'Risk management integration',
+        'Progress monitoring and reporting',
       ],
     },
     {
       id: 3,
-      title: 'Sustainable Engineering Practices',
-      duration: '6 weeks',
-      level: 'All Levels',
-      description: 'Learn to integrate sustainability principles into engineering design and execution.',
+      title: 'Sustainable Infrastructure Development Seminar',
+      date: '2024-07-10',
+      duration: '2 days',
+      type: 'Seminar',
+      description: 'Explore sustainable engineering practices and green infrastructure solutions for modern development projects.',
       topics: [
-        'Green building standards',
-        'Energy-efficient design',
         'Environmental impact assessment',
-        'Sustainable materials',
+        'Green building standards',
+        'Climate-resilient infrastructure',
+        'Sustainable water and sanitation systems',
       ],
     },
     {
       id: 4,
-      title: 'BIM and Digital Construction',
-      duration: '10 weeks',
-      level: 'Intermediate',
-      description: 'Hands-on training in Building Information Modeling and digital construction technologies.',
+      title: 'Organizational Development & Technical Training',
+      date: '2024-08-05',
+      duration: '4 days',
+      type: 'Workshop',
+      description: 'Capacity building program focused on organizational effectiveness and technical skill development for engineering teams.',
       topics: [
-        'BIM software proficiency',
-        '3D modeling and coordination',
-        'Clash detection and resolution',
-        'Digital project delivery',
+        'Team building and leadership',
+        'Technical skill enhancement',
+        'Process optimization',
+        'Knowledge management systems',
       ],
     },
   ];
@@ -64,9 +68,9 @@ export function Training() {
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-4">Training Programs</h1>
+          <h1 className="text-4xl font-bold mb-4">Events & Workshops</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
-            Enhance your engineering skills with our comprehensive professional development programs
+            Professional development programs, workshops, and training sessions organized by DCP
           </p>
         </div>
       </section>
@@ -153,25 +157,29 @@ export function Training() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {programs.map((program) => (
-              <Card key={program.id}>
+            {events.map((event) => (
+              <Card key={event.id}>
                 <CardHeader>
                   <div className="flex justify-between items-start mb-2">
-                    <CardTitle>{program.title}</CardTitle>
+                    <CardTitle>{event.title}</CardTitle>
                     <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full">
-                      {program.level}
+                      {event.type}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600">{program.description}</p>
+                  <p className="text-sm text-gray-600">{event.description}</p>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>{event.date}</span>
+                  </div>
                   <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
                     <Clock className="h-4 w-4" />
-                    <span>{program.duration}</span>
+                    <span>{event.duration}</span>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <h4 className="font-semibold mb-3">Key Topics Covered:</h4>
                   <ul className="space-y-2 mb-6">
-                    {program.topics.map((topic, index) => (
+                    {event.topics.map((topic, index) => (
                       <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
                         <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>{topic}</span>

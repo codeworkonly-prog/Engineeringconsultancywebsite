@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { CheckCircle, Users, Award, Briefcase } from 'lucide-react';
+import { CheckCircle, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 
 export function Home() {
@@ -46,21 +46,18 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Why Choose Us</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              We combine expertise, innovation, and dedication to deliver exceptional results.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-brand-100 p-3 rounded-full mb-4">
-                    <CheckCircle className="h-8 w-8 text-brand-600" />
+                    <Award className="h-8 w-8 text-brand-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Quality Assurance</h3>
+                  <h3 className="font-semibold mb-2">Proven Track Record</h3>
                   <p className="text-sm text-gray-600">
-                    Rigorous quality standards on every project
+                    100+ successful projects delivered across Nepal
                   </p>
                 </div>
               </CardContent>
@@ -72,9 +69,9 @@ export function Home() {
                   <div className="bg-brand-100 p-3 rounded-full mb-4">
                     <Users className="h-8 w-8 text-brand-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Expert Team</h3>
+                  <h3 className="font-semibold mb-2">Multidisciplinary Expertise</h3>
                   <p className="text-sm text-gray-600">
-                    Experienced professionals in every discipline
+                    All engineering and management services under one roof
                   </p>
                 </div>
               </CardContent>
@@ -84,11 +81,11 @@ export function Home() {
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-brand-100 p-3 rounded-full mb-4">
-                    <Award className="h-8 w-8 text-brand-600" />
+                    <CheckCircle className="h-8 w-8 text-brand-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Award Winning</h3>
+                  <h3 className="font-semibold mb-2">Quality Standards</h3>
                   <p className="text-sm text-gray-600">
-                    Recognized excellence in engineering
+                    Strong understanding of local and international standards
                   </p>
                 </div>
               </CardContent>
@@ -98,11 +95,11 @@ export function Home() {
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-brand-100 p-3 rounded-full mb-4">
-                    <Briefcase className="h-8 w-8 text-brand-600" />
+                    <Lightbulb className="h-8 w-8 text-brand-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Full Service</h3>
+                  <h3 className="font-semibold mb-2">Client Satisfaction</h3>
                   <p className="text-sm text-gray-600">
-                    From consultation to project completion
+                    Commitment to quality, timeliness, and client satisfaction
                   </p>
                 </div>
               </CardContent>

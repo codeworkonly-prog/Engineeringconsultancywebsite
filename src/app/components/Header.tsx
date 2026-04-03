@@ -18,7 +18,9 @@ export function Header() {
   const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About Us' },
-    { path: '/training', label: 'Training' },
+    { path: '/company-profile', label: 'Company Profile' },
+    { path: '/team', label: 'Our Team' },
+    { path: '/events', label: 'Events & Workshops' },
     { path: '/projects', label: 'Projects' },
     { path: '/contact', label: 'Contact Us' },
   ];

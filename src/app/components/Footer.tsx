@@ -25,7 +25,7 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-gray-400">
                 <Phone className="h-5 w-5" />
-                <span>+1 (555) 123-4567</span>
+                <span>9841707077</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <Mail className="h-5 w-5" />
@@ -47,8 +47,18 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/training" className="hover:text-white transition-colors">
-                  Training Programs
+                <Link to="/company-profile" className="hover:text-white transition-colors">
+                  Company Profile
+                </Link>
+              </li>
+              <li>
+                <Link to="/team" className="hover:text-white transition-colors">
+                  Our Team
+                </Link>
+              </li>
+              <li>
+                <Link to="/events" className="hover:text-white transition-colors">
+                  Events & Workshops
                 </Link>
               </li>
               <li>
