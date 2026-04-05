@@ -1,5 +1,5 @@
 import { Card, CardContent } from '../components/ui/card';
-import { Target, Eye, Award } from 'lucide-react';
+import { Target, Eye, Award, CheckCircle } from 'lucide-react';
 
 export function About() {
   return (
@@ -59,10 +59,20 @@ export function About() {
                     <Eye className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-3">Our Vision</h3>
-                  <p className="text-sm text-gray-600">
-                    To be a leading consulting firm in engineering and management, recognized for 
-                    delivering innovative, reliable, and sustainable solutions.
-                  </p>
+                  <div className="text-sm text-gray-600 space-y-3 text-left">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Leading consulting firm in engineering and management</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Recognized for delivering innovative and reliable solutions</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Committed to sustainable development practices</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -74,10 +84,19 @@ export function About() {
                     <Target className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-3">Our Mission</h3>
-                  <div className="text-sm text-gray-600 space-y-2">
-                    <p>• Enhance project quality through expert technical and management services</p>
-                    <p>• Strengthen institutional and human capacity across sectors</p>
-                    <p>• Deliver efficient, cost-effective, and sustainable solutions</p>
+                  <div className="text-sm text-gray-600 space-y-3 text-left">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Enhance project quality through expert technical and management services</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Strengthen institutional and human capacity across sectors</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Deliver efficient, cost-effective, and sustainable solutions</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -90,10 +109,20 @@ export function About() {
                     <Award className="h-8 w-8 text-brand-600" />
                   </div>
                   <h3 className="font-semibold mb-3">Our Values</h3>
-                  <p className="text-sm text-gray-600">
-                    Excellence, integrity, innovation, collaboration, and commitment to 
-                    sustainability in everything we do.
-                  </p>
+                  <div className="text-sm text-gray-600 space-y-3 text-left">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Excellence in everything we do</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Integrity and transparency</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p>Innovation and collaboration</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
