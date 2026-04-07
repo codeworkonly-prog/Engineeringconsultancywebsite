@@ -7,7 +7,7 @@ import { Projects } from './pages/Projects';
 import { Contact } from './pages/Contact';
 import { Team } from './pages/Team';
 import { CompanyProfile } from './pages/CompanyProfile';
-import { Dashboard } from './pages/admin/Dashboard';
+import Dashboard from "./pages/admin/Dashboard";
 import { AdminLogin } from './components/AdminLogin';
 import { ProtectedRoute } from './components/ProtectedRoute';
 

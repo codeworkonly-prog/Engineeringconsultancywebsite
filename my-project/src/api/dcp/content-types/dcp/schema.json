@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "dcps",
+  "info": {
+    "singularName": "dcp",
+    "pluralName": "dcps",
+    "displayName": "Project"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "project_name": {
+      "type": "text",
+      "required": true
+    },
+    "project_description": {
+      "type": "blocks"
+    },
+    "project_image": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "project_date": {
+      "type": "date"
+    }
+  }
+}
