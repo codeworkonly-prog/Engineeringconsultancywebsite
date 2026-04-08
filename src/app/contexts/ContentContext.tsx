@@ -26,6 +26,7 @@ export interface Project {
   status: 'Ongoing' | 'Completed';
   startDate: string;
   endDate: string;
+  sector: string;
 }
 
 export interface GalleryImage {
