@@ -1,61 +1,81 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { useContent } from '../../contexts/ContentContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Trash2, Home, ImagePlus, Users as UsersIcon, Briefcase, LogOut, Key } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Briefcase,
+  Users,
+  Calendar,
+  ImageIcon,
+  LogOut,
+  Home,
+  Edit,
+  Trash2,
+  X,
+} from 'lucide-react';
+
+type Section = 'dashboard' | 'projects' | 'team' | 'events' | 'gallery';
 
 export function Dashboard() {
   const navigate = useNavigate();
-  const { logout, changePassword } = useAuth();
+  const { logout } = useAuth();
   const {
     teamMembers,
     projects,
     galleryImages,
+    events,
     addTeamMember,
+    updateTeamMember,
     addProject,
+    updateProject,
     addGalleryImage,
+    updateGalleryImage,
+    addEvent,
+    updateEvent,
     deleteTeamMember,
     deleteProject,
     deleteGalleryImage,
+    deleteEvent,
   } = useContent();
 
-  // Team Member Form State
+  const [activeSection, setActiveSection] = useState<Section>('dashboard');
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Form states
+  const [projectForm, setProjectForm] = useState({
+    name: '',
+    description: '',
+    status: 'Upcoming' as 'Upcoming' | 'Completed',
+    startDate: '',
+    endDate: '',
+  });
+
   const [teamForm, setTeamForm] = useState({
     name: '',
-    position: '',
-    bio: '',
+    role: '',
+    designation: '',
+    qualification: '',
     imageUrl: '',
   });
 
-  // Project Form State
-  const [projectForm, setProjectForm] = useState({
-    title: '',
-    description: '',
-    category: '',
-    imageUrl: '',
-    date: '',
-  });
-
-  // Gallery Form State
   const [galleryForm, setGalleryForm] = useState({
-    title: '',
+    albumName: '',
     imageUrl: '',
-    category: '',
   });
 
-  // Password Change Form State
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+  const [eventForm, setEventForm] = useState({
+    name: '',
+    description: '',
+    startDate: '',
+    endDate: '',
   });
 
   const handleLogout = () => {
@@ -64,451 +84,696 @@ export function Dashboard() {
     toast.success('Logged out successfully');
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  // Project handlers
+  const handleProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error('New passwords do not match');
+    if (!projectForm.name || !projectForm.description || !projectForm.startDate || !projectForm.endDate) {
+      toast.error('Please fill all fields');
       return;
     }
 
-    if (passwordForm.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters long');
-      return;
-    }
-
-    if (changePassword(passwordForm.oldPassword, passwordForm.newPassword)) {
-      toast.success('Password changed successfully');
-      setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
-      setShowPasswordChange(false);
+    if (editingId) {
+      updateProject(editingId, projectForm);
+      toast.success('Project updated');
+      setEditingId(null);
     } else {
-      toast.error('Current password is incorrect');
+      addProject(projectForm);
+      toast.success('Project added');
     }
+    setProjectForm({ name: '', description: '', status: 'Upcoming', startDate: '', endDate: '' });
   };
 
-  const handleAddTeamMember = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!teamForm.name || !teamForm.position || !teamForm.bio || !teamForm.imageUrl) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-    addTeamMember(teamForm);
-    setTeamForm({ name: '', position: '', bio: '', imageUrl: '' });
-    toast.success('Team member added successfully!');
+  const handleEditProject = (project: typeof projects[0]) => {
+    setProjectForm({
+      name: project.name,
+      description: project.description,
+      status: project.status,
+      startDate: project.startDate,
+      endDate: project.endDate,
+    });
+    setEditingId(project.id);
   };
 
-  const handleAddProject = (e: React.FormEvent) => {
+  // Team handlers
+  const handleTeamSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      !projectForm.title ||
-      !projectForm.description ||
-      !projectForm.category ||
-      !projectForm.imageUrl ||
-      !projectForm.date
-    ) {
-      toast.error('Please fill in all fields');
+    if (!teamForm.name || !teamForm.role || !teamForm.designation || !teamForm.qualification || !teamForm.imageUrl) {
+      toast.error('Please fill all fields');
       return;
     }
-    addProject(projectForm);
-    setProjectForm({ title: '', description: '', category: '', imageUrl: '', date: '' });
-    toast.success('Project added successfully!');
+
+    if (editingId) {
+      updateTeamMember(editingId, teamForm);
+      toast.success('Team member updated');
+      setEditingId(null);
+    } else {
+      addTeamMember(teamForm);
+      toast.success('Team member added');
+    }
+    setTeamForm({ name: '', role: '', designation: '', qualification: '', imageUrl: '' });
   };
 
-  const handleAddGalleryImage = (e: React.FormEvent) => {
+  const handleEditTeam = (member: typeof teamMembers[0]) => {
+    setTeamForm({
+      name: member.name,
+      role: member.role,
+      designation: member.designation,
+      qualification: member.qualification,
+      imageUrl: member.imageUrl,
+    });
+    setEditingId(member.id);
+  };
+
+  // Gallery handlers
+  const handleGallerySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!galleryForm.title || !galleryForm.imageUrl || !galleryForm.category) {
-      toast.error('Please fill in all fields');
+    if (!galleryForm.albumName || !galleryForm.imageUrl) {
+      toast.error('Please fill all fields');
       return;
     }
-    addGalleryImage(galleryForm);
-    setGalleryForm({ title: '', imageUrl: '', category: '' });
-    toast.success('Gallery image added successfully!');
+
+    if (editingId) {
+      updateGalleryImage(editingId, galleryForm);
+      toast.success('Gallery image updated');
+      setEditingId(null);
+    } else {
+      addGalleryImage(galleryForm);
+      toast.success('Gallery image added');
+    }
+    setGalleryForm({ albumName: '', imageUrl: '' });
+  };
+
+  const handleEditGallery = (image: typeof galleryImages[0]) => {
+    setGalleryForm({
+      albumName: image.albumName,
+      imageUrl: image.imageUrl,
+    });
+    setEditingId(image.id);
+  };
+
+  // Event handlers
+  const handleEventSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!eventForm.name || !eventForm.description || !eventForm.startDate || !eventForm.endDate) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    if (editingId) {
+      updateEvent(editingId, eventForm);
+      toast.success('Event updated');
+      setEditingId(null);
+    } else {
+      addEvent(eventForm);
+      toast.success('Event added');
+    }
+    setEventForm({ name: '', description: '', startDate: '', endDate: '' });
+  };
+
+  const handleEditEvent = (event: typeof events[0]) => {
+    setEventForm({
+      name: event.name,
+      description: event.description,
+      startDate: event.startDate,
+      endDate: event.endDate,
+    });
+    setEditingId(event.id);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setProjectForm({ name: '', description: '', status: 'Upcoming', startDate: '', endDate: '' });
+    setTeamForm({ name: '', role: '', designation: '', qualification: '', imageUrl: '' });
+    setGalleryForm({ albumName: '', imageUrl: '' });
+    setEventForm({ name: '', description: '', startDate: '', endDate: '' });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Admin Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowPasswordChange(!showPasswordChange)}
-              >
-                <Key className="h-4 w-4 mr-2" />
-                Change Password
-              </Button>
-              <Link to="/">
-                <Button variant="outline" size="sm">
-                  <Home className="h-4 w-4 mr-2" />
-                  Back to Website
-                </Button>
-              </Link>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </div>
-          </div>
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r flex flex-col">
+        <div className="p-6 border-b">
+          <h1 className="text-xl font-bold text-brand-600">Admin Panel</h1>
         </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="gallery" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3">
-            <TabsTrigger value="gallery">
-              <ImagePlus className="h-4 w-4 mr-2" />
-              Gallery
-            </TabsTrigger>
-            <TabsTrigger value="team">
-              <UsersIcon className="h-4 w-4 mr-2" />
-              Team Members
-            </TabsTrigger>
-            <TabsTrigger value="projects">
-              <Briefcase className="h-4 w-4 mr-2" />
-              Projects
-            </TabsTrigger>
-          </TabsList>
+        <nav className="flex-1 p-4">
+          <button
+            onClick={() => setActiveSection('dashboard')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
+              activeSection === 'dashboard' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <LayoutDashboard className="h-5 w-5" />
+            <span>Dashboard</span>
+          </button>
 
-          {/* Gallery Tab */}
-          <TabsContent value="gallery" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Add Gallery Image</CardTitle>
-                <CardDescription>Upload a new image to the project gallery</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleAddGalleryImage} className="space-y-4">
-                  <div>
-                    <Label htmlFor="gallery-title">Image Title</Label>
-                    <Input
-                      id="gallery-title"
-                      placeholder="e.g., Construction Site"
-                      value={galleryForm.title}
-                      onChange={(e) =>
-                        setGalleryForm({ ...galleryForm, title: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="gallery-url">Image URL</Label>
-                    <Input
-                      id="gallery-url"
-                      placeholder="https://..."
-                      value={galleryForm.imageUrl}
-                      onChange={(e) =>
-                        setGalleryForm({ ...galleryForm, imageUrl: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="gallery-category">Category</Label>
-                    <Input
-                      id="gallery-category"
-                      placeholder="e.g., Projects, Team, Work"
-                      value={galleryForm.category}
-                      onChange={(e) =>
-                        setGalleryForm({ ...galleryForm, category: e.target.value })
-                      }
-                    />
-                  </div>
-                  <Button type="submit" className="w-full">Add to Gallery</Button>
-                </form>
-              </CardContent>
-            </Card>
+          <button
+            onClick={() => setActiveSection('projects')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
+              activeSection === 'projects' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Briefcase className="h-5 w-5" />
+            <span>Projects</span>
+          </button>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Current Gallery Images ({galleryImages.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {galleryImages.map((image) => (
-                    <div key={image.id} className="relative group">
-                      <img
-                        src={image.imageUrl}
-                        alt={image.title}
-                        className="w-full h-40 object-cover rounded-lg"
+          <button
+            onClick={() => setActiveSection('team')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
+              activeSection === 'team' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Users className="h-5 w-5" />
+            <span>Team</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSection('events')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
+              activeSection === 'events' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Calendar className="h-5 w-5" />
+            <span>Events</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSection('gallery')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
+              activeSection === 'gallery' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <ImageIcon className="h-5 w-5" />
+            <span>Gallery</span>
+          </button>
+        </nav>
+
+        <div className="p-4 border-t space-y-2">
+          <Link to="/" className="block">
+            <Button variant="outline" size="sm" className="w-full">
+              <Home className="h-4 w-4 mr-2" />
+              Website
+            </Button>
+          </Link>
+          <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto">
+        {/* Header */}
+        <header className="bg-white border-b px-8 py-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {activeSection === 'dashboard' && 'Dashboard'}
+            {activeSection === 'projects' && 'Projects'}
+            {activeSection === 'team' && 'Team'}
+            {activeSection === 'events' && 'Events'}
+            {activeSection === 'gallery' && 'Gallery'}
+          </h2>
+        </header>
+
+        <div className="p-8">
+          {/* Dashboard Section */}
+          {activeSection === 'dashboard' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm text-gray-600">Total Projects</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-brand-600">{projects.length}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm text-gray-600">Team Members</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-brand-600">{teamMembers.length}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm text-gray-600">Events</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-brand-600">{events.length}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm text-gray-600">Gallery Images</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-brand-600">{galleryImages.length}</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Projects Section */}
+          {activeSection === 'projects' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Project' : 'Add New Project'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleProjectSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="project-name">Project Name</Label>
+                      <Input
+                        id="project-name"
+                        value={projectForm.name}
+                        onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
+                        placeholder="Enter project name"
                       />
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                        <div className="text-center text-white">
-                          <p className="font-semibold">{image.title}</p>
-                          <p className="text-sm text-gray-300">{image.category}</p>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="mt-2"
-                            onClick={() => {
-                              deleteGalleryImage(image.id);
-                              toast.success('Image removed');
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            Delete
-                          </Button>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="project-description">Description</Label>
+                      <Textarea
+                        id="project-description"
+                        value={projectForm.description}
+                        onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
+                        placeholder="Enter project description"
+                        rows={4}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="project-status">Status</Label>
+                      <Select
+                        value={projectForm.status}
+                        onValueChange={(value: 'Upcoming' | 'Completed') =>
+                          setProjectForm({ ...projectForm, status: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Upcoming">Upcoming</SelectItem>
+                          <SelectItem value="Completed">Completed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="project-start">Start Date</Label>
+                        <Input
+                          id="project-start"
+                          type="date"
+                          value={projectForm.startDate}
+                          onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="project-end">End Date</Label>
+                        <Input
+                          id="project-end"
+                          type="date"
+                          value={projectForm.endDate}
+                          onChange={(e) => setProjectForm({ ...projectForm, endDate: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button type="submit" className="flex-1">
+                        {editingId ? 'Update Project' : 'Add Project'}
+                      </Button>
+                      {editingId && (
+                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Projects ({projects.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {projects.map((project) => (
+                      <div key={project.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold">{project.name}</h3>
+                              <span
+                                className={`px-2 py-1 rounded text-xs ${
+                                  project.status === 'Completed'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-blue-100 text-blue-700'
+                                }`}
+                              >
+                                {project.status}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{project.description}</p>
+                            <p className="text-xs text-gray-500">
+                              {project.startDate} - {project.endDate}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditProject(project)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                deleteProject(project.id);
+                                toast.success('Project deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-          {/* Team Tab */}
-          <TabsContent value="team" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Add Team Member</CardTitle>
-                <CardDescription>Add a new member to your team</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleAddTeamMember} className="space-y-4">
-                  <div>
-                    <Label htmlFor="team-name">Full Name</Label>
-                    <Input
-                      id="team-name"
-                      placeholder="e.g., John Doe"
-                      value={teamForm.name}
-                      onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="team-position">Position</Label>
-                    <Input
-                      id="team-position"
-                      placeholder="e.g., Senior Engineer"
-                      value={teamForm.position}
-                      onChange={(e) => setTeamForm({ ...teamForm, position: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="team-bio">Bio</Label>
-                    <Textarea
-                      id="team-bio"
-                      placeholder="Brief description of the team member..."
-                      value={teamForm.bio}
-                      onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="team-image">Profile Image URL</Label>
-                    <Input
-                      id="team-image"
-                      placeholder="https://..."
-                      value={teamForm.imageUrl}
-                      onChange={(e) => setTeamForm({ ...teamForm, imageUrl: e.target.value })}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full">Add Team Member</Button>
-                </form>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Current Team Members ({teamMembers.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {teamMembers.map((member) => (
-                    <div
-                      key={member.id}
-                      className="flex items-start gap-4 p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <img
-                        src={member.imageUrl}
-                        alt={member.name}
-                        className="w-16 h-16 rounded-full object-cover"
+          {/* Team Section */}
+          {activeSection === 'team' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Team Member' : 'Add New Team Member'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleTeamSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="team-name">Name</Label>
+                      <Input
+                        id="team-name"
+                        value={teamForm.name}
+                        onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
+                        placeholder="Enter name"
                       />
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{member.name}</h3>
-                        <p className="text-sm text-brand-600">{member.position}</p>
-                        <p className="text-sm text-gray-600 mt-1">{member.bio}</p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          deleteTeamMember(member.id);
-                          toast.success('Team member removed');
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="team-role">Role</Label>
+                      <Input
+                        id="team-role"
+                        value={teamForm.role}
+                        onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
+                        placeholder="e.g., Chief Engineer"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="team-designation">Designation</Label>
+                      <Input
+                        id="team-designation"
+                        value={teamForm.designation}
+                        onChange={(e) => setTeamForm({ ...teamForm, designation: e.target.value })}
+                        placeholder="e.g., Senior Consultant"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="team-qualification">Qualification</Label>
+                      <Input
+                        id="team-qualification"
+                        value={teamForm.qualification}
+                        onChange={(e) => setTeamForm({ ...teamForm, qualification: e.target.value })}
+                        placeholder="e.g., B.E. Civil, M.Sc. Structural Engineering"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="team-image">Image URL</Label>
+                      <Input
+                        id="team-image"
+                        value={teamForm.imageUrl}
+                        onChange={(e) => setTeamForm({ ...teamForm, imageUrl: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button type="submit" className="flex-1">
+                        {editingId ? 'Update Member' : 'Add Member'}
                       </Button>
+                      {editingId && (
+                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  </form>
+                </CardContent>
+              </Card>
 
-          {/* Projects Tab */}
-          <TabsContent value="projects" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Add Project</CardTitle>
-                <CardDescription>Add a new project to your portfolio</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleAddProject} className="space-y-4">
-                  <div>
-                    <Label htmlFor="project-title">Project Title</Label>
-                    <Input
-                      id="project-title"
-                      placeholder="e.g., City Bridge Infrastructure"
-                      value={projectForm.title}
-                      onChange={(e) =>
-                        setProjectForm({ ...projectForm, title: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="project-description">Description</Label>
-                    <Textarea
-                      id="project-description"
-                      placeholder="Brief description of the project..."
-                      value={projectForm.description}
-                      onChange={(e) =>
-                        setProjectForm({ ...projectForm, description: e.target.value })
-                      }
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="project-category">Category</Label>
-                    <Input
-                      id="project-category"
-                      placeholder="e.g., Infrastructure, Commercial, Environmental"
-                      value={projectForm.category}
-                      onChange={(e) =>
-                        setProjectForm({ ...projectForm, category: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="project-image">Project Image URL</Label>
-                    <Input
-                      id="project-image"
-                      placeholder="https://..."
-                      value={projectForm.imageUrl}
-                      onChange={(e) =>
-                        setProjectForm({ ...projectForm, imageUrl: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="project-date">Project Date</Label>
-                    <Input
-                      id="project-date"
-                      type="date"
-                      value={projectForm.date}
-                      onChange={(e) =>
-                        setProjectForm({ ...projectForm, date: e.target.value })
-                      }
-                    />
-                  </div>
-                  <Button type="submit" className="w-full">Add Project</Button>
-                </form>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Current Projects ({projects.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {projects.map((project) => (
-                    <div
-                      key={project.id}
-                      className="flex items-start gap-4 p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <img
-                        src={project.imageUrl}
-                        alt={project.title}
-                        className="w-24 h-24 rounded object-cover"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{project.title}</h3>
-                          <span className="px-2 py-0.5 bg-brand-100 text-brand-600 text-xs rounded">
-                            {project.category}
-                          </span>
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Team Members ({teamMembers.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {teamMembers.map((member) => (
+                      <div key={member.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex gap-4">
+                          <img src={member.imageUrl} alt={member.name} className="w-16 h-16 rounded-full object-cover" />
+                          <div className="flex-1">
+                            <h3 className="font-semibold">{member.name}</h3>
+                            <p className="text-sm text-brand-600">{member.role}</p>
+                            <p className="text-sm text-gray-600">{member.designation}</p>
+                            <p className="text-xs text-gray-500">{member.qualification}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditTeam(member)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                deleteTeamMember(member.id);
+                                toast.success('Team member deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
                         </div>
-                        <p className="text-sm text-gray-600 mb-1">{project.description}</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(project.date).toLocaleDateString()}
-                        </p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          deleteProject(project.id);
-                          toast.success('Project removed');
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-        {/* Password Change Form */}
-        {showPasswordChange && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Change Password</CardTitle>
-              <CardDescription>Update your account password</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleChangePassword} className="space-y-4">
-                <div>
-                  <Label htmlFor="old-password">Current Password</Label>
-                  <Input
-                    id="old-password"
-                    type="password"
-                    value={passwordForm.oldPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, oldPassword: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="new-password">New Password</Label>
-                  <Input
-                    id="new-password"
-                    type="password"
-                    value={passwordForm.newPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="confirm-password">Confirm New Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    value={passwordForm.confirmPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  />
-                </div>
-                <Button type="submit" className="w-full">Change Password</Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+          {/* Events Section */}
+          {activeSection === 'events' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Event' : 'Add New Event'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleEventSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="event-name">Event Name</Label>
+                      <Input
+                        id="event-name"
+                        value={eventForm.name}
+                        onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
+                        placeholder="Enter event name"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="event-description">Description</Label>
+                      <Textarea
+                        id="event-description"
+                        value={eventForm.description}
+                        onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                        placeholder="Enter event description"
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="event-start">Start Date</Label>
+                        <Input
+                          id="event-start"
+                          type="date"
+                          value={eventForm.startDate}
+                          onChange={(e) => setEventForm({ ...eventForm, startDate: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="event-end">End Date</Label>
+                        <Input
+                          id="event-end"
+                          type="date"
+                          value={eventForm.endDate}
+                          onChange={(e) => setEventForm({ ...eventForm, endDate: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button type="submit" className="flex-1">
+                        {editingId ? 'Update Event' : 'Add Event'}
+                      </Button>
+                      {editingId && (
+                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Events ({events.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {events.map((event) => (
+                      <div key={event.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="font-semibold mb-2">{event.name}</h3>
+                            <p className="text-sm text-gray-600 mb-2">{event.description}</p>
+                            <p className="text-xs text-gray-500">
+                              {event.startDate} - {event.endDate}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                deleteEvent(event.id);
+                                toast.success('Event deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Gallery Section */}
+          {activeSection === 'gallery' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Gallery Image' : 'Add New Gallery Image'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleGallerySubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="gallery-album">Album Name</Label>
+                      <Input
+                        id="gallery-album"
+                        value={galleryForm.albumName}
+                        onChange={(e) => setGalleryForm({ ...galleryForm, albumName: e.target.value })}
+                        placeholder="Enter album name"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="gallery-image">Image URL</Label>
+                      <Input
+                        id="gallery-image"
+                        value={galleryForm.imageUrl}
+                        onChange={(e) => setGalleryForm({ ...galleryForm, imageUrl: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button type="submit" className="flex-1">
+                        {editingId ? 'Update Image' : 'Add Image'}
+                      </Button>
+                      {editingId && (
+                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Gallery Images ({galleryImages.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {galleryImages.map((image) => (
+                      <div key={image.id} className="border rounded-lg overflow-hidden">
+                        <img src={image.imageUrl} alt={image.albumName} className="w-full h-48 object-cover" />
+                        <div className="p-3">
+                          <p className="font-semibold text-sm mb-2">{image.albumName}</p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => handleEditGallery(image)}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                deleteGalleryImage(image.id);
+                                toast.success('Image deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
