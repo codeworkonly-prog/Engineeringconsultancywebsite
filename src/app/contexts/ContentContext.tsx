@@ -23,7 +23,7 @@ export interface Project {
   id: string;
   name: string;
   description: string;
-  status: 'Upcoming' | 'Completed';
+  status: 'Ongoing' | 'Completed';
   startDate: string;
   endDate: string;
 }

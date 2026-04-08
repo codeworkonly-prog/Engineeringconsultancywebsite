@@ -24,7 +24,7 @@ import {
 
 type Section = 'dashboard' | 'projects' | 'team' | 'events' | 'gallery';
 
-export function Dashboard() {
+export default function Dashboard() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const {
@@ -53,7 +53,7 @@ export function Dashboard() {
   const [projectForm, setProjectForm] = useState({
     name: '',
     description: '',
-    status: 'Upcoming' as 'Upcoming' | 'Completed',
+    status: 'Ongoing' as 'Ongoing' | 'Completed',
     startDate: '',
     endDate: '',
   });
@@ -100,7 +100,7 @@ export function Dashboard() {
       addProject(projectForm);
       toast.success('Project added');
     }
-    setProjectForm({ name: '', description: '', status: 'Upcoming', startDate: '', endDate: '' });
+    setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '' });
   };
 
   const handleEditProject = (project: typeof projects[0]) => {
@@ -202,7 +202,7 @@ export function Dashboard() {
 
   const cancelEdit = () => {
     setEditingId(null);
-    setProjectForm({ name: '', description: '', status: 'Upcoming', startDate: '', endDate: '' });
+    setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '' });
     setTeamForm({ name: '', role: '', designation: '', qualification: '', imageUrl: '' });
     setGalleryForm({ albumName: '', imageUrl: '' });
     setEventForm({ name: '', description: '', startDate: '', endDate: '' });
@@ -371,7 +371,7 @@ export function Dashboard() {
                       <Label htmlFor="project-status">Status</Label>
                       <Select
                         value={projectForm.status}
-                        onValueChange={(value: 'Upcoming' | 'Completed') =>
+                        onValueChange={(value: 'Ongoing' | 'Completed') =>
                           setProjectForm({ ...projectForm, status: value })
                         }
                       >
@@ -379,7 +379,7 @@ export function Dashboard() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Upcoming">Upcoming</SelectItem>
+                          <SelectItem value="Ongoing">Ongoing</SelectItem>
                           <SelectItem value="Completed">Completed</SelectItem>
                         </SelectContent>
                       </Select>
