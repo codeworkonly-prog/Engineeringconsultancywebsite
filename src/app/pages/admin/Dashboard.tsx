@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { useContent } from '../../contexts/ContentContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -21,6 +20,7 @@ import {
     Trash2,
     X,
 } from 'lucide-react';
+import TinyEditor from "../../components/TinyEditor";
 
 type Section = 'dashboard' | 'projects' | 'team' | 'events' | 'gallery';
 
@@ -62,7 +62,6 @@ export default function Dashboard() {
     const [teamForm, setTeamForm] = useState({
         name: '',
         role: '',
-        designation: '',
         qualification: '',
         imageUrl: '',
     });
@@ -124,7 +123,7 @@ export default function Dashboard() {
     // Team handlers
     const handleTeamSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!teamForm.name || !teamForm.role || !teamForm.designation || !teamForm.qualification || !teamForm.imageUrl) {
+        if (!teamForm.name || !teamForm.role || !teamForm.qualification || !teamForm.imageUrl) {
             toast.error('Please fill all fields');
             return;
         }
@@ -137,14 +136,13 @@ export default function Dashboard() {
             addTeamMember(teamForm);
             toast.success('Team member added');
         }
-        setTeamForm({ name: '', role: '', designation: '', qualification: '', imageUrl: '' });
+        setTeamForm({ name: '', role: '', qualification: '', imageUrl: '' });
     };
 
     const handleEditTeam = (member: typeof teamMembers[0]) => {
         setTeamForm({
             name: member.name,
             role: member.role,
-            designation: member.designation,
             qualification: member.qualification,
             imageUrl: member.imageUrl,
         });
@@ -210,7 +208,7 @@ export default function Dashboard() {
     const cancelEdit = () => {
         setEditingId(null);
         setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '', sector: '' });
-        setTeamForm({ name: '', role: '', designation: '', qualification: '', imageUrl: '' });
+        setTeamForm({ name: '', role: '', qualification: '', imageUrl: '' });
         setGalleryForm({ albumName: '', imageUrl: '' });
         setEventForm({ name: '', description: '', startDate: '', endDate: '' });
     };
@@ -360,12 +358,11 @@ export default function Dashboard() {
 
                                         <div>
                                             <Label htmlFor="project-description">Description</Label>
-                                            <Textarea
-                                                id="project-description"
+                                            <TinyEditor
                                                 value={projectForm.description}
-                                                onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
-                                                placeholder="Enter project description"
-                                                rows={4}
+                                                onChange={(value: string) =>
+                                                    setProjectForm({ ...projectForm, description: value })
+                                                }
                                             />
                                         </div>
 
@@ -521,16 +518,6 @@ export default function Dashboard() {
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="team-designation">Designation</Label>
-                                            <Input
-                                                id="team-designation"
-                                                value={teamForm.designation}
-                                                onChange={(e) => setTeamForm({ ...teamForm, designation: e.target.value })}
-                                                placeholder="e.g., Senior Consultant"
-                                            />
-                                        </div>
-
-                                        <div>
                                             <Label htmlFor="team-qualification">Qualification</Label>
                                             <Input
                                                 id="team-qualification"
@@ -577,7 +564,6 @@ export default function Dashboard() {
                                                     <div className="flex-1">
                                                         <h3 className="font-semibold">{member.name}</h3>
                                                         <p className="text-sm text-brand-600">{member.role}</p>
-                                                        <p className="text-sm text-gray-600">{member.designation}</p>
                                                         <p className="text-xs text-gray-500">{member.qualification}</p>
                                                     </div>
                                                     <div className="flex gap-2">
@@ -625,12 +611,11 @@ export default function Dashboard() {
 
                                         <div>
                                             <Label htmlFor="event-description">Description</Label>
-                                            <Textarea
-                                                id="event-description"
+                                            <TinyEditor
                                                 value={eventForm.description}
-                                                onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
-                                                placeholder="Enter event description"
-                                                rows={4}
+                                                onChange={(value: string) =>
+                                                    setEventForm({ ...eventForm, description: value })
+                                                }
                                             />
                                         </div>
 
