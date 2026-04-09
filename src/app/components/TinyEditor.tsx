@@ -28,11 +28,32 @@ export default function TinyEditor({ value, onChange }: any) {
           "help",
           "wordcount",
         ],
+
         toolbar:
           "undo redo | formatselect | bold italic underline | \
-          alignleft aligncenter alignright alignjustify | \
-          bullist numlist outdent indent | link image media | \
-          removeformat | code preview fullscreen",
+    alignleft aligncenter alignright alignjustify | \
+    bullist numlist | link image media | \
+    code preview fullscreen",
+
+        automatic_uploads: true,
+        paste_data_images: true,
+
+        images_upload_handler: async (blobInfo: any) => {
+          const data = new FormData();
+          data.append("file", blobInfo.blob());
+          data.append("upload_preset", "my_unsigned_preset");
+
+          const res = await fetch(
+            "https://api.cloudinary.com/v1_1/du5txczqe/image/upload",
+            {
+              method: "POST",
+              body: data,
+            }
+          );
+
+          const json = await res.json();
+          return json.secure_url;
+        },
       }}
     />
   );
