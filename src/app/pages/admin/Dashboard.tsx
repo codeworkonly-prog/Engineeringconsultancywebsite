@@ -49,6 +49,38 @@ export default function Dashboard() {
     const [activeSection, setActiveSection] = useState<Section>('dashboard');
     const [editingId, setEditingId] = useState<string | null>(null);
 
+    // Slug generation function
+    const generateSlug = (title: string) => {
+        return title
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '') // remove special characters
+            .replace(/\s+/g, '-') // replace spaces with hyphens
+            .replace(/-+/g, '-') // replace multiple hyphens with single
+            .trim();
+    };
+
+    // Check if slug is unique across all content
+    const isSlugUnique = (slug: string, excludeId?: string) => {
+        const allSlugs = [
+            ...projects.filter(p => p.id !== excludeId).map(p => p.slug),
+            ...events.filter(e => e.id !== excludeId).map(e => e.slug),
+            ...galleryImages.filter(g => g.id !== excludeId).map(g => g.slug),
+        ];
+        return !allSlugs.includes(slug);
+    };
+
+    // Auto-generate unique slug
+    const autoGenerateSlug = (title: string, excludeId?: string) => {
+        let slug = generateSlug(title);
+        let counter = 1;
+        let uniqueSlug = slug;
+        while (!isSlugUnique(uniqueSlug, excludeId)) {
+            uniqueSlug = `${slug}-${counter}`;
+            counter++;
+        }
+        return uniqueSlug;
+    };
+
     // Form states
     const [projectForm, setProjectForm] = useState({
         name: '',
@@ -57,6 +89,7 @@ export default function Dashboard() {
         startDate: '',
         endDate: '',
         sector: '',
+        slug: '',
     });
 
     const [teamForm, setTeamForm] = useState({
@@ -69,6 +102,7 @@ export default function Dashboard() {
     const [galleryForm, setGalleryForm] = useState({
         albumName: '',
         imageUrl: '',
+        slug: '',
     });
 
     const [eventForm, setEventForm] = useState({
@@ -76,6 +110,7 @@ export default function Dashboard() {
         description: '',
         startDate: '',
         endDate: '',
+        slug: '',
     });
 
     const handleLogout = () => {
@@ -87,8 +122,13 @@ export default function Dashboard() {
     // Project handlers
     const handleProjectSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!projectForm.name || !projectForm.description || !projectForm.startDate || !projectForm.endDate) {
+        if (!projectForm.name || !projectForm.description || !projectForm.startDate || !projectForm.endDate || !projectForm.slug) {
             toast.error('Please fill all fields');
+            return;
+        }
+
+        if (!isSlugUnique(projectForm.slug, editingId || undefined)) {
+            toast.error('Slug must be unique');
             return;
         }
 
@@ -105,7 +145,7 @@ export default function Dashboard() {
             addProject(projectForm);
             toast.success('Project added');
         }
-        setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '', sector: '' });
+        setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '', sector: '', slug: '' });
     };
 
     const handleEditProject = (project: typeof projects[0]) => {
@@ -116,6 +156,7 @@ export default function Dashboard() {
             startDate: project.startDate,
             endDate: project.endDate,
             sector: project.sector,
+            slug: project.slug,
         });
         setEditingId(project.id);
     };
@@ -152,8 +193,13 @@ export default function Dashboard() {
     // Gallery handlers
     const handleGallerySubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!galleryForm.albumName || !galleryForm.imageUrl) {
+        if (!galleryForm.albumName || !galleryForm.imageUrl || !galleryForm.slug) {
             toast.error('Please fill all fields');
+            return;
+        }
+
+        if (!isSlugUnique(galleryForm.slug, editingId || undefined)) {
+            toast.error('Slug must be unique');
             return;
         }
 
@@ -165,13 +211,14 @@ export default function Dashboard() {
             addGalleryImage(galleryForm);
             toast.success('Gallery image added');
         }
-        setGalleryForm({ albumName: '', imageUrl: '' });
+        setGalleryForm({ albumName: '', imageUrl: '', slug: '' });
     };
 
     const handleEditGallery = (image: typeof galleryImages[0]) => {
         setGalleryForm({
             albumName: image.albumName,
             imageUrl: image.imageUrl,
+            slug: image.slug,
         });
         setEditingId(image.id);
     };
@@ -179,8 +226,13 @@ export default function Dashboard() {
     // Event handlers
     const handleEventSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!eventForm.name || !eventForm.description || !eventForm.startDate || !eventForm.endDate) {
+        if (!eventForm.name || !eventForm.description || !eventForm.startDate || !eventForm.endDate || !eventForm.slug) {
             toast.error('Please fill all fields');
+            return;
+        }
+
+        if (!isSlugUnique(eventForm.slug, editingId || undefined)) {
+            toast.error('Slug must be unique');
             return;
         }
 
@@ -192,7 +244,7 @@ export default function Dashboard() {
             addEvent(eventForm);
             toast.success('Event added');
         }
-        setEventForm({ name: '', description: '', startDate: '', endDate: '' });
+        setEventForm({ name: '', description: '', startDate: '', endDate: '', slug: '' });
     };
 
     const handleEditEvent = (event: typeof events[0]) => {
@@ -201,16 +253,17 @@ export default function Dashboard() {
             description: event.description,
             startDate: event.startDate,
             endDate: event.endDate,
+            slug: event.slug,
         });
         setEditingId(event.id);
     };
 
     const cancelEdit = () => {
         setEditingId(null);
-        setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '', sector: '' });
+        setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '', sector: '', slug: '' });
         setTeamForm({ name: '', role: '', qualification: '', imageUrl: '' });
-        setGalleryForm({ albumName: '', imageUrl: '' });
-        setEventForm({ name: '', description: '', startDate: '', endDate: '' });
+        setGalleryForm({ albumName: '', imageUrl: '', slug: '' });
+        setEventForm({ name: '', description: '', startDate: '', endDate: '', slug: '' });
     };
 
     return (
@@ -351,10 +404,19 @@ export default function Dashboard() {
                                             <Input
                                                 id="project-name"
                                                 value={projectForm.name}
-                                                onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
+                                                onChange={(e) => {
+                                                    const newName = e.target.value;
+                                                    setProjectForm({
+                                                        ...projectForm,
+                                                        name: newName,
+                                                        slug: editingId ? projectForm.slug : autoGenerateSlug(newName)
+                                                    });
+                                                }}
                                                 placeholder="Enter project name"
                                             />
                                         </div>
+
+
 
                                         <div>
                                             <Label htmlFor="project-description">Description</Label>
@@ -423,7 +485,15 @@ export default function Dashboard() {
                                                 />
                                             </div>
                                         </div>
-
+                                        <div>
+                                            <Label htmlFor="project-slug">Slug</Label>
+                                            <Input
+                                                id="project-slug"
+                                                value={projectForm.slug}
+                                                onChange={(e) => setProjectForm({ ...projectForm, slug: e.target.value })}
+                                                placeholder="project-url"
+                                            />
+                                        </div>
                                         <div className="flex gap-2">
                                             <Button type="submit" className="flex-1">
                                                 {editingId ? 'Update Project' : 'Add Project'}
@@ -604,7 +674,14 @@ export default function Dashboard() {
                                             <Input
                                                 id="event-name"
                                                 value={eventForm.name}
-                                                onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
+                                                onChange={(e) => {
+                                                    const newName = e.target.value;
+                                                    setEventForm({
+                                                        ...eventForm,
+                                                        name: newName,
+                                                        slug: editingId ? eventForm.slug : autoGenerateSlug(newName)
+                                                    });
+                                                }}
                                                 placeholder="Enter event name"
                                             />
                                         </div>
@@ -638,6 +715,16 @@ export default function Dashboard() {
                                                     onChange={(e) => setEventForm({ ...eventForm, endDate: e.target.value })}
                                                 />
                                             </div>
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="event-slug">Slug</Label>
+                                            <Input
+                                                id="event-slug"
+                                                value={eventForm.slug}
+                                                onChange={(e) => setEventForm({ ...eventForm, slug: e.target.value })}
+                                                placeholder="event-url"
+                                            />
                                         </div>
 
                                         <div className="flex gap-2">
@@ -708,7 +795,14 @@ export default function Dashboard() {
                                             <Input
                                                 id="gallery-album"
                                                 value={galleryForm.albumName}
-                                                onChange={(e) => setGalleryForm({ ...galleryForm, albumName: e.target.value })}
+                                                onChange={(e) => {
+                                                    const newAlbumName = e.target.value;
+                                                    setGalleryForm({
+                                                        ...galleryForm,
+                                                        albumName: newAlbumName,
+                                                        slug: editingId ? galleryForm.slug : autoGenerateSlug(newAlbumName)
+                                                    });
+                                                }}
                                                 placeholder="Enter album name"
                                             />
                                         </div>
@@ -720,6 +814,16 @@ export default function Dashboard() {
                                                 value={galleryForm.imageUrl}
                                                 onChange={(e) => setGalleryForm({ ...galleryForm, imageUrl: e.target.value })}
                                                 placeholder="https://..."
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="gallery-slug">Slug</Label>
+                                            <Input
+                                                id="gallery-slug"
+                                                value={galleryForm.slug}
+                                                onChange={(e) => setGalleryForm({ ...galleryForm, slug: e.target.value })}
+                                                placeholder="gallery-url"
                                             />
                                         </div>
 

@@ -26,12 +26,14 @@ export interface Project {
   startDate: string;
   endDate: string;
   sector: string;
+  slug: string;
 }
 
 export interface GalleryImage {
   id: string;
   albumName: string;
   imageUrl: string;
+  slug: string;
 }
 
 export interface Event {
@@ -40,6 +42,7 @@ export interface Event {
   description: string;
   startDate: string;
   endDate: string;
+  slug: string;
 }
 
 interface ContentContextType {
