@@ -48,34 +48,41 @@ export function Dashboard() {
 
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [projectStatusFilter, setProjectStatusFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
 
   // Form states
   const [projectForm, setProjectForm] = useState({
-    name: '',
+    title: '',
     description: '',
-    status: 'Upcoming' as 'Upcoming' | 'Completed',
+    category: '',
+    imageUrl: '',
     startDate: '',
     endDate: '',
+    status: 'ongoing' as 'ongoing' | 'completed',
+    slug: '',
   });
 
   const [teamForm, setTeamForm] = useState({
     name: '',
-    role: '',
-    designation: '',
-    qualification: '',
+    position: '',
+    bio: '',
     imageUrl: '',
   });
 
   const [galleryForm, setGalleryForm] = useState({
-    albumName: '',
+    title: '',
+    category: '',
     imageUrl: '',
   });
 
   const [eventForm, setEventForm] = useState({
-    name: '',
-    description: '',
+    title: '',
     startDate: '',
     endDate: '',
+    duration: '',
+    type: 'Workshop' as 'Workshop' | 'Training' | 'Seminar',
+    description: '',
+    topics: [] as string[],
   });
 
   const handleLogout = () => {
@@ -84,11 +91,45 @@ export function Dashboard() {
     toast.success('Logged out successfully');
   };
 
+  // Helper function to generate slug from title
+  const generateSlug = (title: string, existingId?: string) => {
+    let baseSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    
+    // Check if slug exists (excluding current project being edited)
+    const slugExists = (slug: string) =>
+      projects.some((p) => p.slug === slug && p.id !== existingId);
+    
+    let slug = baseSlug;
+    let counter = 1;
+    
+    while (slugExists(slug)) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+    
+    return slug;
+  };
+
+  // Auto-generate slug when title changes
+  const handleProjectTitleChange = (title: string) => {
+    const slug = generateSlug(title, editingId || undefined);
+    setProjectForm({ ...projectForm, title, slug });
+  };
+
   // Project handlers
   const handleProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!projectForm.name || !projectForm.description || !projectForm.startDate || !projectForm.endDate) {
+    if (!projectForm.title || !projectForm.description || !projectForm.category || !projectForm.imageUrl || !projectForm.startDate || !projectForm.endDate) {
       toast.error('Please fill all fields');
+      return;
+    }
+
+    // Validate that end date is after start date
+    if (new Date(projectForm.endDate) < new Date(projectForm.startDate)) {
+      toast.error('End date must be after start date');
       return;
     }
 
@@ -100,16 +141,19 @@ export function Dashboard() {
       addProject(projectForm);
       toast.success('Project added');
     }
-    setProjectForm({ name: '', description: '', status: 'Upcoming', startDate: '', endDate: '' });
+    setProjectForm({ title: '', description: '', category: '', imageUrl: '', startDate: '', endDate: '', status: 'ongoing', slug: '' });
   };
 
   const handleEditProject = (project: typeof projects[0]) => {
     setProjectForm({
-      name: project.name,
-      description: project.description,
-      status: project.status,
-      startDate: project.startDate,
-      endDate: project.endDate,
+      title: project.title || '',
+      description: project.description || '',
+      category: project.category || '',
+      imageUrl: project.imageUrl || '',
+      startDate: project.startDate || '',
+      endDate: project.endDate || '',
+      status: project.status || 'ongoing',
+      slug: project.slug || '',
     });
     setEditingId(project.id);
   };
@@ -117,7 +161,7 @@ export function Dashboard() {
   // Team handlers
   const handleTeamSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!teamForm.name || !teamForm.role || !teamForm.designation || !teamForm.qualification || !teamForm.imageUrl) {
+    if (!teamForm.name || !teamForm.position || !teamForm.bio || !teamForm.imageUrl) {
       toast.error('Please fill all fields');
       return;
     }
@@ -130,15 +174,14 @@ export function Dashboard() {
       addTeamMember(teamForm);
       toast.success('Team member added');
     }
-    setTeamForm({ name: '', role: '', designation: '', qualification: '', imageUrl: '' });
+    setTeamForm({ name: '', position: '', bio: '', imageUrl: '' });
   };
 
   const handleEditTeam = (member: typeof teamMembers[0]) => {
     setTeamForm({
       name: member.name,
-      role: member.role,
-      designation: member.designation,
-      qualification: member.qualification,
+      position: member.position,
+      bio: member.bio,
       imageUrl: member.imageUrl,
     });
     setEditingId(member.id);
@@ -147,7 +190,7 @@ export function Dashboard() {
   // Gallery handlers
   const handleGallerySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!galleryForm.albumName || !galleryForm.imageUrl) {
+    if (!galleryForm.title || !galleryForm.category || !galleryForm.imageUrl) {
       toast.error('Please fill all fields');
       return;
     }
@@ -160,12 +203,13 @@ export function Dashboard() {
       addGalleryImage(galleryForm);
       toast.success('Gallery image added');
     }
-    setGalleryForm({ albumName: '', imageUrl: '' });
+    setGalleryForm({ title: '', category: '', imageUrl: '' });
   };
 
   const handleEditGallery = (image: typeof galleryImages[0]) => {
     setGalleryForm({
-      albumName: image.albumName,
+      title: image.title,
+      category: image.category,
       imageUrl: image.imageUrl,
     });
     setEditingId(image.id);
@@ -174,38 +218,60 @@ export function Dashboard() {
   // Event handlers
   const handleEventSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!eventForm.name || !eventForm.description || !eventForm.startDate || !eventForm.endDate) {
+    if (!eventForm.title || !eventForm.startDate || !eventForm.endDate || !eventForm.duration || !eventForm.type || !eventForm.description) {
       toast.error('Please fill all fields');
       return;
     }
 
+    // Validate that end date is after start date
+    if (new Date(eventForm.endDate) < new Date(eventForm.startDate)) {
+      toast.error('End date must be after start date');
+      return;
+    }
+
+    // Filter out empty topics
+    const filteredTopics = eventForm.topics.filter(topic => topic.trim() !== '');
+    
+    if (filteredTopics.length === 0) {
+      toast.error('Please add at least one topic');
+      return;
+    }
+
+    const eventData = {
+      ...eventForm,
+      topics: filteredTopics,
+    };
+
     if (editingId) {
-      updateEvent(editingId, eventForm);
+      updateEvent(editingId, eventData);
       toast.success('Event updated');
       setEditingId(null);
     } else {
-      addEvent(eventForm);
+      addEvent(eventData);
       toast.success('Event added');
     }
-    setEventForm({ name: '', description: '', startDate: '', endDate: '' });
+    setEventForm({ title: '', startDate: '', endDate: '', duration: '', type: 'Workshop', description: '', topics: [] });
   };
 
   const handleEditEvent = (event: typeof events[0]) => {
     setEventForm({
-      name: event.name,
-      description: event.description,
-      startDate: event.startDate,
-      endDate: event.endDate,
+      title: event.title || '',
+      startDate: event.startDate || '',
+      endDate: event.endDate || '',
+      duration: event.duration || '',
+      type: event.type || 'Workshop',
+      description: event.description || '',
+      topics: event.topics || [],
     });
     setEditingId(event.id);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setProjectForm({ name: '', description: '', status: 'Upcoming', startDate: '', endDate: '' });
-    setTeamForm({ name: '', role: '', designation: '', qualification: '', imageUrl: '' });
-    setGalleryForm({ albumName: '', imageUrl: '' });
-    setEventForm({ name: '', description: '', startDate: '', endDate: '' });
+    setProjectForm({ title: '', description: '', category: '', imageUrl: '', startDate: '', endDate: '', status: 'ongoing', slug: '' });
+    setTeamForm({ name: '', position: '', bio: '', imageUrl: '' });
+    setGalleryForm({ title: '', category: '', imageUrl: '' });
+    setEventForm({ title: '', startDate: '', endDate: '', duration: '', type: 'Workshop', description: '', topics: [] });
   };
 
   return (
@@ -350,8 +416,8 @@ export function Dashboard() {
                       <Label htmlFor="project-name">Project Name</Label>
                       <Input
                         id="project-name"
-                        value={projectForm.name}
-                        onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
+                        value={projectForm.title}
+                        onChange={(e) => handleProjectTitleChange(e.target.value)}
                         placeholder="Enter project name"
                       />
                     </div>
@@ -368,10 +434,51 @@ export function Dashboard() {
                     </div>
 
                     <div>
+                      <Label htmlFor="project-category">Category</Label>
+                      <Input
+                        id="project-category"
+                        value={projectForm.category}
+                        onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
+                        placeholder="Enter project category"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="project-image">Image URL</Label>
+                      <Input
+                        id="project-image"
+                        value={projectForm.imageUrl}
+                        onChange={(e) => setProjectForm({ ...projectForm, imageUrl: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="project-start-date">Start Date</Label>
+                        <Input
+                          id="project-start-date"
+                          type="date"
+                          value={projectForm.startDate}
+                          onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="project-end-date">End Date</Label>
+                        <Input
+                          id="project-end-date"
+                          type="date"
+                          value={projectForm.endDate}
+                          onChange={(e) => setProjectForm({ ...projectForm, endDate: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
                       <Label htmlFor="project-status">Status</Label>
                       <Select
                         value={projectForm.status}
-                        onValueChange={(value: 'Upcoming' | 'Completed') =>
+                        onValueChange={(value: 'ongoing' | 'completed') =>
                           setProjectForm({ ...projectForm, status: value })
                         }
                       >
@@ -379,31 +486,22 @@ export function Dashboard() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Upcoming">Upcoming</SelectItem>
-                          <SelectItem value="Completed">Completed</SelectItem>
+                          <SelectItem value="ongoing">Ongoing</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="project-start">Start Date</Label>
-                        <Input
-                          id="project-start"
-                          type="date"
-                          value={projectForm.startDate}
-                          onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="project-end">End Date</Label>
-                        <Input
-                          id="project-end"
-                          type="date"
-                          value={projectForm.endDate}
-                          onChange={(e) => setProjectForm({ ...projectForm, endDate: e.target.value })}
-                        />
-                      </div>
+                    <div>
+                      <Label htmlFor="project-slug">Slug (Auto-generated)</Label>
+                      <Input
+                        id="project-slug"
+                        value={projectForm.slug}
+                        readOnly
+                        placeholder="Auto-generated from title"
+                        className="bg-gray-50"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">URL: /projects/{projectForm.slug || 'your-project-name'}</p>
                     </div>
 
                     <div className="flex gap-2">
@@ -422,29 +520,49 @@ export function Dashboard() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>All Projects ({projects.length})</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>All Projects ({projects.filter(p => projectStatusFilter === 'all' || p.status === projectStatusFilter).length})</CardTitle>
+                    <Select
+                      value={projectStatusFilter}
+                      onValueChange={(value: 'all' | 'ongoing' | 'completed') => setProjectStatusFilter(value)}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Projects</SelectItem>
+                        <SelectItem value="ongoing">Ongoing</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {projects.map((project) => (
+                    {projects
+                      .filter(p => projectStatusFilter === 'all' || p.status === projectStatusFilter)
+                      .map((project) => (
                       <div key={project.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                        <div className="flex justify-between items-start">
+                        <div className="flex justify-between items-start gap-4">
+                          <img src={project.imageUrl} alt={project.title} className="w-20 h-20 rounded object-cover flex-shrink-0" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold">{project.name}</h3>
-                              <span
-                                className={`px-2 py-1 rounded text-xs ${
-                                  project.status === 'Completed'
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-blue-100 text-blue-700'
-                                }`}
-                              >
-                                {project.status}
+                              <h3 className="font-semibold">{project.title}</h3>
+                              <span className="px-2 py-1 rounded text-xs bg-brand-100 text-brand-600">
+                                {project.category}
+                              </span>
+                              <span className={`px-2 py-1 rounded text-xs ${
+                                project.status === 'ongoing' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                              }`}>
+                                {project.status === 'ongoing' ? 'Ongoing' : 'Completed'}
                               </span>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">{project.description}</p>
                             <p className="text-xs text-gray-500">
                               {project.startDate} - {project.endDate}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              Slug: {project.slug}
                             </p>
                           </div>
                           <div className="flex gap-2">
@@ -491,32 +609,23 @@ export function Dashboard() {
                     </div>
 
                     <div>
-                      <Label htmlFor="team-role">Role</Label>
+                      <Label htmlFor="team-position">Position</Label>
                       <Input
-                        id="team-role"
-                        value={teamForm.role}
-                        onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
+                        id="team-position"
+                        value={teamForm.position}
+                        onChange={(e) => setTeamForm({ ...teamForm, position: e.target.value })}
                         placeholder="e.g., Chief Engineer"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="team-designation">Designation</Label>
-                      <Input
-                        id="team-designation"
-                        value={teamForm.designation}
-                        onChange={(e) => setTeamForm({ ...teamForm, designation: e.target.value })}
-                        placeholder="e.g., Senior Consultant"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="team-qualification">Qualification</Label>
-                      <Input
-                        id="team-qualification"
-                        value={teamForm.qualification}
-                        onChange={(e) => setTeamForm({ ...teamForm, qualification: e.target.value })}
-                        placeholder="e.g., B.E. Civil, M.Sc. Structural Engineering"
+                      <Label htmlFor="team-bio">Bio</Label>
+                      <Textarea
+                        id="team-bio"
+                        value={teamForm.bio}
+                        onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
+                        placeholder="Enter team member bio"
+                        rows={4}
                       />
                     </div>
 
@@ -556,9 +665,8 @@ export function Dashboard() {
                           <img src={member.imageUrl} alt={member.name} className="w-16 h-16 rounded-full object-cover" />
                           <div className="flex-1">
                             <h3 className="font-semibold">{member.name}</h3>
-                            <p className="text-sm text-brand-600">{member.role}</p>
-                            <p className="text-sm text-gray-600">{member.designation}</p>
-                            <p className="text-xs text-gray-500">{member.qualification}</p>
+                            <p className="text-sm text-brand-600">{member.position}</p>
+                            <p className="text-sm text-gray-600">{member.bio}</p>
                           </div>
                           <div className="flex gap-2">
                             <Button variant="ghost" size="sm" onClick={() => handleEditTeam(member)}>
@@ -597,8 +705,8 @@ export function Dashboard() {
                       <Label htmlFor="event-name">Event Name</Label>
                       <Input
                         id="event-name"
-                        value={eventForm.name}
-                        onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
+                        value={eventForm.title}
+                        onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
                         placeholder="Enter event name"
                       />
                     </div>
@@ -616,7 +724,7 @@ export function Dashboard() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="event-start">Start Date</Label>
+                        <Label htmlFor="event-start">Date</Label>
                         <Input
                           id="event-start"
                           type="date"
@@ -633,6 +741,48 @@ export function Dashboard() {
                           onChange={(e) => setEventForm({ ...eventForm, endDate: e.target.value })}
                         />
                       </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="event-duration">Duration</Label>
+                      <Input
+                        id="event-duration"
+                        type="text"
+                        value={eventForm.duration}
+                        onChange={(e) => setEventForm({ ...eventForm, duration: e.target.value })}
+                        placeholder="e.g., 3 days, 5 days"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Enter duration like "3 days" or "2 weeks"</p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="event-type">Type</Label>
+                      <Select
+                        value={eventForm.type}
+                        onValueChange={(value: 'Workshop' | 'Training' | 'Seminar') =>
+                          setEventForm({ ...eventForm, type: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Workshop">Workshop</SelectItem>
+                          <SelectItem value="Training">Training</SelectItem>
+                          <SelectItem value="Seminar">Seminar</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="event-topics">Topics</Label>
+                      <Textarea
+                        id="event-topics"
+                        value={eventForm.topics.join('\n')}
+                        onChange={(e) => setEventForm({ ...eventForm, topics: e.target.value.split('\n') })}
+                        placeholder="Enter topics, one per line"
+                        rows={4}
+                      />
                     </div>
 
                     <div className="flex gap-2">
@@ -659,11 +809,19 @@ export function Dashboard() {
                       <div key={event.id} className="border rounded-lg p-4 hover:bg-gray-50">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <h3 className="font-semibold mb-2">{event.name}</h3>
+                            <h3 className="font-semibold mb-2">{event.title}</h3>
                             <p className="text-sm text-gray-600 mb-2">{event.description}</p>
                             <p className="text-xs text-gray-500">
                               {event.startDate} - {event.endDate}
                             </p>
+                            <p className="text-xs text-gray-500">
+                              Type: {event.type}
+                            </p>
+                            {event.topics && event.topics.length > 0 && (
+                              <p className="text-xs text-gray-500">
+                                Topics: {event.topics.join(', ')}
+                              </p>
+                            )}
                           </div>
                           <div className="flex gap-2">
                             <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
@@ -699,12 +857,22 @@ export function Dashboard() {
                 <CardContent>
                   <form onSubmit={handleGallerySubmit} className="space-y-4">
                     <div>
-                      <Label htmlFor="gallery-album">Album Name</Label>
+                      <Label htmlFor="gallery-title">Title</Label>
                       <Input
-                        id="gallery-album"
-                        value={galleryForm.albumName}
-                        onChange={(e) => setGalleryForm({ ...galleryForm, albumName: e.target.value })}
-                        placeholder="Enter album name"
+                        id="gallery-title"
+                        value={galleryForm.title}
+                        onChange={(e) => setGalleryForm({ ...galleryForm, title: e.target.value })}
+                        placeholder="Enter title"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="gallery-category">Category</Label>
+                      <Input
+                        id="gallery-category"
+                        value={galleryForm.category}
+                        onChange={(e) => setGalleryForm({ ...galleryForm, category: e.target.value })}
+                        placeholder="Enter category"
                       />
                     </div>
 
@@ -740,9 +908,10 @@ export function Dashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {galleryImages.map((image) => (
                       <div key={image.id} className="border rounded-lg overflow-hidden">
-                        <img src={image.imageUrl} alt={image.albumName} className="w-full h-48 object-cover" />
+                        <img src={image.imageUrl} alt={image.title} className="w-full h-48 object-cover" />
                         <div className="p-3">
-                          <p className="font-semibold text-sm mb-2">{image.albumName}</p>
+                          <p className="font-semibold text-sm mb-1">{image.title}</p>
+                          <p className="text-xs text-gray-500 mb-2">{image.category}</p>
                           <div className="flex gap-2">
                             <Button
                               variant="outline"

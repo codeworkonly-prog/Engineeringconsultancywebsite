@@ -1,16 +1,20 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { Card, CardContent } from '../components/ui/card';
 import { useContent } from '../contexts/ContentContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Calendar } from 'lucide-react';
 
 export function Projects() {
   const { projects, galleryImages } = useContent();
   const [activeTab, setActiveTab] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
 
   const categories = ['all', ...new Set(projects.map((p) => p.category))];
-  const filteredProjects =
-    activeTab === 'all' ? projects : projects.filter((p) => p.category === activeTab);
+  const filteredProjects = projects
+    .filter((p) => activeTab === 'all' || p.category === activeTab)
+    .filter((p) => statusFilter === 'all' || p.status === statusFilter);
 
   return (
     <div>
@@ -27,41 +31,61 @@ export function Projects() {
       {/* Projects Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4">
-              {categories.map((category) => (
-                <TabsTrigger key={category} value={category} className="capitalize">
-                  {category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <div className="flex justify-between items-center mb-8">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+              <TabsList className="grid w-full max-w-2xl grid-cols-4">
+                {categories.map((category) => (
+                  <TabsTrigger key={category} value={category} className="capitalize">
+                    {category}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+            
+            <Select
+              value={statusFilter}
+              onValueChange={(value: 'all' | 'ongoing' | 'completed') => setStatusFilter(value)}
+            >
+              <SelectTrigger className="w-40 ml-4">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="ongoing">Ongoing</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map((project) => (
-              <Card key={project.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <img
-                  src={project.imageUrl}
-                  alt={project.title}
-                  className="w-full h-56 object-cover"
-                />
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full">
-                      {project.category}
-                    </span>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {new Date(project.date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        year: 'numeric',
-                      })}
+              <Link key={project.id} to={`/projects/${project.slug}`}>
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
+                  <img
+                    src={project.imageUrl}
+                    alt={project.title}
+                    className="w-full h-56 object-cover"
+                  />
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full">
+                        {project.category}
+                      </span>
+                      <span className={`px-3 py-1 text-xs rounded-full ${
+                        project.status === 'ongoing' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {project.status === 'ongoing' ? 'Ongoing' : 'Completed'}
+                      </span>
                     </div>
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{project.title}</h3>
-                  <p className="text-sm text-gray-600">{project.description}</p>
-                </CardContent>
-              </Card>
+                    <div className="flex items-center text-xs text-gray-500 mb-3">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {project.startDate} - {project.endDate}
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2">{project.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{project.description}</p>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
 

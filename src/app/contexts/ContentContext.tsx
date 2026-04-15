@@ -3,33 +3,39 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 export interface TeamMember {
   id: string;
   name: string;
-  role: string;
-  designation: string;
-  qualification: string;
+  position: string;
+  bio: string;
   imageUrl: string;
 }
 
 export interface Project {
   id: string;
-  name: string;
+  title: string;
   description: string;
-  status: 'Upcoming' | 'Completed';
+  category: string;
+  imageUrl: string;
   startDate: string;
   endDate: string;
+  status: 'ongoing' | 'completed';
+  slug: string;
 }
 
 export interface GalleryImage {
   id: string;
-  albumName: string;
+  title: string;
+  category: string;
   imageUrl: string;
 }
 
 export interface Event {
   id: string;
-  name: string;
-  description: string;
+  title: string;
   startDate: string;
   endDate: string;
+  duration: string;
+  type: 'Workshop' | 'Training' | 'Seminar';
+  description: string;
+  topics: string[];
 }
 
 interface ContentContextType {
@@ -57,9 +63,8 @@ const initialTeamMembers: TeamMember[] = [
   {
     id: '1',
     name: 'John Anderson',
-    role: 'Chief Engineer',
-    designation: 'Senior Consultant',
-    qualification: 'B.E. Civil, M.Sc. Structural Engineering',
+    position: 'Chief Engineer',
+    bio: 'Senior Consultant with expertise in structural engineering.',
     imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
   },
 ];
@@ -67,18 +72,22 @@ const initialTeamMembers: TeamMember[] = [
 const initialProjects: Project[] = [
   {
     id: '1',
-    name: 'City Bridge Infrastructure',
+    title: 'City Bridge Infrastructure',
     description: 'Complete structural analysis and renovation of major city bridge.',
-    status: 'Completed',
+    category: 'Infrastructure',
+    imageUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
     startDate: '2024-01-15',
     endDate: '2025-12-15',
+    status: 'ongoing',
+    slug: 'city-bridge-infrastructure',
   },
 ];
 
 const initialGalleryImages: GalleryImage[] = [
   {
     id: '1',
-    albumName: 'Construction Projects',
+    title: 'Construction Projects',
+    category: 'Construction',
     imageUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
   },
 ];
@@ -86,10 +95,13 @@ const initialGalleryImages: GalleryImage[] = [
 const initialEvents: Event[] = [
   {
     id: '1',
-    name: 'Engineering Workshop 2026',
-    description: 'A comprehensive workshop on modern engineering practices and sustainable design.',
-    startDate: '2026-06-15',
-    endDate: '2026-06-17',
+    title: 'Advanced Structural Engineering Workshop',
+    startDate: '2024-03-15',
+    endDate: '2024-03-15',
+    duration: '2 hours',
+    type: 'Workshop',
+    description: 'Learn advanced techniques in structural engineering.',
+    topics: ['Finite Element Analysis', 'Material Properties', 'Load Analysis'],
   },
 ];
 

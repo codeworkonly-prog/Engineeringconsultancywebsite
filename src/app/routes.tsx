@@ -4,6 +4,7 @@ import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Training } from './pages/Training';
 import { Projects } from './pages/Projects';
+import { ProjectDetail } from './pages/ProjectDetail';
 import { Contact } from './pages/Contact';
 import { Team } from './pages/Team';
 import { CompanyProfile } from './pages/CompanyProfile';
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       { path: 'team', Component: Team },
       { path: 'events', Component: Training },
       { path: 'projects', Component: Projects },
+      { path: 'projects/:slug', Component: ProjectDetail },
       { path: 'contact', Component: Contact },
     ],
   },
