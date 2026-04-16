@@ -1,8 +1,8 @@
-import { useParams, Link, useNavigate } from 'react-router';
-import { useContent } from '../contexts/ContentContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { Calendar, ArrowLeft, Tag, Clock } from 'lucide-react';
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useContent } from "../contexts/ContentContext";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Calendar, ArrowLeft, Tag, Clock } from "lucide-react";
 
 export function ProjectDetail() {
   const { slug } = useParams();
@@ -16,7 +16,9 @@ export function ProjectDetail() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Project Not Found</h1>
-          <p className="text-gray-600 mb-8">The project you're looking for doesn't exist.</p>
+          <p className="text-gray-600 mb-8">
+            The project you're looking for doesn't exist.
+          </p>
           <Link to="/projects">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -44,10 +46,14 @@ export function ProjectDetail() {
             <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">
               {project.category}
             </span>
-            <span className={`px-3 py-1 backdrop-blur-sm rounded-full text-sm ${
-              project.status === 'ongoing' ? 'bg-green-500/20' : 'bg-gray-500/20'
-            }`}>
-              {project.status === 'ongoing' ? 'Ongoing' : 'Completed'}
+            <span
+              className={`px-3 py-1 backdrop-blur-sm rounded-full text-sm ${
+                project.status === "ongoing"
+                  ? "bg-green-500/20"
+                  : "bg-gray-500/20"
+              }`}
+            >
+              {project.status === "ongoing" ? "Ongoing" : "Completed"}
             </span>
           </div>
         </div>
@@ -69,7 +75,9 @@ export function ProjectDetail() {
 
               <div>
                 <h2 className="text-2xl font-bold mb-4">Project Overview</h2>
-                <p className="text-gray-700 leading-relaxed">{project.description}</p>
+                <p className="text-gray-700 leading-relaxed">
+                  {project.description}
+                </p>
               </div>
 
               <div>
@@ -80,8 +88,12 @@ export function ProjectDetail() {
                       <div className="flex items-start gap-3">
                         <Calendar className="h-5 w-5 text-brand-600 mt-0.5" />
                         <div>
-                          <p className="text-sm text-gray-500 mb-1">Project Duration</p>
-                          <p className="font-semibold">{project.startDate} - {project.endDate}</p>
+                          <p className="text-sm text-gray-500 mb-1">
+                            Project Duration
+                          </p>
+                          <p className="font-semibold">
+                            {project.startDate} - {project.endDate}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -105,7 +117,9 @@ export function ProjectDetail() {
                         <Clock className="h-5 w-5 text-brand-600 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-500 mb-1">Status</p>
-                          <p className="font-semibold capitalize">{project.status}</p>
+                          <p className="font-semibold capitalize">
+                            {project.status}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -120,7 +134,8 @@ export function ProjectDetail() {
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-4">Contact Us</h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Interested in learning more about this project or starting a similar one?
+                    Interested in learning more about this project or starting a
+                    similar one?
                   </p>
                   <Link to="/contact">
                     <Button className="w-full">Get in Touch</Button>
@@ -133,10 +148,17 @@ export function ProjectDetail() {
                   <h3 className="font-semibold mb-4">Other Projects</h3>
                   <div className="space-y-3">
                     {projects
-                      .filter((p) => p.id !== project.id && p.category === project.category)
+                      .filter(
+                        (p) =>
+                          p.id !== project.id &&
+                          p.category === project.category,
+                      )
                       .slice(0, 3)
                       .map((relatedProject) => (
-                        <Link key={relatedProject.id} to={`/projects/${relatedProject.slug}`}>
+                        <Link
+                          key={relatedProject.id}
+                          to={`/projects/${relatedProject.slug}`}
+                        >
                           <div className="flex gap-3 p-2 rounded hover:bg-gray-50 transition-colors cursor-pointer">
                             <img
                               src={relatedProject.imageUrl}
@@ -144,15 +166,24 @@ export function ProjectDetail() {
                               className="w-16 h-16 object-cover rounded"
                             />
                             <div className="flex-1">
-                              <h4 className="text-sm font-semibold line-clamp-1">{relatedProject.title}</h4>
-                              <p className="text-xs text-gray-500">{relatedProject.category}</p>
+                              <h4 className="text-sm font-semibold line-clamp-1">
+                                {relatedProject.title}
+                              </h4>
+                              <p className="text-xs text-gray-500">
+                                {relatedProject.category}
+                              </p>
                             </div>
                           </div>
                         </Link>
                       ))}
                   </div>
-                  {projects.filter((p) => p.id !== project.id && p.category === project.category).length === 0 && (
-                    <p className="text-sm text-gray-500">No related projects found.</p>
+                  {projects.filter(
+                    (p) =>
+                      p.id !== project.id && p.category === project.category,
+                  ).length === 0 && (
+                    <p className="text-sm text-gray-500">
+                      No related projects found.
+                    </p>
                   )}
                 </CardContent>
               </Card>

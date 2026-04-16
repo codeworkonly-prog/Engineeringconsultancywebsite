@@ -1,28 +1,28 @@
-import { Link, useLocation } from 'react-router';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from './ui/button';
-import logoImage from '../../imports/DCP_logo-1.png';
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import logoImage from "../../imports/DCP_logo-1.png";
 
 export function Header() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
-  const isAdmin = location.pathname.startsWith('/admin');
+  const isAdmin = location.pathname.startsWith("/admin");
 
   if (isAdmin) {
     return null; // Don't show main header in admin area
   }
 
   const navLinks = [
-    { path: '/', label: 'Home' },
-    { path: '/about', label: 'About Us' },
-    { path: '/company-profile', label: 'Company Profile' },
-    { path: '/team', label: 'Our Team' },
-    { path: '/events', label: 'Events & Workshops' },
-    { path: '/projects', label: 'Projects' },
-    { path: '/contact', label: 'Contact Us' },
+    { path: "/", label: "Home" },
+    { path: "/about", label: "About Us" },
+    { path: "/company-profile", label: "Company Profile" },
+    { path: "/team", label: "Our Team" },
+    { path: "/events", label: "Events & Workshops" },
+    { path: "/projects", label: "Projects" },
+    { path: "/contact", label: "Contact Us" },
   ];
 
   return (
@@ -41,8 +41,8 @@ export function Header() {
                 to={link.path}
                 className={`text-sm font-medium transition-colors ${
                   isActive(link.path)
-                    ? 'text-brand-600'
-                    : 'text-gray-700 hover:text-brand-600'
+                    ? "text-brand-600"
+                    : "text-gray-700 hover:text-brand-600"
                 }`}
               >
                 {link.label}
@@ -55,7 +55,11 @@ export function Header() {
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
         </div>
 
@@ -68,7 +72,7 @@ export function Header() {
                   key={link.path}
                   to={link.path}
                   className={`text-sm font-medium ${
-                    isActive(link.path) ? 'text-brand-600' : 'text-gray-700'
+                    isActive(link.path) ? "text-brand-600" : "text-gray-700"
                   }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
