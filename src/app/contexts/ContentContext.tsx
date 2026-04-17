@@ -88,7 +88,7 @@ const initialTeamMembers: TeamMember[] = [
     id: "4",
     name: "Satya Raj Pandey",
     position: "Site Engineer",
-    bio: "Bachelor of Engineering - BE, Civil Engineering",
+    bio: "Bachelors Degree in Civil Engineering",
     imgUrl:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMCdFaNdyu-aXJfSYuX40QPFtWFYcusDqSbQ&s",
   },
