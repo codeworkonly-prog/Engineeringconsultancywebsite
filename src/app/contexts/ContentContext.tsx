@@ -36,6 +36,7 @@ export interface Event {
   type: 'Workshop' | 'Training' | 'Seminar';
   description: string;
   topics: string[];
+  slug: string;
 }
 
 interface ContentContextType {
@@ -102,6 +103,7 @@ const initialEvents: Event[] = [
     type: 'Workshop',
     description: 'Learn advanced techniques in structural engineering.',
     topics: ['Finite Element Analysis', 'Material Properties', 'Load Analysis'],
+    slug: 'advanced-structural-engineering-workshop',
   },
 ];
 
