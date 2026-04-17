@@ -72,7 +72,7 @@ const initialTeamMembers: TeamMember[] = [
     id: "2",
     name: "Abishek Sharma",
     position: "Environmental/Civil Engineer",
-    bio: "Master of Science - MS, Environmental/Environmental Health Engineering. Bachelor of Engineering - BE, Civil Engineering",
+    bio: "Master of Science - MS, Environmental/Environmental Health Engineering, Bachelor of Engineering - BE, Civil Engineering",
     imgUrl:
       "https://media.licdn.com/dms/image/v2/D4D03AQGhAbPCMtv6EA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1707734956739?e=2147483647&v=beta&t=48l6GoyUEWZocVtaUhjI7Eti6q4xfFmYI9MlKBxr8j4",
   },
