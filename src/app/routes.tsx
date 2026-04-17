@@ -23,6 +23,7 @@ export const router = createBrowserRouter([
       { path: "company-profile", element: <CompanyProfile /> },
       { path: "team", element: <Team /> },
       { path: "events", element: <Training /> },
+      { path: "events/:slug", element: <EventDetail /> },
       { path: "projects", element: <Projects /> },
       { path: "projects/:slug", element: <ProjectDetail /> },
       { path: "contact", element: <Contact /> },
