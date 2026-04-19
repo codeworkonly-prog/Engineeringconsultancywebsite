@@ -1,8 +1,8 @@
-import { Link } from 'react-router';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { CheckCircle, Users, Award, Lightbulb } from 'lucide-react';
-import { useContent } from '../contexts/ContentContext';
+import { Link } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { CheckCircle, Users, Award, Lightbulb } from "lucide-react";
+import { useContent } from "../contexts/ContentContext";
 
 export function Home() {
   const { projects } = useContent();
@@ -18,12 +18,16 @@ export function Home() {
               Engineering Excellence for Your Projects
             </h1>
             <p className="text-xl mb-8 text-brand-50">
-              We provide comprehensive engineering consultancy and project management services
-              to bring your vision to life.
+              We provide comprehensive engineering consultancy and project
+              management services to bring your vision to life.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/about">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="w-full sm:w-auto"
+                >
                   Learn More
                 </Button>
               </Link>
@@ -69,7 +73,9 @@ export function Home() {
                   <div className="bg-brand-100 p-3 rounded-full mb-4">
                     <Users className="h-8 w-8 text-brand-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Multidisciplinary Expertise</h3>
+                  <h3 className="font-semibold mb-2">
+                    Multidisciplinary Expertise
+                  </h3>
                   <p className="text-sm text-gray-600">
                     All engineering and management services under one roof
                   </p>
@@ -148,7 +154,9 @@ export function Home() {
       {/* CTA Section */}
       <section className="py-16 bg-brand-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Start Your Project?</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to Start Your Project?
+          </h2>
           <p className="text-xl mb-8 text-brand-50">
             Let's work together to bring your engineering vision to life.
           </p>

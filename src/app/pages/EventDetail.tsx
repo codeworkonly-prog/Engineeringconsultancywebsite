@@ -1,8 +1,8 @@
-import { useParams, Link } from 'react-router';
-import { useContent } from '../contexts/ContentContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { Calendar, Clock, CheckCircle, ArrowLeft, Tag } from 'lucide-react';
+import { useParams, Link } from "react-router-dom";
+import { useContent } from "../contexts/ContentContext";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Calendar, Clock, CheckCircle, ArrowLeft, Tag } from "lucide-react";
 
 export function EventDetail() {
   const { slug } = useParams();
@@ -15,7 +15,9 @@ export function EventDetail() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Event Not Found</h1>
-          <p className="text-gray-600 mb-8">The event you're looking for doesn't exist.</p>
+          <p className="text-gray-600 mb-8">
+            The event you're looking for doesn't exist.
+          </p>
           <Link to="/events">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -69,7 +71,9 @@ export function EventDetail() {
                     <li key={index} className="flex items-start gap-3">
                       <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-1" />
                       <div>
-                        <p className="font-semibold text-lg text-gray-900">{topic}</p>
+                        <p className="font-semibold text-lg text-gray-900">
+                          {topic}
+                        </p>
                       </div>
                     </li>
                   ))}
@@ -125,7 +129,8 @@ export function EventDetail() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Interested in This Event?</h2>
           <p className="text-xl mb-8 text-brand-50 max-w-2xl mx-auto">
-            Contact us for more information or to register for this {event.type.toLowerCase()}.
+            Contact us for more information or to register for this{" "}
+            {event.type.toLowerCase()}.
           </p>
           <Link to="/contact">
             <Button size="lg" variant="secondary">
@@ -148,12 +153,16 @@ export function EventDetail() {
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                     <CardContent className="pt-6">
                       <div className="flex justify-between items-start mb-3">
-                        <h3 className="font-semibold line-clamp-2">{relatedEvent.title}</h3>
+                        <h3 className="font-semibold line-clamp-2">
+                          {relatedEvent.title}
+                        </h3>
                         <span className="px-2 py-1 bg-brand-100 text-brand-600 text-xs rounded-full whitespace-nowrap ml-2">
                           {relatedEvent.type}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{relatedEvent.description}</p>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                        {relatedEvent.description}
+                      </p>
                       <div className="flex items-center text-xs text-gray-500 gap-2">
                         <Calendar className="h-3 w-3" />
                         <span>{relatedEvent.startDate}</span>
@@ -164,7 +173,9 @@ export function EventDetail() {
               ))}
           </div>
           {events.filter((e) => e.id !== event.id).length === 0 && (
-            <p className="text-gray-500 text-center">No other events available.</p>
+            <p className="text-gray-500 text-center">
+              No other events available.
+            </p>
           )}
         </div>
       </section>

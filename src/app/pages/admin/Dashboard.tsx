@@ -1,14 +1,25 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { useContent } from '../../contexts/ContentContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Textarea } from "../../components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import { useContent } from "../../contexts/ContentContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "sonner";
 import {
   LayoutDashboard,
   Briefcase,
@@ -20,9 +31,9 @@ import {
   Edit,
   Trash2,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
-type Section = 'dashboard' | 'projects' | 'team' | 'events' | 'gallery';
+type Section = "dashboard" | "projects" | "team" | "events" | "gallery";
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -46,71 +57,73 @@ export function Dashboard() {
     deleteEvent,
   } = useContent();
 
-  const [activeSection, setActiveSection] = useState<Section>('dashboard');
+  const [activeSection, setActiveSection] = useState<Section>("dashboard");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [projectStatusFilter, setProjectStatusFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
+  const [projectStatusFilter, setProjectStatusFilter] = useState<
+    "all" | "ongoing" | "completed"
+  >("all");
 
   // Form states
   const [projectForm, setProjectForm] = useState({
-    title: '',
-    description: '',
-    category: '',
-    imageUrl: '',
-    startDate: '',
-    endDate: '',
-    status: 'ongoing' as 'ongoing' | 'completed',
-    slug: '',
+    title: "",
+    description: "",
+    category: "",
+    imageUrl: "",
+    startDate: "",
+    endDate: "",
+    status: "ongoing" as "ongoing" | "completed",
+    slug: "",
   });
 
   const [teamForm, setTeamForm] = useState({
-    name: '',
-    position: '',
-    bio: '',
-    imageUrl: '',
+    name: "",
+    position: "",
+    bio: "",
+    imageUrl: "",
   });
 
   const [galleryForm, setGalleryForm] = useState({
-    title: '',
-    category: '',
-    imageUrl: '',
+    title: "",
+    category: "",
+    imageUrl: "",
   });
 
   const [eventForm, setEventForm] = useState({
-    title: '',
-    startDate: '',
-    endDate: '',
-    duration: '',
-    type: 'Workshop' as 'Workshop' | 'Training' | 'Seminar',
-    description: '',
+    title: "",
+    startDate: "",
+    endDate: "",
+    duration: "",
+    type: "Workshop" as "Workshop" | "Training" | "Seminar",
+    description: "",
     topics: [] as string[],
-    slug: '',
+    slug: "",
   });
 
   const handleLogout = () => {
     logout();
-    navigate('/admin/login');
-    toast.success('Logged out successfully');
+    navigate("/admin/login");
+    toast.success("Logged out successfully");
   };
 
   // Helper function to generate slug from title
   const generateSlug = (title: string, existingId?: string) => {
     let baseSlug = title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-    
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
     // Check if slug exists (excluding current project being edited)
     const slugExists = (slug: string) =>
       projects.some((p) => p.slug === slug && p.id !== existingId);
-    
+
     let slug = baseSlug;
     let counter = 1;
-    
+
     while (slugExists(slug)) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
-    
+
     return slug;
   };
 
@@ -118,21 +131,21 @@ export function Dashboard() {
   const generateEventSlug = (title: string, existingId?: string) => {
     let baseSlug = title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-    
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
     // Check if slug exists (excluding current event being edited)
     const slugExists = (slug: string) =>
       events.some((e) => e.slug === slug && e.id !== existingId);
-    
+
     let slug = baseSlug;
     let counter = 1;
-    
+
     while (slugExists(slug)) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
-    
+
     return slug;
   };
 
@@ -151,38 +164,54 @@ export function Dashboard() {
   // Project handlers
   const handleProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!projectForm.title || !projectForm.description || !projectForm.category || !projectForm.imageUrl || !projectForm.startDate || !projectForm.endDate) {
-      toast.error('Please fill all fields');
+    if (
+      !projectForm.title ||
+      !projectForm.description ||
+      !projectForm.category ||
+      !projectForm.imageUrl ||
+      !projectForm.startDate ||
+      !projectForm.endDate
+    ) {
+      toast.error("Please fill all fields");
       return;
     }
 
     // Validate that end date is after start date
     if (new Date(projectForm.endDate) < new Date(projectForm.startDate)) {
-      toast.error('End date must be after start date');
+      toast.error("End date must be after start date");
       return;
     }
 
     if (editingId) {
       updateProject(editingId, projectForm);
-      toast.success('Project updated');
+      toast.success("Project updated");
       setEditingId(null);
     } else {
       addProject(projectForm);
-      toast.success('Project added');
+      toast.success("Project added");
     }
-    setProjectForm({ title: '', description: '', category: '', imageUrl: '', startDate: '', endDate: '', status: 'ongoing', slug: '' });
+    setProjectForm({
+      title: "",
+      description: "",
+      category: "",
+      imageUrl: "",
+      startDate: "",
+      endDate: "",
+      status: "ongoing",
+      slug: "",
+    });
   };
 
-  const handleEditProject = (project: typeof projects[0]) => {
+  const handleEditProject = (project: (typeof projects)[0]) => {
     setProjectForm({
-      title: project.title || '',
-      description: project.description || '',
-      category: project.category || '',
-      imageUrl: project.imageUrl || '',
-      startDate: project.startDate || '',
-      endDate: project.endDate || '',
-      status: project.status || 'ongoing',
-      slug: project.slug || '',
+      title: project.title || "",
+      description: project.description || "",
+      category: project.category || "",
+      imageUrl: project.imageUrl || "",
+      startDate: project.startDate || "",
+      endDate: project.endDate || "",
+      status: project.status || "ongoing",
+      slug: project.slug || "",
     });
     setEditingId(project.id);
   };
@@ -190,23 +219,28 @@ export function Dashboard() {
   // Team handlers
   const handleTeamSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!teamForm.name || !teamForm.position || !teamForm.bio || !teamForm.imageUrl) {
-      toast.error('Please fill all fields');
+    if (
+      !teamForm.name ||
+      !teamForm.position ||
+      !teamForm.bio ||
+      !teamForm.imageUrl
+    ) {
+      toast.error("Please fill all fields");
       return;
     }
 
     if (editingId) {
       updateTeamMember(editingId, teamForm);
-      toast.success('Team member updated');
+      toast.success("Team member updated");
       setEditingId(null);
     } else {
       addTeamMember(teamForm);
-      toast.success('Team member added');
+      toast.success("Team member added");
     }
-    setTeamForm({ name: '', position: '', bio: '', imageUrl: '' });
+    setTeamForm({ name: "", position: "", bio: "", imageUrl: "" });
   };
 
-  const handleEditTeam = (member: typeof teamMembers[0]) => {
+  const handleEditTeam = (member: (typeof teamMembers)[0]) => {
     setTeamForm({
       name: member.name,
       position: member.position,
@@ -220,22 +254,22 @@ export function Dashboard() {
   const handleGallerySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!galleryForm.title || !galleryForm.category || !galleryForm.imageUrl) {
-      toast.error('Please fill all fields');
+      toast.error("Please fill all fields");
       return;
     }
 
     if (editingId) {
       updateGalleryImage(editingId, galleryForm);
-      toast.success('Gallery image updated');
+      toast.success("Gallery image updated");
       setEditingId(null);
     } else {
       addGalleryImage(galleryForm);
-      toast.success('Gallery image added');
+      toast.success("Gallery image added");
     }
-    setGalleryForm({ title: '', category: '', imageUrl: '' });
+    setGalleryForm({ title: "", category: "", imageUrl: "" });
   };
 
-  const handleEditGallery = (image: typeof galleryImages[0]) => {
+  const handleEditGallery = (image: (typeof galleryImages)[0]) => {
     setGalleryForm({
       title: image.title,
       category: image.category,
@@ -247,22 +281,31 @@ export function Dashboard() {
   // Event handlers
   const handleEventSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!eventForm.title || !eventForm.startDate || !eventForm.endDate || !eventForm.duration || !eventForm.type || !eventForm.description) {
-      toast.error('Please fill all fields');
+    if (
+      !eventForm.title ||
+      !eventForm.startDate ||
+      !eventForm.endDate ||
+      !eventForm.duration ||
+      !eventForm.type ||
+      !eventForm.description
+    ) {
+      toast.error("Please fill all fields");
       return;
     }
 
     // Validate that end date is after start date
     if (new Date(eventForm.endDate) < new Date(eventForm.startDate)) {
-      toast.error('End date must be after start date');
+      toast.error("End date must be after start date");
       return;
     }
 
     // Filter out empty topics
-    const filteredTopics = eventForm.topics.filter(topic => topic.trim() !== '');
-    
+    const filteredTopics = eventForm.topics.filter(
+      (topic) => topic.trim() !== "",
+    );
+
     if (filteredTopics.length === 0) {
-      toast.error('Please add at least one topic');
+      toast.error("Please add at least one topic");
       return;
     }
 
@@ -273,35 +316,62 @@ export function Dashboard() {
 
     if (editingId) {
       updateEvent(editingId, eventData);
-      toast.success('Event updated');
+      toast.success("Event updated");
       setEditingId(null);
     } else {
       addEvent(eventData);
-      toast.success('Event added');
+      toast.success("Event added");
     }
-    setEventForm({ title: '', startDate: '', endDate: '', duration: '', type: 'Workshop', description: '', topics: [], slug: '' });
+    setEventForm({
+      title: "",
+      startDate: "",
+      endDate: "",
+      duration: "",
+      type: "Workshop",
+      description: "",
+      topics: [],
+      slug: "",
+    });
   };
 
-  const handleEditEvent = (event: typeof events[0]) => {
+  const handleEditEvent = (event: (typeof events)[0]) => {
     setEventForm({
-      title: event.title || '',
-      startDate: event.startDate || '',
-      endDate: event.endDate || '',
-      duration: event.duration || '',
-      type: event.type || 'Workshop',
-      description: event.description || '',
+      title: event.title || "",
+      startDate: event.startDate || "",
+      endDate: event.endDate || "",
+      duration: event.duration || "",
+      type: event.type || "Workshop",
+      description: event.description || "",
       topics: event.topics || [],
-      slug: event.slug || '',
+      slug: event.slug || "",
     });
     setEditingId(event.id);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setProjectForm({ title: '', description: '', category: '', imageUrl: '', startDate: '', endDate: '', status: 'ongoing', slug: '' });
-    setTeamForm({ name: '', position: '', bio: '', imageUrl: '' });
-    setGalleryForm({ title: '', category: '', imageUrl: '' });
-    setEventForm({ title: '', startDate: '', endDate: '', duration: '', type: 'Workshop', description: '', topics: [], slug: '' });
+    setProjectForm({
+      title: "",
+      description: "",
+      category: "",
+      imageUrl: "",
+      startDate: "",
+      endDate: "",
+      status: "ongoing",
+      slug: "",
+    });
+    setTeamForm({ name: "", position: "", bio: "", imageUrl: "" });
+    setGalleryForm({ title: "", category: "", imageUrl: "" });
+    setEventForm({
+      title: "",
+      startDate: "",
+      endDate: "",
+      duration: "",
+      type: "Workshop",
+      description: "",
+      topics: [],
+      slug: "",
+    });
   };
 
   return (
@@ -314,9 +384,11 @@ export function Dashboard() {
 
         <nav className="flex-1 p-4">
           <button
-            onClick={() => setActiveSection('dashboard')}
+            onClick={() => setActiveSection("dashboard")}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
-              activeSection === 'dashboard' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+              activeSection === "dashboard"
+                ? "bg-brand-50 text-brand-600"
+                : "text-gray-700 hover:bg-gray-50"
             }`}
           >
             <LayoutDashboard className="h-5 w-5" />
@@ -324,9 +396,11 @@ export function Dashboard() {
           </button>
 
           <button
-            onClick={() => setActiveSection('projects')}
+            onClick={() => setActiveSection("projects")}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
-              activeSection === 'projects' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+              activeSection === "projects"
+                ? "bg-brand-50 text-brand-600"
+                : "text-gray-700 hover:bg-gray-50"
             }`}
           >
             <Briefcase className="h-5 w-5" />
@@ -334,9 +408,11 @@ export function Dashboard() {
           </button>
 
           <button
-            onClick={() => setActiveSection('team')}
+            onClick={() => setActiveSection("team")}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
-              activeSection === 'team' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+              activeSection === "team"
+                ? "bg-brand-50 text-brand-600"
+                : "text-gray-700 hover:bg-gray-50"
             }`}
           >
             <Users className="h-5 w-5" />
@@ -344,9 +420,11 @@ export function Dashboard() {
           </button>
 
           <button
-            onClick={() => setActiveSection('events')}
+            onClick={() => setActiveSection("events")}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
-              activeSection === 'events' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+              activeSection === "events"
+                ? "bg-brand-50 text-brand-600"
+                : "text-gray-700 hover:bg-gray-50"
             }`}
           >
             <Calendar className="h-5 w-5" />
@@ -354,9 +432,11 @@ export function Dashboard() {
           </button>
 
           <button
-            onClick={() => setActiveSection('gallery')}
+            onClick={() => setActiveSection("gallery")}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
-              activeSection === 'gallery' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+              activeSection === "gallery"
+                ? "bg-brand-50 text-brand-600"
+                : "text-gray-700 hover:bg-gray-50"
             }`}
           >
             <ImageIcon className="h-5 w-5" />
@@ -371,7 +451,12 @@ export function Dashboard() {
               Website
             </Button>
           </Link>
-          <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={handleLogout}
+          >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>
@@ -383,62 +468,80 @@ export function Dashboard() {
         {/* Header */}
         <header className="bg-white border-b px-8 py-6">
           <h2 className="text-2xl font-bold text-gray-900">
-            {activeSection === 'dashboard' && 'Dashboard'}
-            {activeSection === 'projects' && 'Projects'}
-            {activeSection === 'team' && 'Team'}
-            {activeSection === 'events' && 'Events'}
-            {activeSection === 'gallery' && 'Gallery'}
+            {activeSection === "dashboard" && "Dashboard"}
+            {activeSection === "projects" && "Projects"}
+            {activeSection === "team" && "Team"}
+            {activeSection === "events" && "Events"}
+            {activeSection === "gallery" && "Gallery"}
           </h2>
         </header>
 
         <div className="p-8">
           {/* Dashboard Section */}
-          {activeSection === 'dashboard' && (
+          {activeSection === "dashboard" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm text-gray-600">Total Projects</CardTitle>
+                  <CardTitle className="text-sm text-gray-600">
+                    Total Projects
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-brand-600">{projects.length}</p>
+                  <p className="text-3xl font-bold text-brand-600">
+                    {projects.length}
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm text-gray-600">Team Members</CardTitle>
+                  <CardTitle className="text-sm text-gray-600">
+                    Team Members
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-brand-600">{teamMembers.length}</p>
+                  <p className="text-3xl font-bold text-brand-600">
+                    {teamMembers.length}
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm text-gray-600">Events</CardTitle>
+                  <CardTitle className="text-sm text-gray-600">
+                    Events
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-brand-600">{events.length}</p>
+                  <p className="text-3xl font-bold text-brand-600">
+                    {events.length}
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm text-gray-600">Gallery Images</CardTitle>
+                  <CardTitle className="text-sm text-gray-600">
+                    Gallery Images
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold text-brand-600">{galleryImages.length}</p>
+                  <p className="text-3xl font-bold text-brand-600">
+                    {galleryImages.length}
+                  </p>
                 </CardContent>
               </Card>
             </div>
           )}
 
           {/* Projects Section */}
-          {activeSection === 'projects' && (
+          {activeSection === "projects" && (
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{editingId ? 'Edit Project' : 'Add New Project'}</CardTitle>
+                  <CardTitle>
+                    {editingId ? "Edit Project" : "Add New Project"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleProjectSubmit} className="space-y-4">
@@ -447,7 +550,9 @@ export function Dashboard() {
                       <Input
                         id="project-name"
                         value={projectForm.title}
-                        onChange={(e) => handleProjectTitleChange(e.target.value)}
+                        onChange={(e) =>
+                          handleProjectTitleChange(e.target.value)
+                        }
                         placeholder="Enter project name"
                       />
                     </div>
@@ -457,7 +562,12 @@ export function Dashboard() {
                       <Textarea
                         id="project-description"
                         value={projectForm.description}
-                        onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
+                        onChange={(e) =>
+                          setProjectForm({
+                            ...projectForm,
+                            description: e.target.value,
+                          })
+                        }
                         placeholder="Enter project description"
                         rows={4}
                       />
@@ -468,7 +578,12 @@ export function Dashboard() {
                       <Input
                         id="project-category"
                         value={projectForm.category}
-                        onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
+                        onChange={(e) =>
+                          setProjectForm({
+                            ...projectForm,
+                            category: e.target.value,
+                          })
+                        }
                         placeholder="Enter project category"
                       />
                     </div>
@@ -478,7 +593,12 @@ export function Dashboard() {
                       <Input
                         id="project-image"
                         value={projectForm.imageUrl}
-                        onChange={(e) => setProjectForm({ ...projectForm, imageUrl: e.target.value })}
+                        onChange={(e) =>
+                          setProjectForm({
+                            ...projectForm,
+                            imageUrl: e.target.value,
+                          })
+                        }
                         placeholder="https://..."
                       />
                     </div>
@@ -490,7 +610,12 @@ export function Dashboard() {
                           id="project-start-date"
                           type="date"
                           value={projectForm.startDate}
-                          onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
+                          onChange={(e) =>
+                            setProjectForm({
+                              ...projectForm,
+                              startDate: e.target.value,
+                            })
+                          }
                         />
                       </div>
                       <div>
@@ -499,7 +624,12 @@ export function Dashboard() {
                           id="project-end-date"
                           type="date"
                           value={projectForm.endDate}
-                          onChange={(e) => setProjectForm({ ...projectForm, endDate: e.target.value })}
+                          onChange={(e) =>
+                            setProjectForm({
+                              ...projectForm,
+                              endDate: e.target.value,
+                            })
+                          }
                         />
                       </div>
                     </div>
@@ -508,7 +638,7 @@ export function Dashboard() {
                       <Label htmlFor="project-status">Status</Label>
                       <Select
                         value={projectForm.status}
-                        onValueChange={(value: 'ongoing' | 'completed') =>
+                        onValueChange={(value: "ongoing" | "completed") =>
                           setProjectForm({ ...projectForm, status: value })
                         }
                       >
@@ -523,7 +653,9 @@ export function Dashboard() {
                     </div>
 
                     <div>
-                      <Label htmlFor="project-slug">Slug (Auto-generated)</Label>
+                      <Label htmlFor="project-slug">
+                        Slug (Auto-generated)
+                      </Label>
                       <Input
                         id="project-slug"
                         value={projectForm.slug}
@@ -531,15 +663,21 @@ export function Dashboard() {
                         placeholder="Auto-generated from title"
                         className="bg-gray-50"
                       />
-                      <p className="text-xs text-gray-500 mt-1">URL: /projects/{projectForm.slug || 'your-project-name'}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        URL: /projects/{projectForm.slug || "your-project-name"}
+                      </p>
                     </div>
 
                     <div className="flex gap-2">
                       <Button type="submit" className="flex-1">
-                        {editingId ? 'Update Project' : 'Add Project'}
+                        {editingId ? "Update Project" : "Add Project"}
                       </Button>
                       {editingId && (
-                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={cancelEdit}
+                        >
                           <X className="h-4 w-4" />
                         </Button>
                       )}
@@ -551,10 +689,22 @@ export function Dashboard() {
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle>All Projects ({projects.filter(p => projectStatusFilter === 'all' || p.status === projectStatusFilter).length})</CardTitle>
+                    <CardTitle>
+                      All Projects (
+                      {
+                        projects.filter(
+                          (p) =>
+                            projectStatusFilter === "all" ||
+                            p.status === projectStatusFilter,
+                        ).length
+                      }
+                      )
+                    </CardTitle>
                     <Select
                       value={projectStatusFilter}
-                      onValueChange={(value: 'all' | 'ongoing' | 'completed') => setProjectStatusFilter(value)}
+                      onValueChange={(value: "all" | "ongoing" | "completed") =>
+                        setProjectStatusFilter(value)
+                      }
                     >
                       <SelectTrigger className="w-40">
                         <SelectValue />
@@ -570,49 +720,74 @@ export function Dashboard() {
                 <CardContent>
                   <div className="space-y-3">
                     {projects
-                      .filter(p => projectStatusFilter === 'all' || p.status === projectStatusFilter)
+                      .filter(
+                        (p) =>
+                          projectStatusFilter === "all" ||
+                          p.status === projectStatusFilter,
+                      )
                       .map((project) => (
-                      <div key={project.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                        <div className="flex justify-between items-start gap-4">
-                          <img src={project.imageUrl} alt={project.title} className="w-20 h-20 rounded object-cover flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold">{project.title}</h3>
-                              <span className="px-2 py-1 rounded text-xs bg-brand-100 text-brand-600">
-                                {project.category}
-                              </span>
-                              <span className={`px-2 py-1 rounded text-xs ${
-                                project.status === 'ongoing' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
-                              }`}>
-                                {project.status === 'ongoing' ? 'Ongoing' : 'Completed'}
-                              </span>
+                        <div
+                          key={project.id}
+                          className="border rounded-lg p-4 hover:bg-gray-50"
+                        >
+                          <div className="flex justify-between items-start gap-4">
+                            <img
+                              src={project.imageUrl}
+                              alt={project.title}
+                              className="w-20 h-20 rounded object-cover flex-shrink-0"
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h3 className="font-semibold">
+                                  {project.title}
+                                </h3>
+                                <span className="px-2 py-1 rounded text-xs bg-brand-100 text-brand-600">
+                                  {project.category}
+                                </span>
+                                <span
+                                  className={`px-2 py-1 rounded text-xs ${
+                                    project.status === "ongoing"
+                                      ? "bg-green-100 text-green-600"
+                                      : "bg-gray-100 text-gray-600"
+                                  }`}
+                                >
+                                  {project.status === "ongoing"
+                                    ? "Ongoing"
+                                    : "Completed"}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-2">
+                                {project.description}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {project.startDate} - {project.endDate}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                Slug: {project.slug}
+                              </p>
                             </div>
-                            <p className="text-sm text-gray-600 mb-2">{project.description}</p>
-                            <p className="text-xs text-gray-500">
-                              {project.startDate} - {project.endDate}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              Slug: {project.slug}
-                            </p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="sm" onClick={() => handleEditProject(project)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                deleteProject(project.id);
-                                toast.success('Project deleted');
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditProject(project)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  deleteProject(project.id);
+                                  toast.success("Project deleted");
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </CardContent>
               </Card>
@@ -620,11 +795,13 @@ export function Dashboard() {
           )}
 
           {/* Team Section */}
-          {activeSection === 'team' && (
+          {activeSection === "team" && (
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{editingId ? 'Edit Team Member' : 'Add New Team Member'}</CardTitle>
+                  <CardTitle>
+                    {editingId ? "Edit Team Member" : "Add New Team Member"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleTeamSubmit} className="space-y-4">
@@ -633,7 +810,9 @@ export function Dashboard() {
                       <Input
                         id="team-name"
                         value={teamForm.name}
-                        onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
+                        onChange={(e) =>
+                          setTeamForm({ ...teamForm, name: e.target.value })
+                        }
                         placeholder="Enter name"
                       />
                     </div>
@@ -643,7 +822,9 @@ export function Dashboard() {
                       <Input
                         id="team-position"
                         value={teamForm.position}
-                        onChange={(e) => setTeamForm({ ...teamForm, position: e.target.value })}
+                        onChange={(e) =>
+                          setTeamForm({ ...teamForm, position: e.target.value })
+                        }
                         placeholder="e.g., Chief Engineer"
                       />
                     </div>
@@ -653,7 +834,9 @@ export function Dashboard() {
                       <Textarea
                         id="team-bio"
                         value={teamForm.bio}
-                        onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
+                        onChange={(e) =>
+                          setTeamForm({ ...teamForm, bio: e.target.value })
+                        }
                         placeholder="Enter team member bio"
                         rows={4}
                       />
@@ -664,17 +847,23 @@ export function Dashboard() {
                       <Input
                         id="team-image"
                         value={teamForm.imageUrl}
-                        onChange={(e) => setTeamForm({ ...teamForm, imageUrl: e.target.value })}
+                        onChange={(e) =>
+                          setTeamForm({ ...teamForm, imageUrl: e.target.value })
+                        }
                         placeholder="https://..."
                       />
                     </div>
 
                     <div className="flex gap-2">
                       <Button type="submit" className="flex-1">
-                        {editingId ? 'Update Member' : 'Add Member'}
+                        {editingId ? "Update Member" : "Add Member"}
                       </Button>
                       {editingId && (
-                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={cancelEdit}
+                        >
                           <X className="h-4 w-4" />
                         </Button>
                       )}
@@ -690,16 +879,31 @@ export function Dashboard() {
                 <CardContent>
                   <div className="space-y-3">
                     {teamMembers.map((member) => (
-                      <div key={member.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                      <div
+                        key={member.id}
+                        className="border rounded-lg p-4 hover:bg-gray-50"
+                      >
                         <div className="flex gap-4">
-                          <img src={member.imageUrl} alt={member.name} className="w-16 h-16 rounded-full object-cover" />
+                          <img
+                            src={member.imageUrl}
+                            alt={member.name}
+                            className="w-16 h-16 rounded-full object-cover"
+                          />
                           <div className="flex-1">
                             <h3 className="font-semibold">{member.name}</h3>
-                            <p className="text-sm text-brand-600">{member.position}</p>
-                            <p className="text-sm text-gray-600">{member.bio}</p>
+                            <p className="text-sm text-brand-600">
+                              {member.position}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {member.bio}
+                            </p>
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm" onClick={() => handleEditTeam(member)}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditTeam(member)}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
@@ -707,7 +911,7 @@ export function Dashboard() {
                               size="sm"
                               onClick={() => {
                                 deleteTeamMember(member.id);
-                                toast.success('Team member deleted');
+                                toast.success("Team member deleted");
                               }}
                             >
                               <Trash2 className="h-4 w-4 text-red-500" />
@@ -723,11 +927,13 @@ export function Dashboard() {
           )}
 
           {/* Events Section */}
-          {activeSection === 'events' && (
+          {activeSection === "events" && (
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{editingId ? 'Edit Event' : 'Add New Event'}</CardTitle>
+                  <CardTitle>
+                    {editingId ? "Edit Event" : "Add New Event"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleEventSubmit} className="space-y-4">
@@ -746,7 +952,12 @@ export function Dashboard() {
                       <Textarea
                         id="event-description"
                         value={eventForm.description}
-                        onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                        onChange={(e) =>
+                          setEventForm({
+                            ...eventForm,
+                            description: e.target.value,
+                          })
+                        }
                         placeholder="Enter event description"
                         rows={4}
                       />
@@ -759,7 +970,12 @@ export function Dashboard() {
                           id="event-start"
                           type="date"
                           value={eventForm.startDate}
-                          onChange={(e) => setEventForm({ ...eventForm, startDate: e.target.value })}
+                          onChange={(e) =>
+                            setEventForm({
+                              ...eventForm,
+                              startDate: e.target.value,
+                            })
+                          }
                         />
                       </div>
                       <div>
@@ -768,7 +984,12 @@ export function Dashboard() {
                           id="event-end"
                           type="date"
                           value={eventForm.endDate}
-                          onChange={(e) => setEventForm({ ...eventForm, endDate: e.target.value })}
+                          onChange={(e) =>
+                            setEventForm({
+                              ...eventForm,
+                              endDate: e.target.value,
+                            })
+                          }
                         />
                       </div>
                     </div>
@@ -779,19 +1000,26 @@ export function Dashboard() {
                         id="event-duration"
                         type="text"
                         value={eventForm.duration}
-                        onChange={(e) => setEventForm({ ...eventForm, duration: e.target.value })}
+                        onChange={(e) =>
+                          setEventForm({
+                            ...eventForm,
+                            duration: e.target.value,
+                          })
+                        }
                         placeholder="e.g., 3 days, 5 days"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Enter duration like "3 days" or "2 weeks"</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Enter duration like "3 days" or "2 weeks"
+                      </p>
                     </div>
 
                     <div>
                       <Label htmlFor="event-type">Type</Label>
                       <Select
                         value={eventForm.type}
-                        onValueChange={(value: 'Workshop' | 'Training' | 'Seminar') =>
-                          setEventForm({ ...eventForm, type: value })
-                        }
+                        onValueChange={(
+                          value: "Workshop" | "Training" | "Seminar",
+                        ) => setEventForm({ ...eventForm, type: value })}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -808,8 +1036,13 @@ export function Dashboard() {
                       <Label htmlFor="event-topics">Topics</Label>
                       <Textarea
                         id="event-topics"
-                        value={eventForm.topics.join('\n')}
-                        onChange={(e) => setEventForm({ ...eventForm, topics: e.target.value.split('\n') })}
+                        value={eventForm.topics.join("\n")}
+                        onChange={(e) =>
+                          setEventForm({
+                            ...eventForm,
+                            topics: e.target.value.split("\n"),
+                          })
+                        }
                         placeholder="Enter topics, one per line"
                         rows={4}
                       />
@@ -824,15 +1057,21 @@ export function Dashboard() {
                         placeholder="Auto-generated from title"
                         className="bg-gray-50"
                       />
-                      <p className="text-xs text-gray-500 mt-1">URL: /events/{eventForm.slug || 'your-event-name'}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        URL: /events/{eventForm.slug || "your-event-name"}
+                      </p>
                     </div>
 
                     <div className="flex gap-2">
                       <Button type="submit" className="flex-1">
-                        {editingId ? 'Update Event' : 'Add Event'}
+                        {editingId ? "Update Event" : "Add Event"}
                       </Button>
                       {editingId && (
-                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={cancelEdit}
+                        >
                           <X className="h-4 w-4" />
                         </Button>
                       )}
@@ -848,11 +1087,18 @@ export function Dashboard() {
                 <CardContent>
                   <div className="space-y-3">
                     {events.map((event) => (
-                      <div key={event.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                      <div
+                        key={event.id}
+                        className="border rounded-lg p-4 hover:bg-gray-50"
+                      >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <h3 className="font-semibold mb-2">{event.title}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{event.description}</p>
+                            <h3 className="font-semibold mb-2">
+                              {event.title}
+                            </h3>
+                            <p className="text-sm text-gray-600 mb-2">
+                              {event.description}
+                            </p>
                             <p className="text-xs text-gray-500">
                               {event.startDate} - {event.endDate}
                             </p>
@@ -861,7 +1107,7 @@ export function Dashboard() {
                             </p>
                             {event.topics && event.topics.length > 0 && (
                               <p className="text-xs text-gray-500">
-                                Topics: {event.topics.join(', ')}
+                                Topics: {event.topics.join(", ")}
                               </p>
                             )}
                             <p className="text-xs text-gray-400 mt-1">
@@ -869,7 +1115,11 @@ export function Dashboard() {
                             </p>
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditEvent(event)}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
@@ -877,7 +1127,7 @@ export function Dashboard() {
                               size="sm"
                               onClick={() => {
                                 deleteEvent(event.id);
-                                toast.success('Event deleted');
+                                toast.success("Event deleted");
                               }}
                             >
                               <Trash2 className="h-4 w-4 text-red-500" />
@@ -893,11 +1143,13 @@ export function Dashboard() {
           )}
 
           {/* Gallery Section */}
-          {activeSection === 'gallery' && (
+          {activeSection === "gallery" && (
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{editingId ? 'Edit Gallery Image' : 'Add New Gallery Image'}</CardTitle>
+                  <CardTitle>
+                    {editingId ? "Edit Gallery Image" : "Add New Gallery Image"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleGallerySubmit} className="space-y-4">
@@ -906,7 +1158,12 @@ export function Dashboard() {
                       <Input
                         id="gallery-title"
                         value={galleryForm.title}
-                        onChange={(e) => setGalleryForm({ ...galleryForm, title: e.target.value })}
+                        onChange={(e) =>
+                          setGalleryForm({
+                            ...galleryForm,
+                            title: e.target.value,
+                          })
+                        }
                         placeholder="Enter title"
                       />
                     </div>
@@ -916,7 +1173,12 @@ export function Dashboard() {
                       <Input
                         id="gallery-category"
                         value={galleryForm.category}
-                        onChange={(e) => setGalleryForm({ ...galleryForm, category: e.target.value })}
+                        onChange={(e) =>
+                          setGalleryForm({
+                            ...galleryForm,
+                            category: e.target.value,
+                          })
+                        }
                         placeholder="Enter category"
                       />
                     </div>
@@ -926,17 +1188,26 @@ export function Dashboard() {
                       <Input
                         id="gallery-image"
                         value={galleryForm.imageUrl}
-                        onChange={(e) => setGalleryForm({ ...galleryForm, imageUrl: e.target.value })}
+                        onChange={(e) =>
+                          setGalleryForm({
+                            ...galleryForm,
+                            imageUrl: e.target.value,
+                          })
+                        }
                         placeholder="https://..."
                       />
                     </div>
 
                     <div className="flex gap-2">
                       <Button type="submit" className="flex-1">
-                        {editingId ? 'Update Image' : 'Add Image'}
+                        {editingId ? "Update Image" : "Add Image"}
                       </Button>
                       {editingId && (
-                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={cancelEdit}
+                        >
                           <X className="h-4 w-4" />
                         </Button>
                       )}
@@ -947,16 +1218,29 @@ export function Dashboard() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>All Gallery Images ({galleryImages.length})</CardTitle>
+                  <CardTitle>
+                    All Gallery Images ({galleryImages.length})
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {galleryImages.map((image) => (
-                      <div key={image.id} className="border rounded-lg overflow-hidden">
-                        <img src={image.imageUrl} alt={image.title} className="w-full h-48 object-cover" />
+                      <div
+                        key={image.id}
+                        className="border rounded-lg overflow-hidden"
+                      >
+                        <img
+                          src={image.imageUrl}
+                          alt={image.title}
+                          className="w-full h-48 object-cover"
+                        />
                         <div className="p-3">
-                          <p className="font-semibold text-sm mb-1">{image.title}</p>
-                          <p className="text-xs text-gray-500 mb-2">{image.category}</p>
+                          <p className="font-semibold text-sm mb-1">
+                            {image.title}
+                          </p>
+                          <p className="text-xs text-gray-500 mb-2">
+                            {image.category}
+                          </p>
                           <div className="flex gap-2">
                             <Button
                               variant="outline"
@@ -972,7 +1256,7 @@ export function Dashboard() {
                               size="sm"
                               onClick={() => {
                                 deleteGalleryImage(image.id);
-                                toast.success('Image deleted');
+                                toast.success("Image deleted");
                               }}
                             >
                               <Trash2 className="h-4 w-4 text-red-500" />
