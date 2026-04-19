@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import logoImage from "../../imports/DCP_logo-1.png";
+import logoImage from "../../imports/logo.png";
 
 export function Header() {
   const location = useLocation();

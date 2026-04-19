@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import dikshaImage from "../../imports/dco.png";
 
 export interface TeamMember {
   id: string;
@@ -66,7 +67,7 @@ const initialTeamMembers: TeamMember[] = [
     name: "Diksha Shrestha",
     position: "Managing Director",
     bio: "MBA",
-    imgUrl: "",
+    imgUrl: dikshaImage,
   },
   {
     id: "2",

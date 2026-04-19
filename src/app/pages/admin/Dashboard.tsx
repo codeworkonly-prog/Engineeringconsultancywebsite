@@ -79,7 +79,7 @@ export function Dashboard() {
     name: "",
     position: "",
     bio: "",
-    imageUrl: "",
+    imgUrl: "",
   });
 
   const [galleryForm, setGalleryForm] = useState({
@@ -223,7 +223,7 @@ export function Dashboard() {
       !teamForm.name ||
       !teamForm.position ||
       !teamForm.bio ||
-      !teamForm.imageUrl
+      !teamForm.imgUrl
     ) {
       toast.error("Please fill all fields");
       return;
@@ -237,7 +237,7 @@ export function Dashboard() {
       addTeamMember(teamForm);
       toast.success("Team member added");
     }
-    setTeamForm({ name: "", position: "", bio: "", imageUrl: "" });
+    setTeamForm({ name: "", position: "", bio: "", imgUrl: "" });
   };
 
   const handleEditTeam = (member: (typeof teamMembers)[0]) => {
@@ -245,7 +245,7 @@ export function Dashboard() {
       name: member.name,
       position: member.position,
       bio: member.bio,
-      imageUrl: member.imageUrl,
+      imgUrl: member.imgUrl,
     });
     setEditingId(member.id);
   };
@@ -360,7 +360,7 @@ export function Dashboard() {
       status: "ongoing",
       slug: "",
     });
-    setTeamForm({ name: "", position: "", bio: "", imageUrl: "" });
+    setTeamForm({ name: "", position: "", bio: "", imgUrl: "" });
     setGalleryForm({ title: "", category: "", imageUrl: "" });
     setEventForm({
       title: "",
@@ -846,9 +846,9 @@ export function Dashboard() {
                       <Label htmlFor="team-image">Image URL</Label>
                       <Input
                         id="team-image"
-                        value={teamForm.imageUrl}
+                        value={teamForm.imgUrl}
                         onChange={(e) =>
-                          setTeamForm({ ...teamForm, imageUrl: e.target.value })
+                          setTeamForm({ ...teamForm, imgUrl: e.target.value })
                         }
                         placeholder="https://..."
                       />
@@ -885,7 +885,7 @@ export function Dashboard() {
                       >
                         <div className="flex gap-4">
                           <img
-                            src={member.imageUrl}
+                            src={member.imgUrl}
                             alt={member.name}
                             className="w-16 h-16 rounded-full object-cover"
                           />
