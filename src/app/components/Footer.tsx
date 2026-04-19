@@ -28,15 +28,17 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-gray-400">
                 <Phone className="h-5 w-5" />
-                <span>9841707077</span>
+                <span><a href="tel:+9779841707077">+977 9841707077</a></span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <Mail className="h-5 w-5" />
-                <span>consultingdiksha@gmail.com</span>
+                <span><a href="mailto:consultingdiksha@gmail.com">consultingdiksha@gmail.com</a></span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <MapPin className="h-5 w-5" />
-                <span>Ghattekulo-32, Kathmandu</span>
+                <span><a href="https://maps.google.com/?q=Ghattekulo-32, Kathmandu" target="_blank" rel="noopener noreferrer">
+                  Ghattekulo-32, Kathmandu
+                </a></span>
               </div>
             </div>
           </div>

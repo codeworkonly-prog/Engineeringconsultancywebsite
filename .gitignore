@@ -1,6 +1,6 @@
 # dependencies
 /node_modules/
-/my-project/node_modules
+/my-project/Snode_modules
 /package-lock.json
 /yarn.lock
 /pnpm-lock.yaml
