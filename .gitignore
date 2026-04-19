@@ -1,6 +1,6 @@
 # dependencies
 /node_modules/
-/my-project/Snode_modules
+/my-project/node_modules
 /package-lock.json
 /yarn.lock
 /pnpm-lock.yaml
@@ -37,9 +37,6 @@ Thumbs.db
 
 # generated files
 /src/types/generated/
-
-# Supabase local
-/supabase/.cache/
 
 # Misc
 /.history/

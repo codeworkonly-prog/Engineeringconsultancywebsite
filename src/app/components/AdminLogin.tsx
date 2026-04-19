@@ -99,13 +99,13 @@ export function AdminLogin() {
           <PasswordResetForm onBack={() => setShowResetForm(false)} />
         )}
 
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        {/* <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center">
             Default credentials: admin / admin123
             <br />
             Please change your password after first login
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
