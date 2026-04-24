@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import dikshaImage from "../../imports/dco.png";
+import dikshaImage from "../../imports/diksha.png";
+import shreyaImage from "../../imports/shreya.png";
+import satyaImage from "../../imports/satya.png";
+import abhishekImage from "../../imports/Abhishek.png";
 
 export interface TeamMember {
   id: string;
@@ -75,7 +78,7 @@ const initialTeamMembers: TeamMember[] = [
     position: "Environmental/Civil Engineer",
     bio: "Master of Science - MS, Environmental/Environmental Health Engineering, Bachelor of Engineering - BE, Civil Engineering",
     imgUrl:
-      "https://media.licdn.com/dms/image/v2/D4D03AQGhAbPCMtv6EA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1707734956739?e=2147483647&v=beta&t=48l6GoyUEWZocVtaUhjI7Eti6q4xfFmYI9MlKBxr8j4",
+      abhishekImage,
   },
   {
     id: "3",
@@ -83,7 +86,7 @@ const initialTeamMembers: TeamMember[] = [
     position: "Architect",
     bio: "Bachelor of Architecture (B.Arch)",
     imgUrl:
-      "https://pps.services.adobe.com/api/profile/14DD1EBA667EB9400A495FA9@AdobeID/image/8ba43f61-57ac-4810-bc10-a2f6cb390d97/276",
+      shreyaImage,
   },
   {
     id: "4",
@@ -91,7 +94,7 @@ const initialTeamMembers: TeamMember[] = [
     position: "Site Engineer",
     bio: "Bachelors Degree in Civil Engineering",
     imgUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMCdFaNdyu-aXJfSYuX40QPFtWFYcusDqSbQ&s",
+      satyaImage,
   },
 ];
 
