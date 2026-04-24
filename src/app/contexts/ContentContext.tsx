@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 import dikshaImage from "../../imports/diksha.png";
 import shreyaImage from "../../imports/shreya.png";
 import satyaImage from "../../imports/satya.png";
-import abhishekImage from "../../imports/Abhishek.png";
+import abhishekImage from "../../imports/abhishek.png";
 
 export interface TeamMember {
   id: string;
