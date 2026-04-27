@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import dikshaImage from "../../imports/diksha.png";
 import shreyaImage from "../../imports/shreya.png";
-import satyaImage from "../../imports/satya.png";
-import abhishekImage from "../../imports/abhishek.png";
+import satyaImage from "../../imports/Satya.png";
+import abhishekImage from "../../imports/Abhishek.png";
 
 export interface TeamMember {
   id: string;
@@ -77,24 +77,21 @@ const initialTeamMembers: TeamMember[] = [
     name: "Abishek Sharma",
     position: "Environmental/Civil Engineer",
     bio: "Master of Science - MS, Environmental/Environmental Health Engineering, Bachelor of Engineering - BE, Civil Engineering",
-    imgUrl:
-      abhishekImage,
+    imgUrl: abhishekImage,
   },
   {
     id: "3",
     name: "Shreya Tuladhar",
     position: "Architect",
     bio: "Bachelor of Architecture (B.Arch)",
-    imgUrl:
-      shreyaImage,
+    imgUrl: shreyaImage,
   },
   {
     id: "4",
     name: "Satya Raj Pandey",
     position: "Site Engineer",
     bio: "Bachelors Degree in Civil Engineering",
-    imgUrl:
-      satyaImage,
+    imgUrl: satyaImage,
   },
 ];
 
