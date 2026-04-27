@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import dikshaImage from "../../imports/diksha.png";
-import shreyaImage from "../../imports/shreya.png";
-import satyaImage from "../../imports/Satya.png";
-import abhishekImage from "../../imports/Abhishek.png";
+import dikshaImage from "../../imports/diksha1.png";
+import shreyaImage from "../../imports/shreya1.png";
+import satyaImage from "../../imports/Satya1.png";
+import abhishekImage from "../../imports/Abhishek1.png";
 
 export interface TeamMember {
   id: string;
