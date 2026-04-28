@@ -1,33 +1,19 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Card, CardContent } from "../components/ui/card";
-import { useContent } from "../contexts/ContentContext";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
-import { Calendar } from "lucide-react";
+import { useState } from 'react';
+import { Link } from 'react-router';
+import { Card, CardContent } from '../components/ui/card';
+import { useContent } from '../contexts/ContentContext';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Calendar } from 'lucide-react';
 
 export function Projects() {
   const { projects, galleryImages } = useContent();
-  const [activeTab, setActiveTab] = useState("all");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "ongoing" | "completed"
-  >("all");
+  const [activeTab, setActiveTab] = useState<'all' | 'Design and Build' | 'Contract'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
 
-  const categories = ["all", ...new Set(projects.map((p) => p.category))];
   const filteredProjects = projects
-    .filter((p) => activeTab === "all" || p.category === activeTab)
-    .filter((p) => statusFilter === "all" || p.status === statusFilter);
+    .filter((p) => activeTab === 'all' || p.projectType === activeTab)
+    .filter((p) => statusFilter === 'all' || p.status === statusFilter);
 
   return (
     <div>
@@ -36,8 +22,7 @@ export function Projects() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Our Projects</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
-            Explore our portfolio of successful engineering projects and see how
-            we deliver excellence
+            Explore our portfolio of successful engineering projects and see how we deliver excellence
           </p>
         </div>
       </section>
@@ -45,32 +30,20 @@ export function Projects() {
       {/* Projects Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="flex-1"
-            >
-              <TabsList className="grid w-full max-w-2xl grid-cols-4">
-                {categories.map((category) => (
-                  <TabsTrigger
-                    key={category}
-                    value={category}
-                    className="capitalize"
-                  >
-                    {category}
-                  </TabsTrigger>
-                ))}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'all' | 'Design and Build' | 'Contract')} className="flex-1">
+              <TabsList className="grid w-full max-w-2xl grid-cols-3">
+                <TabsTrigger value="all">All Projects</TabsTrigger>
+                <TabsTrigger value="Design and Build">Design and Build</TabsTrigger>
+                <TabsTrigger value="Contract">Contract</TabsTrigger>
               </TabsList>
             </Tabs>
 
             <Select
               value={statusFilter}
-              onValueChange={(value: "all" | "ongoing" | "completed") =>
-                setStatusFilter(value)
-              }
+              onValueChange={(value: 'all' | 'ongoing' | 'completed') => setStatusFilter(value)}
             >
-              <SelectTrigger className="w-40 ml-4">
+              <SelectTrigger className="w-40">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -91,30 +64,25 @@ export function Projects() {
                     className="w-full h-56 object-cover"
                   />
                   <CardContent className="pt-6">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
                       <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full">
+                        {project.projectType}
+                      </span>
+                      <span className="px-3 py-1 bg-purple-100 text-purple-600 text-xs rounded-full">
                         {project.category}
                       </span>
-                      <span
-                        className={`px-3 py-1 text-xs rounded-full ${
-                          project.status === "ongoing"
-                            ? "bg-green-100 text-green-600"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {project.status === "ongoing" ? "Ongoing" : "Completed"}
+                      <span className={`px-3 py-1 text-xs rounded-full ${
+                        project.status === 'ongoing' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {project.status === 'ongoing' ? 'Ongoing' : 'Completed'}
                       </span>
                     </div>
                     <div className="flex items-center text-xs text-gray-500 mb-3">
                       <Calendar className="h-3 w-3 mr-1" />
                       {project.startDate} - {project.endDate}
                     </div>
-                    <h3 className="font-semibold text-lg mb-2">
-                      {project.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                      {project.description}
-                    </p>
+                    <h3 className="font-semibold text-lg mb-2">{project.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{project.description}</p>
                   </CardContent>
                 </Card>
               </Link>
@@ -134,7 +102,9 @@ export function Projects() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Project Gallery</h2>
-            <p className="text-gray-600">A glimpse into our work and team</p>
+            <p className="text-gray-600">
+              A glimpse into our work and team
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
