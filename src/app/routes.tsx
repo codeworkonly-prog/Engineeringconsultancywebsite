@@ -8,7 +8,10 @@ import { ProjectDetail } from "./pages/ProjectDetail";
 import { EventDetail } from "./pages/EventDetail";
 import { Contact } from "./pages/Contact";
 import { Team } from "./pages/Team";
+import { TeamMemberDetail } from "./pages/TeamMemberDetail";
 import { CompanyProfile } from "./pages/CompanyProfile";
+import { CompanySector } from "./pages/CompanySector";
+import { ConsultingService } from "./pages/ConsultingService";
 import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminLogin } from "./components/AdminLogin";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -16,22 +19,25 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root />,
+    Component: Root,
     children: [
-      { index: true, element: <Home /> },
-      { path: "about", element: <About /> },
-      { path: "company-profile", element: <CompanyProfile /> },
-      { path: "team", element: <Team /> },
-      { path: "events", element: <Training /> },
-      { path: "events/:slug", element: <EventDetail /> },
-      { path: "projects", element: <Projects /> },
-      { path: "projects/:slug", element: <ProjectDetail /> },
-      { path: "contact", element: <Contact /> },
+      { index: true, Component: Home },
+      { path: "about", Component: About },
+      { path: "company-sector", Component: CompanySector },
+      { path: "consulting-service", Component: ConsultingService },
+      { path: "company-profile", Component: CompanyProfile },
+      { path: "team", Component: Team },
+      { path: "team/:slug", Component: TeamMemberDetail },
+      { path: "events", Component: Training },
+      { path: "events/:slug", Component: EventDetail },
+      { path: "projects", Component: Projects },
+      { path: "projects/:slug", Component: ProjectDetail },
+      { path: "contact", Component: Contact },
     ],
   },
   {
     path: "/admin/login",
-    element: <AdminLogin />,
+    Component: AdminLogin,
   },
   {
     path: "/admin",
