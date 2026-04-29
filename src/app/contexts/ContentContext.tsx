@@ -1,4 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import dikshaImage from "../../imports/diksha1.png";
+import shreyaImage from "../../imports/shreya1.png";
+import satyaImage from "../../imports/Satya1.png";
+import abhishekImage from "../../imports/Abhishek1.png";
 
 export interface TeamMember {
   id: string;
@@ -90,12 +94,36 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 const initialTeamMembers: TeamMember[] = [
   {
     id: '1',
-    name: 'John Anderson',
+    name: 'Diksha Shrestha',
     position: 'Managing Director',
-    bio: 'Senior Consultant with expertise in structural engineering.',
-    imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
-    slug: 'john-anderson',
+    bio: 'Strong leadership, expert management, and a commitment to delivering innovative consulting and project solutions with excellence.',
+    imageUrl: dikshaImage,
+    slug: 'diksha-shrestha',
   },
+  {
+    id: '2',
+    name: 'Abhishek Sharma',
+    position: 'Environmental/Civil Engineer',
+    bio: 'Master of Science - MS, Environmental/Environmental Health Engineering, Bachelor of Engineering - BE, Civil Engineering',
+    imageUrl: abhishekImage,
+    slug: 'abhishek-sharma',
+  },
+  {
+    id: '3',
+    name: 'Shreya Tuladhar',
+    position: 'Architect',
+    bio: 'Bachelor of Architecture (B.Arch)',
+    imageUrl: shreyaImage,
+    slug: 'shreya-tuladhar',
+  },
+  {
+    id: '4',
+    name: 'Satya Raj Pandey',
+    position: 'Engineer',
+    bio: 'Bachelors Degree in Civil Engineering',
+    imageUrl: satyaImage,
+    slug: 'satya-raj-pandey',
+  }
 ];
 
 const initialClients: Client[] = [];
