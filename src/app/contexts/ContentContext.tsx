@@ -20,16 +20,6 @@ export interface Client {
   website: string;
 }
 
-export interface Review {
-  id: string;
-  reviewerName: string;
-  reviewerPosition: string;
-  reviewerCompany: string;
-  reviewerImage: string;
-  rating: number;
-  testimonial: string;
-}
-
 export interface Project {
   id: string;
   title: string;
@@ -68,7 +58,6 @@ interface ContentContextType {
   galleryImages: GalleryImage[];
   events: Event[];
   clients: Client[];
-  reviews: Review[];
   addTeamMember: (member: Omit<TeamMember, 'id'>) => void;
   updateTeamMember: (id: string, member: Omit<TeamMember, 'id'>) => void;
   addProject: (project: Omit<Project, 'id'>) => void;
@@ -79,14 +68,11 @@ interface ContentContextType {
   updateEvent: (id: string, event: Omit<Event, 'id'>) => void;
   addClient: (client: Omit<Client, 'id'>) => void;
   updateClient: (id: string, client: Omit<Client, 'id'>) => void;
-  addReview: (review: Omit<Review, 'id'>) => void;
-  updateReview: (id: string, review: Omit<Review, 'id'>) => void;
   deleteTeamMember: (id: string) => void;
   deleteProject: (id: string) => void;
   deleteGalleryImage: (id: string) => void;
   deleteEvent: (id: string) => void;
   deleteClient: (id: string) => void;
-  deleteReview: (id: string) => void;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -141,8 +127,6 @@ const initialClients: Client[] = [
   },
 ];
 
-const initialReviews: Review[] = [];
-
 const initialProjects: Project[] = [
   {
     id: '1',
@@ -187,7 +171,6 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(initialGalleryImages);
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [clients, setClients] = useState<Client[]>(initialClients);
-  const [reviews, setReviews] = useState<Review[]>(initialReviews);
 
   const addTeamMember = (member: Omit<TeamMember, 'id'>) => {
     const newMember = { ...member, id: Date.now().toString() };
@@ -254,18 +237,6 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     setClients((prev) => prev.filter((client) => client.id !== id));
   };
 
-  const addReview = (review: Omit<Review, 'id'>) => {
-    const newReview = { ...review, id: Date.now().toString() };
-    setReviews((prev) => [...prev, newReview]);
-  };
-
-  const updateReview = (id: string, review: Omit<Review, 'id'>) => {
-    setReviews((prev) => prev.map((r) => (r.id === id ? { ...review, id } : r)));
-  };
-
-  const deleteReview = (id: string) => {
-    setReviews((prev) => prev.filter((review) => review.id !== id));
-  };
 
   return (
     <ContentContext.Provider
@@ -275,7 +246,6 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         galleryImages,
         events,
         clients,
-        reviews,
         addTeamMember,
         updateTeamMember,
         addProject,
@@ -286,14 +256,11 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         updateEvent,
         addClient,
         updateClient,
-        addReview,
-        updateReview,
         deleteTeamMember,
         deleteProject,
         deleteGalleryImage,
         deleteEvent,
         deleteClient,
-        deleteReview,
       }}
     >
       {children}

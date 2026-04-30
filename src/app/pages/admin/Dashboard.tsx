@@ -24,7 +24,7 @@ import {
   Star,
 } from 'lucide-react';
 
-type Section = 'dashboard' | 'projects' | 'team' | 'events' | 'gallery' | 'clients' | 'reviews';
+type Section = 'dashboard' | 'projects' | 'team' | 'events' | 'gallery' | 'clients';
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -35,7 +35,6 @@ export function Dashboard() {
     galleryImages,
     events,
     clients,
-    reviews,
     addTeamMember,
     updateTeamMember,
     addProject,
@@ -46,14 +45,11 @@ export function Dashboard() {
     updateEvent,
     addClient,
     updateClient,
-    addReview,
-    updateReview,
     deleteTeamMember,
     deleteProject,
     deleteGalleryImage,
     deleteEvent,
     deleteClient,
-    deleteReview,
   } = useContent();
 
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
@@ -102,15 +98,6 @@ export function Dashboard() {
     name: '',
     logoUrl: '',
     website: '',
-  });
-
-  const [reviewForm, setReviewForm] = useState({
-    reviewerName: '',
-    reviewerPosition: '',
-    reviewerCompany: '',
-    reviewerImage: '',
-    rating: 5,
-    testimonial: '',
   });
 
   const handleLogout = () => {
@@ -301,36 +288,7 @@ export function Dashboard() {
     setEditingId(client.id);
   };
 
-  // Review handlers
-  const handleReviewSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reviewForm.reviewerName || !reviewForm.reviewerPosition || !reviewForm.reviewerCompany || !reviewForm.reviewerImage || !reviewForm.testimonial) {
-      toast.error('Please fill all fields');
-      return;
-    }
 
-    if (editingId) {
-      updateReview(editingId, reviewForm);
-      toast.success('Review updated');
-      setEditingId(null);
-    } else {
-      addReview(reviewForm);
-      toast.success('Review added');
-    }
-    setReviewForm({ reviewerName: '', reviewerPosition: '', reviewerCompany: '', reviewerImage: '', rating: 5, testimonial: '' });
-  };
-
-  const handleEditReview = (review: typeof reviews[0]) => {
-    setReviewForm({
-      reviewerName: review.reviewerName,
-      reviewerPosition: review.reviewerPosition,
-      reviewerCompany: review.reviewerCompany,
-      reviewerImage: review.reviewerImage,
-      rating: review.rating,
-      testimonial: review.testimonial,
-    });
-    setEditingId(review.id);
-  };
 
   // Gallery handlers
   const handleGallerySubmit = (e: React.FormEvent) => {
@@ -419,7 +377,6 @@ export function Dashboard() {
     setGalleryForm({ title: '', category: '', imageUrl: '' });
     setEventForm({ title: '', startDate: '', endDate: '', duration: '', type: 'Workshop', description: '', topics: [], slug: '' });
     setClientForm({ name: '', logoUrl: '', website: '' });
-    setReviewForm({ reviewerName: '', reviewerPosition: '', reviewerCompany: '', reviewerImage: '', rating: 5, testimonial: '' });
   };
 
   return (
@@ -490,16 +447,6 @@ export function Dashboard() {
             <Building2 className="h-5 w-5" />
             <span>Clients</span>
           </button>
-
-          <button
-            onClick={() => setActiveSection('reviews')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
-              activeSection === 'reviews' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <Star className="h-5 w-5" />
-            <span>Reviews</span>
-          </button>
         </nav>
 
         <div className="p-4 border-t space-y-2">
@@ -527,7 +474,6 @@ export function Dashboard() {
             {activeSection === 'events' && 'Events'}
             {activeSection === 'gallery' && 'Gallery'}
             {activeSection === 'clients' && 'Clients'}
-            {activeSection === 'reviews' && 'Reviews'}
           </h2>
         </header>
 
@@ -580,14 +526,6 @@ export function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm text-gray-600">Reviews</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold text-brand-600">{reviews.length}</p>
-                </CardContent>
-              </Card>
             </div>
           )}
 
@@ -1260,145 +1198,6 @@ export function Dashboard() {
                               onClick={() => {
                                 deleteClient(client.id);
                                 toast.success('Client deleted');
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Reviews Section */}
-          {activeSection === 'reviews' && (
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{editingId ? 'Edit Review' : 'Add New Review'}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleReviewSubmit} className="space-y-4">
-                    <div>
-                      <Label htmlFor="reviewer-name">Reviewer Name</Label>
-                      <Input
-                        id="reviewer-name"
-                        value={reviewForm.reviewerName}
-                        onChange={(e) => setReviewForm({ ...reviewForm, reviewerName: e.target.value })}
-                        placeholder="Enter reviewer name"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="reviewer-position">Position</Label>
-                      <Input
-                        id="reviewer-position"
-                        value={reviewForm.reviewerPosition}
-                        onChange={(e) => setReviewForm({ ...reviewForm, reviewerPosition: e.target.value })}
-                        placeholder="e.g., CEO, Project Manager"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="reviewer-company">Company</Label>
-                      <Input
-                        id="reviewer-company"
-                        value={reviewForm.reviewerCompany}
-                        onChange={(e) => setReviewForm({ ...reviewForm, reviewerCompany: e.target.value })}
-                        placeholder="Enter company name"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="reviewer-image">Reviewer Image URL</Label>
-                      <Input
-                        id="reviewer-image"
-                        value={reviewForm.reviewerImage}
-                        onChange={(e) => setReviewForm({ ...reviewForm, reviewerImage: e.target.value })}
-                        placeholder="https://..."
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="rating">Rating</Label>
-                      <Select
-                        value={reviewForm.rating.toString()}
-                        onValueChange={(value) => setReviewForm({ ...reviewForm, rating: parseInt(value) })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="5">5 Stars</SelectItem>
-                          <SelectItem value="4">4 Stars</SelectItem>
-                          <SelectItem value="3">3 Stars</SelectItem>
-                          <SelectItem value="2">2 Stars</SelectItem>
-                          <SelectItem value="1">1 Star</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="testimonial">Testimonial</Label>
-                      <Textarea
-                        id="testimonial"
-                        value={reviewForm.testimonial}
-                        onChange={(e) => setReviewForm({ ...reviewForm, testimonial: e.target.value })}
-                        placeholder="Enter review testimonial"
-                        rows={4}
-                      />
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button type="submit" className="flex-1">
-                        {editingId ? 'Update Review' : 'Add Review'}
-                      </Button>
-                      {editingId && (
-                        <Button type="button" variant="outline" onClick={cancelEdit}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>All Reviews ({reviews.length})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {reviews.map((review) => (
-                      <div key={review.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                        <div className="flex gap-4">
-                          <img src={review.reviewerImage} alt={review.reviewerName} className="w-16 h-16 rounded-full object-cover flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold">{review.reviewerName}</h3>
-                              <div className="flex gap-0.5">
-                                {[...Array(review.rating)].map((_, i) => (
-                                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                ))}
-                              </div>
-                            </div>
-                            <p className="text-sm text-brand-600">{review.reviewerPosition} at {review.reviewerCompany}</p>
-                            <p className="text-sm text-gray-600 mt-2">{review.testimonial}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="sm" onClick={() => handleEditReview(review)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                deleteReview(review.id);
-                                toast.success('Review deleted');
                               }}
                             >
                               <Trash2 className="h-4 w-4 text-red-500" />

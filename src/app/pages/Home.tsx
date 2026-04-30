@@ -5,7 +5,7 @@ import { CheckCircle, Users, Award, Lightbulb, Star, Quote } from 'lucide-react'
 import { useContent } from '../contexts/ContentContext';
 
 export function Home() {
-  const { projects, clients, reviews } = useContent();
+  const { projects, clients } = useContent();
   const featuredProjects = projects.slice(0, 3);
 
   return (
@@ -171,51 +171,6 @@ export function Home() {
                     className="max-h-16 max-w-full object-contain"
                   />
                 </a>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Reviews Section */}
-      {reviews.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">What Our Clients Say</h2>
-              <p className="text-gray-600">
-                Read testimonials from our satisfied clients
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {reviews.map((review) => (
-                <Card key={review.id} className="relative">
-                  <CardContent className="pt-6">
-                    <div className="absolute top-4 right-4 text-brand-100">
-                      <Quote className="h-8 w-8" />
-                    </div>
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(review.rating)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                    <p className="text-gray-600 mb-6 italic">"{review.testimonial}"</p>
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={review.reviewerImage}
-                        alt={review.reviewerName}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="font-semibold">{review.reviewerName}</p>
-                        <p className="text-sm text-gray-600">
-                          {review.reviewerPosition}, {review.reviewerCompany}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               ))}
             </div>
           </div>
