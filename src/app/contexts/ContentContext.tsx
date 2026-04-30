@@ -126,7 +126,20 @@ const initialTeamMembers: TeamMember[] = [
   }
 ];
 
-const initialClients: Client[] = [];
+const initialClients: Client[] = [
+  {
+    id: '1',
+    name: 'Gorkha Brewery',
+    logoUrl: 'https://gorkhabrewery.com/media/o13b1o33/gorkha-brewery-carlsberg-group-logo.jpeg?width=172&mode=max',
+    website: 'https://gorkhabrewery.com/en/',
+  },
+  {
+    id: '2',
+    name: 'Iva Tara',
+    logoUrl: 'https://www.ivatara.com/assets/images/logo.svg',
+    website: 'https://www.ivatara.com/',
+  },
+];
 
 const initialReviews: Review[] = [];
 
