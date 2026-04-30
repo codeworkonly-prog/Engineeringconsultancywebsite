@@ -12,7 +12,7 @@ export function Training() {
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-4">Events & Workshops</h1>
+          <h1 className="text-4xl font-bold mb-4">Events</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
             Professional development programs, workshops, and training sessions organized by DCP
           </p>
