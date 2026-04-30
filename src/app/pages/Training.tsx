@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { BookOpen, Users, Clock, Award, CheckCircle, Calendar } from 'lucide-react';
+import { BookOpen, Users, Clock, Award, CheckCircle, Calendar, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
 
@@ -39,7 +39,7 @@ export function Training() {
                   </div>
                   <h3 className="font-semibold mb-2">Expert Instructors</h3>
                   <p className="text-sm text-gray-600">
-                    Learn from experienced engineers with decades of industry experience
+                    Learn directly from experienced professionals working in real-world infrastructure and projects.
                   </p>
                 </div>
               </CardContent>
@@ -51,23 +51,22 @@ export function Training() {
                   <div className="bg-brand-100 p-3 rounded-full mb-4">
                     <Users className="h-8 w-8 text-brand-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Small Class Sizes</h3>
+                  <h3 className="font-semibold mb-2">Practical Hands-on Training</h3>
                   <p className="text-sm text-gray-600">
-                    Personalized attention with limited enrollment per program
+                    Gain real project experience through applied workshops and field-based learning.
                   </p>
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-brand-100 p-3 rounded-full mb-4">
-                    <Clock className="h-8 w-8 text-brand-600" />
+                    <GraduationCap className="h-8 w-8 text-brand-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Flexible Scheduling</h3>
+                  <h3 className="font-semibold mb-2">Comprehensive Learning Support</h3>
                   <p className="text-sm text-gray-600">
-                    Evening and weekend options to fit your busy schedule
+                    Well-structured programs with all necessary resources made easily accessible to participants.
                   </p>
                 </div>
               </CardContent>
