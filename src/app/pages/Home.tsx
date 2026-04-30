@@ -163,7 +163,7 @@ export function Home() {
                   href={client.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center p-6 bg-white rounded-lg hover:shadow-lg transition-shadow duration-200 grayscale hover:grayscale-0"
+                  className="flex items-center justify-center p-6 bg-white rounded-lg hover:shadow-lg transition-shadow duration-200"
                 >
                   <img
                     src={client.logoUrl}

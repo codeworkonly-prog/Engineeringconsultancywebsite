@@ -263,7 +263,7 @@ export function Dashboard() {
   // Client handlers
   const handleClientSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clientForm.name || !clientForm.logoUrl || !clientForm.website) {
+    if (!clientForm.name || !clientForm.logoUrl ) {
       toast.error('Please fill all fields');
       return;
     }

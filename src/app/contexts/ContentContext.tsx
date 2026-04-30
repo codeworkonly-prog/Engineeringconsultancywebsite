@@ -125,6 +125,36 @@ const initialClients: Client[] = [
     logoUrl: 'https://www.ivatara.com/assets/images/logo.svg',
     website: 'https://www.ivatara.com/',
   },
+  {
+    id: '3',
+    name: 'Kathmandu Valley Water Supply Management Board (KVWSMB)',
+    logoUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjrSQkI08Tv4eadvR0pJjeqvqMk5fP9T1GwA&s',
+    website: 'http://www.kvwsmb.gov.np/',
+  },
+   {
+    id: '4',
+    name: 'Nepal Oil Corporation (NOC)',
+    logoUrl: 'https://noc.org.np/assets/noctitl-a0600df220658d84cad1b8af45a54370.png',
+    website: 'https://noc.org.np/',
+  },
+  {
+    id: '5',
+    name: 'Special Economic Zone Authority (SEZA)',
+    logoUrl: 'https://giwmscdnone.gov.np/static/assets/image/Emblem_of_Nepal.png',
+    website: 'https://giwmscdnone.gov.np/',
+  },
+  {
+    id: '6',
+    name: 'Kathmandu Upatyaka Khanepani Limited (KUKL)',
+    logoUrl: 'https://www.kukl.org.np/storage/setting/1/logo/6886-kukl-logo.png',
+    website: 'https://www.kukl.org.np/',
+  },
+  {
+    id: '7',
+    name: 'Economic Policy Incubator (EPI)',
+    logoUrl: 'https://sejonnepal.com/wp-content/uploads/2022/07/EPI-1.png',
+    website: '',
+  },
 ];
 
 const initialProjects: Project[] = [
