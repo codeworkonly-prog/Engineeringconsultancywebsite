@@ -9,39 +9,57 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 
-// TYPES
+// TYPESimport dikshaImage from "../../imports/diksha1.png";
+import shreyaImage from "../../imports/shreya1.png";
+import satyaImage from "../../imports/Satya1.png";
+import abhishekImage from "../../imports/Abhishek1.png";
+
 export interface TeamMember {
   id: string;
   name: string;
-  role: string;
-  qualification: string;
+  position: string;
+  bio: string;
   imageUrl: string;
+  slug: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  logoUrl: string;
+  website: string;
 }
 
 export interface Project {
   id: string;
-  name: string;
+  title: string;
   description: string;
-  status: 'Ongoing' | 'Completed';
+  category: string;
+  projectType: 'Design and Build' | 'Contract';
+  imageUrl: string;
   startDate: string;
   endDate: string;
-  sector: string;
+  status: 'ongoing' | 'completed';
   slug: string;
 }
 
 export interface GalleryImage {
   id: string;
-  albumName: string;
+  title: string;
+  category: string;
   imageUrl: string;
   slug: string;
 }
 
 export interface Event {
   id: string;
-  name: string;
-  description: string;
+  title: string;
   startDate: string;
   endDate: string;
+  duration: string;
+  type: 'Workshop' | 'Training' | 'Seminar';
+  description: string;
+  topics: string[];
   slug: string;
 }
 
@@ -50,31 +68,150 @@ interface ContentContextType {
   projects: Project[];
   galleryImages: GalleryImage[];
   events: Event[];
-
-  addTeamMember: (member: Omit<TeamMember, 'id'>) => Promise<void>;
-  updateTeamMember: (id: string, member: Omit<TeamMember, 'id'>) => Promise<void>;
-  deleteTeamMember: (id: string) => Promise<void>;
-
-  addProject: (project: Omit<Project, 'id'>) => Promise<void>;
-  updateProject: (id: string, project: Omit<Project, 'id'>) => Promise<void>;
-  deleteProject: (id: string) => Promise<void>;
-
-  addGalleryImage: (image: Omit<GalleryImage, 'id'>) => Promise<void>;
-  updateGalleryImage: (id: string, image: Omit<GalleryImage, 'id'>) => Promise<void>;
-  deleteGalleryImage: (id: string) => Promise<void>;
-
-  addEvent: (event: Omit<Event, 'id'>) => Promise<void>;
-  updateEvent: (id: string, event: Omit<Event, 'id'>) => Promise<void>;
-  deleteEvent: (id: string) => Promise<void>;
+  clients: Client[];
+  addTeamMember: (member: Omit<TeamMember, 'id'>) => void;
+  updateTeamMember: (id: string, member: Omit<TeamMember, 'id'>) => void;
+  addProject: (project: Omit<Project, 'id'>) => void;
+  updateProject: (id: string, project: Omit<Project, 'id'>) => void;
+  addGalleryImage: (image: Omit<GalleryImage, 'id'>) => void;
+  updateGalleryImage: (id: string, image: Omit<GalleryImage, 'id'>) => void;
+  addEvent: (event: Omit<Event, 'id'>) => void;
+  updateEvent: (id: string, event: Omit<Event, 'id'>) => void;
+  addClient: (client: Omit<Client, 'id'>) => void;
+  updateClient: (id: string, client: Omit<Client, 'id'>) => void;
+  deleteTeamMember: (id: string) => void;
+  deleteProject: (id: string) => void;
+  deleteGalleryImage: (id: string) => void;
+  deleteEvent: (id: string) => void;
+  deleteClient: (id: string) => void;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
+const initialTeamMembers: TeamMember[] = [
+  {
+    id: '1',
+    name: 'Diksha Shrestha',
+    position: 'Managing Director',
+    bio: 'Strong leadership, expert management, and a commitment to delivering innovative consulting and project solutions with excellence.',
+    imageUrl: dikshaImage,
+    slug: 'diksha-shrestha',
+  },
+  {
+    id: '2',
+    name: 'Abhishek Sharma',
+    position: 'Environmental/Civil Engineer',
+    bio: 'Master of Science - MS, Environmental/Environmental Health Engineering, Bachelor of Engineering - BE, Civil Engineering',
+    imageUrl: abhishekImage,
+    slug: 'abhishek-sharma',
+  },
+  {
+    id: '3',
+    name: 'Shreya Tuladhar',
+    position: 'Architect',
+    bio: 'Bachelor of Architecture (B.Arch)',
+    imageUrl: shreyaImage,
+    slug: 'shreya-tuladhar',
+  },
+  {
+    id: '4',
+    name: 'Satya Raj Pandey',
+    position: 'Engineer',
+    bio: 'Bachelors Degree in Civil Engineering',
+    imageUrl: satyaImage,
+    slug: 'satya-raj-pandey',
+  }
+];
+
+const initialClients: Client[] = [
+  {
+    id: '1',
+    name: 'Gorkha Brewery',
+    logoUrl: 'https://gorkhabrewery.com/media/o13b1o33/gorkha-brewery-carlsberg-group-logo.jpeg?width=172&mode=max',
+    website: 'https://gorkhabrewery.com/en/',
+  },
+  {
+    id: '2',
+    name: 'Iva Tara',
+    logoUrl: 'https://www.ivatara.com/assets/images/logo.svg',
+    website: 'https://www.ivatara.com/',
+  },
+  {
+    id: '3',
+    name: 'Kathmandu Valley Water Supply Management Board (KVWSMB)',
+    logoUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjrSQkI08Tv4eadvR0pJjeqvqMk5fP9T1GwA&s',
+    website: 'http://www.kvwsmb.gov.np/',
+  },
+   {
+    id: '4',
+    name: 'Nepal Oil Corporation (NOC)',
+    logoUrl: 'https://noc.org.np/assets/noctitl-a0600df220658d84cad1b8af45a54370.png',
+    website: 'https://noc.org.np/',
+  },
+  {
+    id: '5',
+    name: 'Special Economic Zone Authority (SEZA)',
+    logoUrl: 'https://giwmscdnone.gov.np/static/assets/image/Emblem_of_Nepal.png',
+    website: 'https://giwmscdnone.gov.np/',
+  },
+  {
+    id: '6',
+    name: 'Kathmandu Upatyaka Khanepani Limited (KUKL)',
+    logoUrl: 'https://www.kukl.org.np/storage/setting/1/logo/6886-kukl-logo.png',
+    website: 'https://www.kukl.org.np/',
+  },
+  {
+    id: '7',
+    name: 'Economic Policy Incubator (EPI)',
+    logoUrl: 'https://sejonnepal.com/wp-content/uploads/2022/07/EPI-1.png',
+    website: '',
+  },
+];
+
+const initialProjects: Project[] = [
+  {
+    id: '1',
+    title: 'City Bridge Infrastructure',
+    description: 'Complete structural analysis and renovation of major city bridge.',
+    category: 'Infrastructure',
+    projectType: 'Design and Build',
+    imageUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+    startDate: '2024-01-15',
+    endDate: '2025-12-15',
+    status: 'ongoing',
+    slug: 'city-bridge-infrastructure',
+  },
+];
+
+const initialGalleryImages: GalleryImage[] = [
+  {
+    id: '1',
+    title: 'Construction Projects',
+    category: 'Construction',
+    imageUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+  },
+];
+
+const initialEvents: Event[] = [
+  {
+    id: '1',
+    title: 'Advanced Structural Engineering Workshop',
+    startDate: '2024-03-15',
+    endDate: '2024-03-15',
+    duration: '2 hours',
+    type: 'Workshop',
+    description: 'Learn advanced techniques in structural engineering.',
+    topics: ['Finite Element Analysis', 'Material Properties', 'Load Analysis'],
+    slug: 'advanced-structural-engineering-workshop',
+  },
+];
+
 export function ContentProvider({ children }: { children: ReactNode }) {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(initialGalleryImages);
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [clients, setClients] = useState<Client[]>(initialClients);
 
   // 🔄 LOAD DATA FROM FIRESTORE
   const loadCollection = async (name: string, setter: any) => {
@@ -171,6 +308,20 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     loadAll();
   };
 
+  const addClient = (client: Omit<Client, 'id'>) => {
+    const newClient = { ...client, id: Date.now().toString() };
+    setClients((prev) => [...prev, newClient]);
+  };
+
+  const updateClient = (id: string, client: Omit<Client, 'id'>) => {
+    setClients((prev) => prev.map((c) => (c.id === id ? { ...client, id } : c)));
+  };
+
+  const deleteClient = (id: string) => {
+    setClients((prev) => prev.filter((client) => client.id !== id));
+  };
+
+
   return (
     <ContentContext.Provider
       value={{
@@ -178,7 +329,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         projects,
         galleryImages,
         events,
-
+        clients,
         addTeamMember,
         updateTeamMember,
         deleteTeamMember,
@@ -193,7 +344,13 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
         addEvent,
         updateEvent,
+        addClient,
+        updateClient,
+        deleteTeamMember,
+        deleteProject,
+        deleteGalleryImage,
         deleteEvent,
+        deleteClient,
       }}
     >
       {children}

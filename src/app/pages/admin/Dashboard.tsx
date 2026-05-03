@@ -9,262 +9,375 @@ import { useContent } from '../../contexts/ContentContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
 import {
-    LayoutDashboard,
-    Briefcase,
-    Users,
-    Calendar,
-    ImageIcon,
-    LogOut,
-    Home,
-    Edit,
-    Trash2,
-    X,
+  LayoutDashboard,
+  Briefcase,
+  Users,
+  Calendar,
+  ImageIcon,
+  LogOut,
+  Home,
+  Edit,
+  Trash2,
+  X,
+  Building2,
+  Star,
 } from 'lucide-react';
 import TinyEditor from "../../components/TinyEditor";
 
-type Section = 'dashboard' | 'projects' | 'team' | 'events' | 'gallery';
+type Section = 'dashboard' | 'projects' | 'team' | 'events' | 'gallery' | 'clients';
 
-export default function Dashboard() {
-    const navigate = useNavigate();
-    const { logout } = useAuth();
-    const {
-        teamMembers,
-        projects,
-        galleryImages,
-        events,
-        addTeamMember,
-        updateTeamMember,
-        addProject,
-        updateProject,
-        addGalleryImage,
-        updateGalleryImage,
-        addEvent,
-        updateEvent,
-        deleteTeamMember,
-        deleteProject,
-        deleteGalleryImage,
-        deleteEvent,
-    } = useContent();
+export function Dashboard() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const {
+    teamMembers,
+    projects,
+    galleryImages,
+    events,
+    clients,
+    addTeamMember,
+    updateTeamMember,
+    addProject,
+    updateProject,
+    addGalleryImage,
+    updateGalleryImage,
+    addEvent,
+    updateEvent,
+    addClient,
+    updateClient,
+    deleteTeamMember,
+    deleteProject,
+    deleteGalleryImage,
+    deleteEvent,
+    deleteClient,
+  } = useContent();
 
-    const [activeSection, setActiveSection] = useState<Section>('dashboard');
-    const [editingId, setEditingId] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<Section>('dashboard');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [projectStatusFilter, setProjectStatusFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
 
-    // Slug generation function
-    const generateSlug = (title: string) => {
-        return title
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '') // remove special characters
-            .replace(/\s+/g, '-') // replace spaces with hyphens
-            .replace(/-+/g, '-') // replace multiple hyphens with single
-            .trim();
-    };
+  // Form states
+  const [projectForm, setProjectForm] = useState({
+    title: '',
+    description: '',
+    category: '',
+    projectType: 'Design and Build' as 'Design and Build' | 'Contract',
+    imageUrl: '',
+    startDate: '',
+    endDate: '',
+    status: 'ongoing' as 'ongoing' | 'completed',
+    slug: '',
+  });
 
-    // Check if slug is unique across all content
-    const isSlugUnique = (slug: string, excludeId?: string) => {
-        const allSlugs = [
-            ...projects.filter(p => p.id !== excludeId).map(p => p.slug),
-            ...events.filter(e => e.id !== excludeId).map(e => e.slug),
-            ...galleryImages.filter(g => g.id !== excludeId).map(g => g.slug),
-        ];
-        return !allSlugs.includes(slug);
-    };
+  const [teamForm, setTeamForm] = useState({
+    name: '',
+    position: '',
+    bio: '',
+    imageUrl: '',
+    slug: '',
+  });
 
-    // Auto-generate unique slug
-    const autoGenerateSlug = (title: string, excludeId?: string) => {
-        let slug = generateSlug(title);
-        let counter = 1;
-        let uniqueSlug = slug;
-        while (!isSlugUnique(uniqueSlug, excludeId)) {
-            uniqueSlug = `${slug}-${counter}`;
-            counter++;
-        }
-        return uniqueSlug;
-    };
+  const [galleryForm, setGalleryForm] = useState({
+    title: '',
+    category: '',
+    imageUrl: '',
+  });
 
-    // Form states
-    const [projectForm, setProjectForm] = useState({
-        name: '',
-        description: '',
-        status: 'Ongoing' as 'Ongoing' | 'Completed',
-        startDate: '',
-        endDate: '',
-        sector: '',
-        slug: '',
+  const [eventForm, setEventForm] = useState({
+    title: '',
+    startDate: '',
+    endDate: '',
+    duration: '',
+    type: 'Workshop' as 'Workshop' | 'Training' | 'Seminar',
+    description: '',
+    topics: [] as string[],
+    slug: '',
+  });
+
+  const [clientForm, setClientForm] = useState({
+    name: '',
+    logoUrl: '',
+    website: '',
+  });
+
+  const handleLogout = () => {
+    logout();
+    navigate('/admin/login');
+    toast.success('Logged out successfully');
+  };
+
+  // Helper function to generate slug from title
+  const generateSlug = (title: string, existingId?: string) => {
+    let baseSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    
+    // Check if slug exists (excluding current project being edited)
+    const slugExists = (slug: string) =>
+      projects.some((p) => p.slug === slug && p.id !== existingId);
+    
+    let slug = baseSlug;
+    let counter = 1;
+    
+    while (slugExists(slug)) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+    
+    return slug;
+  };
+
+  // Helper function to generate event slug from title
+  const generateEventSlug = (title: string, existingId?: string) => {
+    let baseSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    // Check if slug exists (excluding current event being edited)
+    const slugExists = (slug: string) =>
+      events.some((e) => e.slug === slug && e.id !== existingId);
+
+    let slug = baseSlug;
+    let counter = 1;
+
+    while (slugExists(slug)) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
+    return slug;
+  };
+
+  // Helper function to generate team member slug from name
+  const generateTeamSlug = (name: string, existingId?: string) => {
+    let baseSlug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    // Check if slug exists (excluding current team member being edited)
+    const slugExists = (slug: string) =>
+      teamMembers.some((t) => t.slug === slug && t.id !== existingId);
+
+    let slug = baseSlug;
+    let counter = 1;
+
+    while (slugExists(slug)) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
+    return slug;
+  };
+
+  // Auto-generate slug when title changes
+  const handleProjectTitleChange = (title: string) => {
+    const slug = generateSlug(title, editingId || undefined);
+    setProjectForm({ ...projectForm, title, slug });
+  };
+
+  // Auto-generate event slug when title changes
+  const handleEventTitleChange = (title: string) => {
+    const slug = generateEventSlug(title, editingId || undefined);
+    setEventForm({ ...eventForm, title, slug });
+  };
+
+  // Auto-generate team slug when name changes
+  const handleTeamNameChange = (name: string) => {
+    const slug = generateTeamSlug(name, editingId || undefined);
+    setTeamForm({ ...teamForm, name, slug });
+  };
+
+  // Project handlers
+  const handleProjectSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!projectForm.title || !projectForm.description || !projectForm.category || !projectForm.imageUrl || !projectForm.startDate || !projectForm.endDate) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    // Validate that end date is after start date
+    if (new Date(projectForm.endDate) < new Date(projectForm.startDate)) {
+      toast.error('End date must be after start date');
+      return;
+    }
+
+    if (editingId) {
+      updateProject(editingId, projectForm);
+      toast.success('Project updated');
+      setEditingId(null);
+    } else {
+      addProject(projectForm);
+      toast.success('Project added');
+    }
+    setProjectForm({ title: '', description: '', category: '', projectType: 'Design and Build', imageUrl: '', startDate: '', endDate: '', status: 'ongoing', slug: '' });
+  };
+
+  const handleEditProject = (project: typeof projects[0]) => {
+    setProjectForm({
+      title: project.title || '',
+      description: project.description || '',
+      category: project.category || '',
+      projectType: project.projectType || 'Design and Build',
+      imageUrl: project.imageUrl || '',
+      startDate: project.startDate || '',
+      endDate: project.endDate || '',
+      status: project.status || 'ongoing',
+      slug: project.slug || '',
     });
+    setEditingId(project.id);
+  };
 
-    const [teamForm, setTeamForm] = useState({
-        name: '',
-        role: '',
-        qualification: '',
-        imageUrl: '',
+  // Team handlers
+  const handleTeamSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!teamForm.name || !teamForm.position || !teamForm.bio || !teamForm.imageUrl) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    if (editingId) {
+      updateTeamMember(editingId, teamForm);
+      toast.success('Team member updated');
+      setEditingId(null);
+    } else {
+      addTeamMember(teamForm);
+      toast.success('Team member added');
+    }
+    setTeamForm({ name: '', position: '', bio: '', imageUrl: '', slug: '' });
+  };
+
+  const handleEditTeam = (member: typeof teamMembers[0]) => {
+    setTeamForm({
+      name: member.name,
+      position: member.position,
+      bio: member.bio,
+      imageUrl: member.imageUrl,
+      slug: member.slug,
     });
+    setEditingId(member.id);
+  };
 
-    const [galleryForm, setGalleryForm] = useState({
-        albumName: '',
-        imageUrl: '',
-        slug: '',
+  // Client handlers
+  const handleClientSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clientForm.name || !clientForm.logoUrl ) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    if (editingId) {
+      updateClient(editingId, clientForm);
+      toast.success('Client updated');
+      setEditingId(null);
+    } else {
+      addClient(clientForm);
+      toast.success('Client added');
+    }
+    setClientForm({ name: '', logoUrl: '', website: '' });
+  };
+
+  const handleEditClient = (client: typeof clients[0]) => {
+    setClientForm({
+      name: client.name,
+      logoUrl: client.logoUrl,
+      website: client.website,
     });
+    setEditingId(client.id);
+  };
 
-    const [eventForm, setEventForm] = useState({
-        name: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        slug: '',
+
+
+  // Gallery handlers
+  const handleGallerySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!galleryForm.title || !galleryForm.category || !galleryForm.imageUrl) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    if (editingId) {
+      updateGalleryImage(editingId, galleryForm);
+      toast.success('Gallery image updated');
+      setEditingId(null);
+    } else {
+      addGalleryImage(galleryForm);
+      toast.success('Gallery image added');
+    }
+    setGalleryForm({ title: '', category: '', imageUrl: '' });
+  };
+
+  const handleEditGallery = (image: typeof galleryImages[0]) => {
+    setGalleryForm({
+      title: image.title,
+      category: image.category,
+      imageUrl: image.imageUrl,
     });
+    setEditingId(image.id);
+  };
 
-    const handleLogout = () => {
-        logout();
-        navigate('/admin/login');
-        toast.success('Logged out successfully');
+  // Event handlers
+  const handleEventSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!eventForm.title || !eventForm.startDate || !eventForm.endDate || !eventForm.duration || !eventForm.type || !eventForm.description) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    // Validate that end date is after start date
+    if (new Date(eventForm.endDate) < new Date(eventForm.startDate)) {
+      toast.error('End date must be after start date');
+      return;
+    }
+
+    // Filter out empty topics
+    const filteredTopics = eventForm.topics.filter(topic => topic.trim() !== '');
+    
+    if (filteredTopics.length === 0) {
+      toast.error('Please add at least one topic');
+      return;
+    }
+
+    const eventData = {
+      ...eventForm,
+      topics: filteredTopics,
     };
 
-    // Project handlers
-    const handleProjectSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!projectForm.name || !projectForm.description || !projectForm.startDate || !projectForm.endDate || !projectForm.slug) {
-            toast.error('Please fill all fields');
-            return;
-        }
+    if (editingId) {
+      updateEvent(editingId, eventData);
+      toast.success('Event updated');
+      setEditingId(null);
+    } else {
+      addEvent(eventData);
+      toast.success('Event added');
+    }
+    setEventForm({ title: '', startDate: '', endDate: '', duration: '', type: 'Workshop', description: '', topics: [], slug: '' });
+  };
 
-        if (!isSlugUnique(projectForm.slug, editingId || undefined)) {
-            toast.error('Slug must be unique');
-            return;
-        }
+  const handleEditEvent = (event: typeof events[0]) => {
+    setEventForm({
+      title: event.title || '',
+      startDate: event.startDate || '',
+      endDate: event.endDate || '',
+      duration: event.duration || '',
+      type: event.type || 'Workshop',
+      description: event.description || '',
+      topics: event.topics || [],
+      slug: event.slug || '',
+    });
+    setEditingId(event.id);
+  };
 
-        if (new Date(projectForm.endDate) < new Date(projectForm.startDate)) {
-            toast.error('End date cannot be before start date');
-            return;
-        }
-
-        if (editingId) {
-            updateProject(editingId, projectForm);
-            toast.success('Project updated');
-            setEditingId(null);
-        } else {
-            addProject(projectForm);
-            toast.success('Project added');
-        }
-        setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '', sector: '', slug: '' });
-    };
-
-    const handleEditProject = (project: typeof projects[0]) => {
-        setProjectForm({
-            name: project.name,
-            description: project.description,
-            status: project.status,
-            startDate: project.startDate,
-            endDate: project.endDate,
-            sector: project.sector,
-            slug: project.slug,
-        });
-        setEditingId(project.id);
-    };
-
-    // Team handlers
-    const handleTeamSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!teamForm.name || !teamForm.role || !teamForm.qualification || !teamForm.imageUrl) {
-            toast.error('Please fill all fields');
-            return;
-        }
-
-        if (editingId) {
-            updateTeamMember(editingId, teamForm);
-            toast.success('Team member updated');
-            setEditingId(null);
-        } else {
-            addTeamMember(teamForm);
-            toast.success('Team member added');
-        }
-        setTeamForm({ name: '', role: '', qualification: '', imageUrl: '' });
-    };
-
-    const handleEditTeam = (member: typeof teamMembers[0]) => {
-        setTeamForm({
-            name: member.name,
-            role: member.role,
-            qualification: member.qualification,
-            imageUrl: member.imageUrl,
-        });
-        setEditingId(member.id);
-    };
-
-    // Gallery handlers
-    const handleGallerySubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!galleryForm.albumName || !galleryForm.imageUrl || !galleryForm.slug) {
-            toast.error('Please fill all fields');
-            return;
-        }
-
-        if (!isSlugUnique(galleryForm.slug, editingId || undefined)) {
-            toast.error('Slug must be unique');
-            return;
-        }
-
-        if (editingId) {
-            updateGalleryImage(editingId, galleryForm);
-            toast.success('Gallery image updated');
-            setEditingId(null);
-        } else {
-            addGalleryImage(galleryForm);
-            toast.success('Gallery image added');
-        }
-        setGalleryForm({ albumName: '', imageUrl: '', slug: '' });
-    };
-
-    const handleEditGallery = (image: typeof galleryImages[0]) => {
-        setGalleryForm({
-            albumName: image.albumName,
-            imageUrl: image.imageUrl,
-            slug: image.slug,
-        });
-        setEditingId(image.id);
-    };
-
-    // Event handlers
-    const handleEventSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!eventForm.name || !eventForm.description || !eventForm.startDate || !eventForm.endDate || !eventForm.slug) {
-            toast.error('Please fill all fields');
-            return;
-        }
-
-        if (!isSlugUnique(eventForm.slug, editingId || undefined)) {
-            toast.error('Slug must be unique');
-            return;
-        }
-
-        if (editingId) {
-            updateEvent(editingId, eventForm);
-            toast.success('Event updated');
-            setEditingId(null);
-        } else {
-            addEvent(eventForm);
-            toast.success('Event added');
-        }
-        setEventForm({ name: '', description: '', startDate: '', endDate: '', slug: '' });
-    };
-
-    const handleEditEvent = (event: typeof events[0]) => {
-        setEventForm({
-            name: event.name,
-            description: event.description,
-            startDate: event.startDate,
-            endDate: event.endDate,
-            slug: event.slug,
-        });
-        setEditingId(event.id);
-    };
-
-    const cancelEdit = () => {
-        setEditingId(null);
-        setProjectForm({ name: '', description: '', status: 'Ongoing', startDate: '', endDate: '', sector: '', slug: '' });
-        setTeamForm({ name: '', role: '', qualification: '', imageUrl: '' });
-        setGalleryForm({ albumName: '', imageUrl: '', slug: '' });
-        setEventForm({ name: '', description: '', startDate: '', endDate: '', slug: '' });
-    };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setProjectForm({ title: '', description: '', category: '', projectType: 'Design and Build', imageUrl: '', startDate: '', endDate: '', status: 'ongoing', slug: '' });
+    setTeamForm({ name: '', position: '', bio: '', imageUrl: '', slug: '' });
+    setGalleryForm({ title: '', category: '', imageUrl: '' });
+    setEventForm({ title: '', startDate: '', endDate: '', duration: '', type: 'Workshop', description: '', topics: [], slug: '' });
+    setClientForm({ name: '', logoUrl: '', website: '' });
+  };
 
     return (
         <div className="flex h-screen bg-gray-50">
@@ -311,15 +424,26 @@ export default function Dashboard() {
                         <span>Events</span>
                     </button>
 
-                    <button
-                        onClick={() => setActiveSection('gallery')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${activeSection === 'gallery' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
-                            }`}
-                    >
-                        <ImageIcon className="h-5 w-5" />
-                        <span>Gallery</span>
-                    </button>
-                </nav>
+          <button
+            onClick={() => setActiveSection('gallery')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
+              activeSection === 'gallery' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <ImageIcon className="h-5 w-5" />
+            <span>Gallery</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSection('clients')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
+              activeSection === 'clients' ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Building2 className="h-5 w-5" />
+            <span>Clients</span>
+          </button>
+        </nav>
 
                 <div className="p-4 border-t space-y-2">
                     <Link to="/" className="block">
@@ -335,31 +459,32 @@ export default function Dashboard() {
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-auto">
-                {/* Header */}
-                <header className="bg-white border-b px-8 py-6">
-                    <h2 className="text-2xl font-bold text-gray-900">
-                        {activeSection === 'dashboard' && 'Dashboard'}
-                        {activeSection === 'projects' && 'Projects'}
-                        {activeSection === 'team' && 'Team'}
-                        {activeSection === 'events' && 'Events'}
-                        {activeSection === 'gallery' && 'Gallery'}
-                    </h2>
-                </header>
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto">
+        {/* Header */}
+        <header className="bg-white border-b px-8 py-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {activeSection === 'dashboard' && 'Dashboard'}
+            {activeSection === 'projects' && 'Projects'}
+            {activeSection === 'team' && 'Team'}
+            {activeSection === 'events' && 'Events'}
+            {activeSection === 'gallery' && 'Gallery'}
+            {activeSection === 'clients' && 'Clients'}
+          </h2>
+        </header>
 
-                <div className="p-8">
-                    {/* Dashboard Section */}
-                    {activeSection === 'dashboard' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-sm text-gray-600">Total Projects</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-3xl font-bold text-brand-600">{projects.length}</p>
-                                </CardContent>
-                            </Card>
+        <div className="p-8">
+          {/* Dashboard Section */}
+          {activeSection === 'dashboard' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm text-gray-600">Total Projects</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-brand-600">{projects.length}</p>
+                </CardContent>
+              </Card>
 
                             <Card>
                                 <CardHeader>
@@ -379,44 +504,45 @@ export default function Dashboard() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-sm text-gray-600">Gallery Images</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-3xl font-bold text-brand-600">{galleryImages.length}</p>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm text-gray-600">Gallery Images</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-brand-600">{galleryImages.length}</p>
+                </CardContent>
+              </Card>
 
-                    {/* Projects Section */}
-                    {activeSection === 'projects' && (
-                        <div className="space-y-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>{editingId ? 'Edit Project' : 'Add New Project'}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <form onSubmit={handleProjectSubmit} className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="project-name">Project Name</Label>
-                                            <Input
-                                                id="project-name"
-                                                value={projectForm.name}
-                                                onChange={(e) => {
-                                                    const newName = e.target.value;
-                                                    setProjectForm({
-                                                        ...projectForm,
-                                                        name: newName,
-                                                        slug: editingId ? projectForm.slug : autoGenerateSlug(newName)
-                                                    });
-                                                }}
-                                                placeholder="Enter project name"
-                                            />
-                                        </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm text-gray-600">Clients</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-brand-600">{clients.length}</p>
+                </CardContent>
+              </Card>
 
+            </div>
+          )}
 
+          {/* Projects Section */}
+          {activeSection === 'projects' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Project' : 'Add New Project'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleProjectSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="project-name">Project Name</Label>
+                      <Input
+                        id="project-name"
+                        value={projectForm.title}
+                        onChange={(e) => handleProjectTitleChange(e.target.value)}
+                        placeholder="Enter project name"
+                      />
+                    </div>
 
                                         <div>
                                             <Label htmlFor="project-description">Description</Label>
@@ -428,184 +554,241 @@ export default function Dashboard() {
                                             />
                                         </div>
 
-                                        <div>
-                                            <Label htmlFor="project-status">Status</Label>
-                                            <Select
-                                                value={projectForm.status}
-                                                onValueChange={(value: 'Ongoing' | 'Completed') =>
-                                                    setProjectForm({ ...projectForm, status: value })
-                                                }
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Ongoing">Ongoing</SelectItem>
-                                                    <SelectItem value="Completed">Completed</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                    <div>
+                      <Label htmlFor="project-category">Category</Label>
+                      <Input
+                        id="project-category"
+                        value={projectForm.category}
+                        onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
+                        placeholder="Enter project category"
+                      />
+                    </div>
 
-                                        <div>
-                                            <Label>Sector</Label>
-                                            <Select
-                                                value={projectForm.sector}
-                                                onValueChange={(value) =>
-                                                    setProjectForm({ ...projectForm, sector: value })
-                                                }
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select sector" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Infrastructure">Infrastructure</SelectItem>
-                                                    <SelectItem value="Residential">Residential</SelectItem>
-                                                    <SelectItem value="Commercial">Commercial</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                    <div>
+                      <Label htmlFor="project-type">Project Type</Label>
+                      <Select
+                        value={projectForm.projectType}
+                        onValueChange={(value: 'Design and Build' | 'Contract') =>
+                          setProjectForm({ ...projectForm, projectType: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Design and Build">Design and Build</SelectItem>
+                          <SelectItem value="Contract">Contract</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <Label htmlFor="project-start">Start Date</Label>
-                                                <Input
-                                                    id="project-start"
-                                                    type="date"
-                                                    value={projectForm.startDate}
-                                                    onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor="project-end">End Date</Label>
-                                                <Input
-                                                    id="project-end"
-                                                    type="date"
-                                                    value={projectForm.endDate}
-                                                    onChange={(e) => setProjectForm({ ...projectForm, endDate: e.target.value })}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <Label htmlFor="project-slug">Slug</Label>
-                                            <Input
-                                                id="project-slug"
-                                                value={projectForm.slug}
-                                                onChange={(e) => setProjectForm({ ...projectForm, slug: e.target.value })}
-                                                placeholder="project-url"
-                                            />
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <Button type="submit" className="flex-1">
-                                                {editingId ? 'Update Project' : 'Add Project'}
-                                            </Button>
-                                            {editingId && (
-                                                <Button type="button" variant="outline" onClick={cancelEdit}>
-                                                    <X className="h-4 w-4" />
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </form>
-                                </CardContent>
-                            </Card>
+                    <div>
+                      <Label htmlFor="project-image">Image URL</Label>
+                      <Input
+                        id="project-image"
+                        value={projectForm.imageUrl}
+                        onChange={(e) => setProjectForm({ ...projectForm, imageUrl: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>All Projects ({projects.length})</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-3">
-                                        {projects.map((project) => (
-                                            <div key={project.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                                                <div className="flex justify-between items-start">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center gap-2 mb-2">
-                                                            <h3 className="font-semibold">{project.name}</h3>
-                                                            <span
-                                                                className={`px-2 py-1 rounded text-xs ${project.status === 'Completed'
-                                                                    ? 'bg-green-100 text-green-700'
-                                                                    : 'bg-blue-100 text-blue-700'
-                                                                    }`}
-                                                            >
-                                                                {project.status}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-sm text-gray-600 mb-2">{project.description}</p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {project.startDate} - {project.endDate}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <Button variant="ghost" size="sm" onClick={() => handleEditProject(project)}>
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                deleteProject(project.id);
-                                                                toast.success('Project deleted');
-                                                            }}
-                                                        >
-                                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="project-start-date">Start Date</Label>
+                        <Input
+                          id="project-start-date"
+                          type="date"
+                          value={projectForm.startDate}
+                          onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="project-end-date">End Date</Label>
+                        <Input
+                          id="project-end-date"
+                          type="date"
+                          value={projectForm.endDate}
+                          onChange={(e) => setProjectForm({ ...projectForm, endDate: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="project-status">Status</Label>
+                      <Select
+                        value={projectForm.status}
+                        onValueChange={(value: 'ongoing' | 'completed') =>
+                          setProjectForm({ ...projectForm, status: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ongoing">Ongoing</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="project-slug">Slug (Auto-generated)</Label>
+                      <Input
+                        id="project-slug"
+                        value={projectForm.slug}
+                        readOnly
+                        placeholder="Auto-generated from title"
+                        className="bg-gray-50"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">URL: /projects/{projectForm.slug || 'your-project-name'}</p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button type="submit" className="flex-1">
+                        {editingId ? 'Update Project' : 'Add Project'}
+                      </Button>
+                      {editingId && (
+                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>All Projects ({projects.filter(p => projectStatusFilter === 'all' || p.status === projectStatusFilter).length})</CardTitle>
+                    <Select
+                      value={projectStatusFilter}
+                      onValueChange={(value: 'all' | 'ongoing' | 'completed') => setProjectStatusFilter(value)}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Projects</SelectItem>
+                        <SelectItem value="ongoing">Ongoing</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {projects
+                      .filter(p => projectStatusFilter === 'all' || p.status === projectStatusFilter)
+                      .map((project) => (
+                      <div key={project.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex justify-between items-start gap-4">
+                          <img src={project.imageUrl} alt={project.title} className="w-20 h-20 rounded object-cover flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold">{project.title}</h3>
+                              <span className="px-2 py-1 rounded text-xs bg-brand-100 text-brand-600">
+                                {project.category}
+                              </span>
+                              <span className={`px-2 py-1 rounded text-xs ${
+                                project.status === 'ongoing' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                              }`}>
+                                {project.status === 'ongoing' ? 'Ongoing' : 'Completed'}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{project.description}</p>
+                            <p className="text-xs text-gray-500">
+                              {project.startDate} - {project.endDate}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              Slug: {project.slug}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditProject(project)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                deleteProject(project.id);
+                                toast.success('Project deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
                         </div>
-                    )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-                    {/* Team Section */}
-                    {activeSection === 'team' && (
-                        <div className="space-y-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>{editingId ? 'Edit Team Member' : 'Add New Team Member'}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <form onSubmit={handleTeamSubmit} className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="team-name">Name</Label>
-                                            <Input
-                                                id="team-name"
-                                                value={teamForm.name}
-                                                onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
-                                                placeholder="Enter name"
-                                            />
-                                        </div>
+          {/* Team Section */}
+          {activeSection === 'team' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Team Member' : 'Add New Team Member'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleTeamSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="team-name">Name</Label>
+                      <Input
+                        id="team-name"
+                        value={teamForm.name}
+                        onChange={(e) => handleTeamNameChange(e.target.value)}
+                        placeholder="Enter name"
+                      />
+                    </div>
 
-                                        <div>
-                                            <Label htmlFor="team-role">Role</Label>
-                                            <Input
-                                                id="team-role"
-                                                value={teamForm.role}
-                                                onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
-                                                placeholder="e.g., Chief Engineer"
-                                            />
-                                        </div>
+                    <div>
+                      <Label htmlFor="team-position">Position</Label>
+                      <Input
+                        id="team-position"
+                        value={teamForm.position}
+                        onChange={(e) => setTeamForm({ ...teamForm, position: e.target.value })}
+                        placeholder="e.g., Chief Engineer"
+                      />
+                    </div>
 
-                                        <div>
-                                            <Label htmlFor="team-qualification">Qualification</Label>
-                                            <Input
-                                                id="team-qualification"
-                                                value={teamForm.qualification}
-                                                onChange={(e) => setTeamForm({ ...teamForm, qualification: e.target.value })}
-                                                placeholder="e.g., B.E. Civil, M.Sc. Structural Engineering"
-                                            />
-                                        </div>
+                    <div>
+                      <Label htmlFor="team-bio">Bio</Label>
+                      <Textarea
+                        id="team-bio"
+                        value={teamForm.bio}
+                        onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
+                        placeholder="Enter team member bio"
+                        rows={4}
+                      />
+                    </div>
 
-                                        <div>
-                                            <Label htmlFor="team-image">Image URL</Label>
-                                            <Input
-                                                id="team-image"
-                                                value={teamForm.imageUrl}
-                                                onChange={(e) => setTeamForm({ ...teamForm, imageUrl: e.target.value })}
-                                                placeholder="https://..."
-                                            />
-                                        </div>
+                    <div>
+                      <Label htmlFor="team-image">Image URL</Label>
+                      <Input
+                        id="team-image"
+                        value={teamForm.imageUrl}
+                        onChange={(e) => setTeamForm({ ...teamForm, imageUrl: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="team-slug">Slug (Auto-generated)</Label>
+                      <Input
+                        id="team-slug"
+                        value={teamForm.slug}
+                        readOnly
+                        placeholder="Auto-generated from name"
+                        className="bg-gray-50"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">URL: /team/{teamForm.slug || 'member-name'}</p>
+                    </div>
 
                                         <div className="flex gap-2">
                                             <Button type="submit" className="flex-1">
@@ -621,70 +804,63 @@ export default function Dashboard() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>All Team Members ({teamMembers.length})</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-3">
-                                        {teamMembers.map((member) => (
-                                            <div key={member.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                                                <div className="flex gap-4">
-                                                    <img src={member.imageUrl} alt={member.name} className="w-16 h-16 rounded-full object-cover" />
-                                                    <div className="flex-1">
-                                                        <h3 className="font-semibold">{member.name}</h3>
-                                                        <p className="text-sm text-brand-600">{member.role}</p>
-                                                        <p className="text-xs text-gray-500">{member.qualification}</p>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <Button variant="ghost" size="sm" onClick={() => handleEditTeam(member)}>
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                deleteTeamMember(member.id);
-                                                                toast.success('Team member deleted');
-                                                            }}
-                                                        >
-                                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Team Members ({teamMembers.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {teamMembers.map((member) => (
+                      <div key={member.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex gap-4">
+                          <img src={member.imageUrl} alt={member.name} className="w-16 h-16 rounded-full object-cover" />
+                          <div className="flex-1">
+                            <h3 className="font-semibold">{member.name}</h3>
+                            <p className="text-sm text-brand-600">{member.position}</p>
+                            <p className="text-sm text-gray-600">{member.bio}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditTeam(member)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                deleteTeamMember(member.id);
+                                toast.success('Team member deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
                         </div>
-                    )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-                    {/* Events Section */}
-                    {activeSection === 'events' && (
-                        <div className="space-y-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>{editingId ? 'Edit Event' : 'Add New Event'}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <form onSubmit={handleEventSubmit} className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="event-name">Event Name</Label>
-                                            <Input
-                                                id="event-name"
-                                                value={eventForm.name}
-                                                onChange={(e) => {
-                                                    const newName = e.target.value;
-                                                    setEventForm({
-                                                        ...eventForm,
-                                                        name: newName,
-                                                        slug: editingId ? eventForm.slug : autoGenerateSlug(newName)
-                                                    });
-                                                }}
-                                                placeholder="Enter event name"
-                                            />
-                                        </div>
+          {/* Events Section */}
+          {activeSection === 'events' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Event' : 'Add New Event'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleEventSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="event-name">Event Name</Label>
+                      <Input
+                        id="event-name"
+                        value={eventForm.title}
+                        onChange={(e) => handleEventTitleChange(e.target.value)}
+                        placeholder="Enter event name"
+                      />
+                    </div>
 
                                         <div>
                                             <Label htmlFor="event-description">Description</Label>
@@ -696,36 +872,80 @@ export default function Dashboard() {
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <Label htmlFor="event-start">Start Date</Label>
-                                                <Input
-                                                    id="event-start"
-                                                    type="date"
-                                                    value={eventForm.startDate}
-                                                    onChange={(e) => setEventForm({ ...eventForm, startDate: e.target.value })}
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor="event-end">End Date</Label>
-                                                <Input
-                                                    id="event-end"
-                                                    type="date"
-                                                    value={eventForm.endDate}
-                                                    onChange={(e) => setEventForm({ ...eventForm, endDate: e.target.value })}
-                                                />
-                                            </div>
-                                        </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="event-start">Date</Label>
+                        <Input
+                          id="event-start"
+                          type="date"
+                          value={eventForm.startDate}
+                          onChange={(e) => setEventForm({ ...eventForm, startDate: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="event-end">End Date</Label>
+                        <Input
+                          id="event-end"
+                          type="date"
+                          value={eventForm.endDate}
+                          onChange={(e) => setEventForm({ ...eventForm, endDate: e.target.value })}
+                        />
+                      </div>
+                    </div>
 
-                                        <div>
-                                            <Label htmlFor="event-slug">Slug</Label>
-                                            <Input
-                                                id="event-slug"
-                                                value={eventForm.slug}
-                                                onChange={(e) => setEventForm({ ...eventForm, slug: e.target.value })}
-                                                placeholder="event-url"
-                                            />
-                                        </div>
+                    <div>
+                      <Label htmlFor="event-duration">Duration</Label>
+                      <Input
+                        id="event-duration"
+                        type="text"
+                        value={eventForm.duration}
+                        onChange={(e) => setEventForm({ ...eventForm, duration: e.target.value })}
+                        placeholder="e.g., 3 days, 5 days"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Enter duration like "3 days" or "2 weeks"</p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="event-type">Type</Label>
+                      <Select
+                        value={eventForm.type}
+                        onValueChange={(value: 'Workshop' | 'Training' | 'Seminar') =>
+                          setEventForm({ ...eventForm, type: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Workshop">Workshop</SelectItem>
+                          <SelectItem value="Training">Training</SelectItem>
+                          <SelectItem value="Seminar">Seminar</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="event-topics">Topics</Label>
+                      <Textarea
+                        id="event-topics"
+                        value={eventForm.topics.join('\n')}
+                        onChange={(e) => setEventForm({ ...eventForm, topics: e.target.value.split('\n') })}
+                        placeholder="Enter topics, one per line"
+                        rows={4}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="event-slug">Slug (Auto-generated)</Label>
+                      <Input
+                        id="event-slug"
+                        value={eventForm.slug}
+                        readOnly
+                        placeholder="Auto-generated from title"
+                        className="bg-gray-50"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">URL: /events/{eventForm.slug || 'your-event-name'}</p>
+                    </div>
 
                                         <div className="flex gap-2">
                                             <Button type="submit" className="flex-1">
@@ -741,71 +961,85 @@ export default function Dashboard() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>All Events ({events.length})</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-3">
-                                        {events.map((event) => (
-                                            <div key={event.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                                                <div className="flex justify-between items-start">
-                                                    <div className="flex-1">
-                                                        <h3 className="font-semibold mb-2">{event.name}</h3>
-                                                        <p className="text-sm text-gray-600 mb-2">{event.description}</p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {event.startDate} - {event.endDate}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                deleteEvent(event.id);
-                                                                toast.success('Event deleted');
-                                                            }}
-                                                        >
-                                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Events ({events.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {events.map((event) => (
+                      <div key={event.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="font-semibold mb-2">{event.title}</h3>
+                            <p className="text-sm text-gray-600 mb-2">{event.description}</p>
+                            <p className="text-xs text-gray-500">
+                              {event.startDate} - {event.endDate}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Type: {event.type}
+                            </p>
+                            {event.topics && event.topics.length > 0 && (
+                              <p className="text-xs text-gray-500">
+                                Topics: {event.topics.join(', ')}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-400 mt-1">
+                              Slug: {event.slug}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                deleteEvent(event.id);
+                                toast.success('Event deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
                         </div>
-                    )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-                    {/* Gallery Section */}
-                    {activeSection === 'gallery' && (
-                        <div className="space-y-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>{editingId ? 'Edit Gallery Image' : 'Add New Gallery Image'}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <form onSubmit={handleGallerySubmit} className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="gallery-album">Album Name</Label>
-                                            <Input
-                                                id="gallery-album"
-                                                value={galleryForm.albumName}
-                                                onChange={(e) => {
-                                                    const newAlbumName = e.target.value;
-                                                    setGalleryForm({
-                                                        ...galleryForm,
-                                                        albumName: newAlbumName,
-                                                        slug: editingId ? galleryForm.slug : autoGenerateSlug(newAlbumName)
-                                                    });
-                                                }}
-                                                placeholder="Enter album name"
-                                            />
-                                        </div>
+          {/* Gallery Section */}
+          {activeSection === 'gallery' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Gallery Image' : 'Add New Gallery Image'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleGallerySubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="gallery-title">Title</Label>
+                      <Input
+                        id="gallery-title"
+                        value={galleryForm.title}
+                        onChange={(e) => setGalleryForm({ ...galleryForm, title: e.target.value })}
+                        placeholder="Enter title"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="gallery-category">Category</Label>
+                      <Input
+                        id="gallery-category"
+                        value={galleryForm.category}
+                        onChange={(e) => setGalleryForm({ ...galleryForm, category: e.target.value })}
+                        placeholder="Enter category"
+                      />
+                    </div>
 
                                         <div>
                                             <Label htmlFor="gallery-image">Image URL</Label>
@@ -841,48 +1075,148 @@ export default function Dashboard() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>All Gallery Images ({galleryImages.length})</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {galleryImages.map((image) => (
-                                            <div key={image.id} className="border rounded-lg overflow-hidden">
-                                                <img src={image.imageUrl} alt={image.albumName} className="w-full h-48 object-cover" />
-                                                <div className="p-3">
-                                                    <p className="font-semibold text-sm mb-2">{image.albumName}</p>
-                                                    <div className="flex gap-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="flex-1"
-                                                            onClick={() => handleEditGallery(image)}
-                                                        >
-                                                            <Edit className="h-4 w-4 mr-1" />
-                                                            Edit
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                deleteGalleryImage(image.id);
-                                                                toast.success('Image deleted');
-                                                            }}
-                                                        >
-                                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Gallery Images ({galleryImages.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {galleryImages.map((image) => (
+                      <div key={image.id} className="border rounded-lg overflow-hidden">
+                        <img src={image.imageUrl} alt={image.title} className="w-full h-48 object-cover" />
+                        <div className="p-3">
+                          <p className="font-semibold text-sm mb-1">{image.title}</p>
+                          <p className="text-xs text-gray-500 mb-2">{image.category}</p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => handleEditGallery(image)}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                deleteGalleryImage(image.id);
+                                toast.success('Image deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
                         </div>
-                    )}
-                </div>
-            </main>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Clients Section */}
+          {activeSection === 'clients' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingId ? 'Edit Client' : 'Add New Client'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleClientSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="client-name">Client Name</Label>
+                      <Input
+                        id="client-name"
+                        value={clientForm.name}
+                        onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
+                        placeholder="Enter client organization name"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="client-logo">Logo URL</Label>
+                      <Input
+                        id="client-logo"
+                        value={clientForm.logoUrl}
+                        onChange={(e) => setClientForm({ ...clientForm, logoUrl: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="client-website">Website URL</Label>
+                      <Input
+                        id="client-website"
+                        value={clientForm.website}
+                        onChange={(e) => setClientForm({ ...clientForm, website: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button type="submit" className="flex-1">
+                        {editingId ? 'Update Client' : 'Add Client'}
+                      </Button>
+                      {editingId && (
+                        <Button type="button" variant="outline" onClick={cancelEdit}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Clients ({clients.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {clients.map((client) => (
+                      <div key={client.id} className="border rounded-lg overflow-hidden">
+                        <div className="p-4 bg-gray-50 flex items-center justify-center h-32">
+                          <img src={client.logoUrl} alt={client.name} className="max-h-20 max-w-full object-contain" />
+                        </div>
+                        <div className="p-3">
+                          <p className="font-semibold text-sm mb-1">{client.name}</p>
+                          <a href={client.website} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-600 hover:underline block truncate">
+                            {client.website}
+                          </a>
+                          <div className="flex gap-2 mt-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => handleEditClient(client)}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                deleteClient(client.id);
+                                toast.success('Client deleted');
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
-    );
+      </main>
+    </div>
+  );
 }

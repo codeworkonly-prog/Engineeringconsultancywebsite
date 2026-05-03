@@ -1,10 +1,12 @@
 import { Card, CardContent } from '../components/ui/card';
+import { Link } from 'react-router';
 import { CheckCircle, Building2, Users, Award, Lightbulb } from 'lucide-react';
 
 export function CompanyProfile() {
   const services = [
     {
-      category: 'Engineering Consultancy',
+      category: 'Engineering Consultancy & Infrastructure Design',
+      href: '/consulting-service',
       items: [
         'Detailed Engineering Design & Drawings',
         'Feasibility Studies & Master Planning',
@@ -12,19 +14,12 @@ export function CompanyProfile() {
         'Infrastructure Planning & Development',
         'Water Supply & Sanitation Systems',
         'Structural, Architectural & MEP Design',
-      ],
-    },
-    {
-      category: 'Project Management & Supervision',
-      items: [
         'Construction Supervision',
-        'Contract Administration',
-        'Quality Assurance & Control',
-        'Third-Party Inspection',
       ],
     },
     {
       category: 'Procurement & Bid Support',
+      href: '/consulting-service',
       items: [
         'Preparation of Bid Documents',
         'Bid Evaluation & Procurement Support',
@@ -32,7 +27,28 @@ export function CompanyProfile() {
       ],
     },
     {
-      category: 'Research & Development',
+      category: 'Civil Engineering & Infrastructure Projects',
+      href: '/projects',
+      items: [
+        'Roads, Bridges & Urban Infrastructure',
+        'Water Supply & Sanitation Projects',
+        'Structural & Building Design Projects',
+        'Construction Supervision Projects',
+      ],
+    },
+    {
+      category: 'Design & Build Projects',
+      href: '/projects',
+      items: [
+        'Turnkey Infrastructure Solutions',
+        'Detailed Engineering Design Projects',
+        'Cost Estimation & BOQ Projects',
+        'Quality Assurance Projects',
+      ],
+    },
+    {
+      category: 'Research & Development Programs',
+      href: '/events',
       items: [
         'Socio-economic Studies',
         'Policy & Institutional Framework Development',
@@ -41,6 +57,7 @@ export function CompanyProfile() {
     },
     {
       category: 'Training & Capacity Building',
+      href: '/events',
       items: [
         'Public Procurement & Contract Management',
         'Project Planning & Management Tools (Primavera, etc.)',
@@ -91,19 +108,24 @@ export function CompanyProfile() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {services.map((service, index) => (
-              <Card key={index}>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold text-lg mb-4 text-brand-600">{service.category}</h3>
-                  <ul className="space-y-2">
-                    {service.items.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              <Link key={index} to={service.href} className="block h-full">
+                <Card className="h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer">
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold text-lg mb-4 text-brand-600">
+                      {service.category}
+                    </h3>
+
+                    <ul className="space-y-2">
+                      {service.items.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+                          <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
@@ -115,7 +137,7 @@ export function CompanyProfile() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Our Experience</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We have successfully delivered <span className="font-bold text-brand-600">100+ consulting assignments</span> across Nepal, 
+              We have successfully delivered <span className="font-bold text-brand-600">100+ consulting assignments</span> across Nepal,
               working with government agencies, development partners, and private sector clients.
             </p>
           </div>
@@ -147,11 +169,13 @@ export function CompanyProfile() {
                 <Award className="h-8 w-8 text-brand-600" />
                 <h2 className="text-3xl font-bold">Flagship Project Highlight</h2>
               </div>
-              
-              <h3 className="text-2xl font-semibold mb-4 text-brand-700">Sisneri Water Supply Project</h3>
-              
+
+              <h3 className="text-2xl font-semibold mb-4 text-brand-700">
+                Sisneri Water Supply Project
+              </h3>
+
               <p className="text-gray-700 mb-6">
-                One of our major assignments involved detailed engineering design and consultancy services 
+                One of our major assignments involved detailed engineering design and consultancy services
                 for a large-scale water supply system serving Kathmandu Valley.
               </p>
 
@@ -180,7 +204,7 @@ export function CompanyProfile() {
 
                 <div className="bg-white rounded-lg p-6">
                   <p className="text-gray-700 italic">
-                    "This project demonstrates our capability to handle complex, large-scale infrastructure 
+                    "This project demonstrates our capability to handle complex, large-scale infrastructure
                     projects with technical precision and professional excellence."
                   </p>
                 </div>
@@ -224,58 +248,50 @@ export function CompanyProfile() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-brand-100 p-3 rounded-full mb-4">
-                    <Award className="h-8 w-8 text-brand-600" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Proven Track Record</h3>
-                  <p className="text-sm text-gray-600">
-                    100+ successful projects delivered across Nepal
-                  </p>
+              <CardContent className="pt-6 text-center">
+                <div className="bg-brand-100 p-3 rounded-full w-fit mx-auto mb-4">
+                  <Award className="h-8 w-8 text-brand-600" />
                 </div>
+                <h3 className="font-semibold mb-2">Proven Track Record</h3>
+                <p className="text-sm text-gray-600">
+                  100+ successful projects delivered across Nepal
+                </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-brand-100 p-3 rounded-full mb-4">
-                    <Users className="h-8 w-8 text-brand-600" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Multidisciplinary Expertise</h3>
-                  <p className="text-sm text-gray-600">
-                    All engineering and management services under one roof
-                  </p>
+              <CardContent className="pt-6 text-center">
+                <div className="bg-brand-100 p-3 rounded-full w-fit mx-auto mb-4">
+                  <Users className="h-8 w-8 text-brand-600" />
                 </div>
+                <h3 className="font-semibold mb-2">Multidisciplinary Expertise</h3>
+                <p className="text-sm text-gray-600">
+                  All engineering and management services under one roof
+                </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-brand-100 p-3 rounded-full mb-4">
-                    <CheckCircle className="h-8 w-8 text-brand-600" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Quality Standards</h3>
-                  <p className="text-sm text-gray-600">
-                    Strong understanding of local and international standards
-                  </p>
+              <CardContent className="pt-6 text-center">
+                <div className="bg-brand-100 p-3 rounded-full w-fit mx-auto mb-4">
+                  <CheckCircle className="h-8 w-8 text-brand-600" />
                 </div>
+                <h3 className="font-semibold mb-2">Quality Standards</h3>
+                <p className="text-sm text-gray-600">
+                  Strong understanding of local and international standards
+                </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-brand-100 p-3 rounded-full mb-4">
-                    <Lightbulb className="h-8 w-8 text-brand-600" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Client Satisfaction</h3>
-                  <p className="text-sm text-gray-600">
-                    Commitment to quality, timeliness, and client satisfaction
-                  </p>
+              <CardContent className="pt-6 text-center">
+                <div className="bg-brand-100 p-3 rounded-full w-fit mx-auto mb-4">
+                  <Lightbulb className="h-8 w-8 text-brand-600" />
                 </div>
+                <h3 className="font-semibold mb-2">Client Satisfaction</h3>
+                <p className="text-sm text-gray-600">
+                  Commitment to quality, timeliness, and client satisfaction
+                </p>
               </CardContent>
             </Card>
           </div>

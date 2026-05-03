@@ -19,9 +19,9 @@ export function Header() {
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About Us' },
     { path: '/company-profile', label: 'Company Profile' },
-    { path: '/team', label: 'Our Team' },
-    { path: '/events', label: 'Events & Workshops' },
+    { path: '/consulting-service', label: 'Consulting Service' },
     { path: '/projects', label: 'Projects' },
+    { path: '/events', label: 'Events' },
     { path: '/contact', label: 'Contact Us' },
   ];
 

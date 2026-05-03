@@ -1,8 +1,11 @@
 import { Card, CardContent } from '../components/ui/card';
 import { useContent } from '../contexts/ContentContext';
+import { Link } from 'react-router';
 
 export function Team() {
   const { teamMembers } = useContent();
+  const managingDirector = teamMembers[0];
+  const otherMembers = teamMembers.slice(1);
 
   return (
     <div>
@@ -22,33 +25,65 @@ export function Team() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Our team consists of qualified and experienced professionals including engineers, 
-              project managers, procurement experts, and administrative professionals who combine 
+              Our team consists of qualified and experienced professionals including engineers,
+              project managers, procurement experts, and administrative professionals who combine
               technical expertise with practical experience.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teamMembers.map((member) => (
-              <Card key={member.id} className="overflow-hidden">
-                <img
-                  src={member.imageUrl}
-                  alt={member.name}
-                  className="w-full h-64 object-cover"
-                />
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
-                  <p className="text-brand-600 text-sm mb-3">{member.position}</p>
-                  <p className="text-sm text-gray-600">{member.bio}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {teamMembers.length === 0 && (
+          {teamMembers.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <p>No team members added yet. Add team members from the admin dashboard.</p>
             </div>
+          ) : (
+            <>
+              {/* Managing Director - Center Highlight */}
+              {managingDirector && (
+                <div className="max-w-2xl mx-auto mb-16">
+                  <Link to={`/team/${managingDirector.slug}`}>
+                    <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-200 cursor-pointer">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <img
+                          src={managingDirector.imageUrl}
+                          alt={managingDirector.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <CardContent className="pt-6 flex flex-col justify-center">
+                          <div className="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full mb-3 w-fit">
+                            Leadership
+                          </div>
+                          <h3 className="font-semibold text-2xl mb-2">{managingDirector.name}</h3>
+                          <p className="text-brand-600 mb-4">{managingDirector.position}</p>
+                          <p className="text-gray-600">{managingDirector.bio}</p>
+                        </CardContent>
+                      </div>
+                    </Card>
+                  </Link>
+                </div>
+              )}
+
+              {/* Other Team Members */}
+              {otherMembers.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {otherMembers.map((member) => (
+                    <Link key={member.id} to={`/team/${member.slug}`}>
+                      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer h-full">
+                        <img
+                          src={member.imageUrl}
+                          alt={member.name}
+                          className="w-full h-64 object-cover"
+                        />
+                        <CardContent className="pt-6">
+                          <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
+                          <p className="text-brand-600 text-sm mb-3">{member.position}</p>
+                          <p className="text-sm text-gray-600">{member.bio}</p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

@@ -1,11 +1,11 @@
 import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { CheckCircle, Users, Award, Lightbulb } from 'lucide-react';
+import { CheckCircle, Users, Award, Lightbulb, Star, Quote } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 
 export function Home() {
-  const { projects } = useContent();
+  const { projects, clients } = useContent();
   const featuredProjects = projects.slice(0, 3);
 
   return (
@@ -144,6 +144,38 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      {/* Clients Section */}
+      {clients.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Our Valued Clients</h2>
+              <p className="text-gray-600">
+                Trusted by leading organizations across Nepal
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-center">
+              {clients.map((client) => (
+                <a
+                  key={client.id}
+                  href={client.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center p-6 bg-white rounded-lg hover:shadow-lg transition-shadow duration-200"
+                >
+                  <img
+                    src={client.logoUrl}
+                    alt={client.name}
+                    className="max-h-16 max-w-full object-contain"
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-16 bg-brand-600 text-white">
