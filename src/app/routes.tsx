@@ -14,6 +14,7 @@ import { CompanySector } from './pages/CompanySector';
 import { ConsultingService } from './pages/ConsultingService';
 import { Dashboard } from './pages/admin/Dashboard';
 import { AdminLogin } from './components/AdminLogin';
+import { NotFound } from './pages/NotFound';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
       { path: 'projects', Component: Projects },
       { path: 'projects/:slug', Component: ProjectDetail },
       { path: 'contact', Component: Contact },
+      { path: '*', Component: NotFound },
     ],
   },
   {
