@@ -11,22 +11,49 @@ export function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-brand-500 to-brand-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <section className="relative min-h-screen flex items-center text-white overflow-hidden">
+
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="/src/imports/engineering.png"
+            alt="Engineering Consultancy"
+            className="w-full h-full object-cover"
+          />
+
+          {/* Optional Overlay */}
+          <div className="absolute inset-0 bg-black/40"></div>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
-            <h1 className="text-5xl font-bold mb-6">
-              Engineering Excellence for Your Projects
+
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              Engineering Consultancy & Project Experts in Nepal
             </h1>
-            <p className="text-xl mb-8 text-brand-50">
-              We provide comprehensive engineering consultancy and project management services
-              to bring your vision to life.
+
+            <p className="text-lg md:text-xl mb-6 text-gray-100">
+              Diksha Consulting and Projects Pvt. Ltd. delivers expert engineering consultancy,
+              project support, and industry-driven training solutions.
             </p>
+
+            <p className="text-lg md:text-xl mb-8 text-gray-200">
+              We help organizations and professionals achieve real-world results through practical expertise,
+              efficient execution, and high-impact outcomes.
+            </p>
+
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/about">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="w-full sm:w-auto"
+                >
                   Learn More
                 </Button>
               </Link>
+
               <Link to="/projects">
                 <Button
                   size="lg"
@@ -37,6 +64,7 @@ export function Home() {
                 </Button>
               </Link>
             </div>
+
           </div>
         </div>
       </section>
