@@ -2,6 +2,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Target, Eye, Award, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
+import aboutUs from "../../imports/About_us.png";
 
 export function About() {
   const { teamMembers } = useContent();
@@ -44,34 +45,119 @@ export function About() {
       </section>
 
       {/* Who We Are Section */}
-      <section id="who-we-are" className="py-16 scroll-mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section
+        id="who-we-are"
+        className="relative py-24 bg-gradient-to-b from-white to-blue-50 overflow-hidden"
+      >
+        {/* Background Blur */}
+        <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-40 -z-10" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-40 -z-10" />
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+            {/* LEFT CONTENT */}
             <div>
-              <h2 className="text-3xl font-bold mb-6">Who We Are</h2>
-              <p className="text-gray-600 mb-4">
-                Diksha Consulting & Training Pvt. Ltd. is a multidisciplinary engineering and management 
-                consulting firm based in Kathmandu, Nepal. Established as a private limited company, we 
-                specialize in delivering high-quality consultancy, technical advisory, and capacity-building 
-                services to both public and private sector organizations.
+              {/* Heading */}
+              <h2 className="text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 mb-6">
+                Building Nepal’s Future Through
+                <span className="text-blue-700"> Engineering Excellence</span>
+              </h2>
+
+              {/* Description */}
+              <p className="text-lg text-gray-600 leading-relaxed mb-6">
+                Diksha Consulting & Training Pvt. Ltd. is a leading multidisciplinary
+                engineering consulting and professional training company based in
+                Kathmandu, Nepal. We specialize in infrastructure planning, project
+                management, civil engineering consultancy, construction supervision,
+                feasibility studies, DPR preparation, and technical capacity-building
+                programs for public and private sector organizations.
               </p>
-              <p className="text-gray-600 mb-4">
-                With a strong focus on innovation, sustainability, and professional excellence, we support 
-                clients throughout the project lifecycle—from feasibility studies and design to procurement, 
-                supervision, and training.
+
+              <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                From road and bridge engineering to water supply, urban development,
+                hydropower support, and engineering training, we deliver innovative,
+                sustainable, and practical solutions that contribute to Nepal’s
+                long-term development and infrastructure growth.
               </p>
-              <p className="text-gray-600">
-                We pride ourselves on our commitment to quality, sustainability, and client satisfaction. 
-                Every project we undertake is approached with meticulous attention to detail and a 
-                dedication to excellence.
-              </p>
+
+              {/* Feature Points */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {[
+                  "Engineering Consultancy",
+                  "Project Management",
+                  "Infrastructure Development",
+                  "Professional Training",
+                  "Sustainable Solutions",
+                  "Technical Advisory",
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 bg-white shadow-sm border border-gray-100 rounded-xl px-4 py-3"
+                  >
+                    <CheckCircle className="h-4 w-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700 font-medium text-sm">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="flex gap-4">
+                <a
+                  href="/services"
+                  className="bg-blue-700 hover:bg-blue-800 transition text-white px-6 py-3 rounded-xl font-semibold shadow-lg"
+                >
+                  Explore Services
+                </a>
+
+                <a
+                  href="/contact"
+                  className="border border-gray-300 hover:border-blue-700 hover:text-blue-700 transition px-6 py-3 rounded-xl font-semibold text-gray-700"
+                >
+                  Contact Us
+                </a>
+              </div>
             </div>
+
+            {/* RIGHT IMAGE */}
             <div className="relative">
-              <img
-                src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop"
-                alt="Team collaboration"
-                className="rounded-lg shadow-lg"
-              />
+
+              {/* Main Image */}
+              <div className="relative rounded-[32px] overflow-hidden shadow-2xl border border-slate-200">
+
+                <img
+                  src={aboutUs}
+                  alt="Diksha Consulting engineering team in Nepal"
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
+
+                {/* Bottom Info Card */}
+                <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md rounded-2xl p-5 shadow-xl">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    Trusted Engineering Partner in Nepal
+                  </h3>
+
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Delivering consultancy, infrastructure solutions, and technical
+                    training with innovation, sustainability, and professional excellence.
+                  </p>
+                </div>
+              </div>
+
+              {/* Floating Badge */}
+              <div className="absolute -bottom-6 -right-6 bg-blue-500 text-white px-6 py-4 rounded-2xl shadow-2xl">
+                <CheckCircle className="h-8 w-8 text-white" />
+                <p className="text-3xl font-extrabold">10+</p>
+                <p className="text-sm font-medium">Technical Services</p>
+              </div>
             </div>
           </div>
         </div>
