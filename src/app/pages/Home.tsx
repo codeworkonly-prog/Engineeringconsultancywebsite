@@ -3,6 +3,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { CheckCircle, Users, Award, Lightbulb, Star, Quote } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
+import engineering from "../../imports/engineering.png";
 
 export function Home() {
   const { projects, clients } = useContent();
@@ -16,7 +17,7 @@ export function Home() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src="/src/imports/engineering.png"
+            src={engineering}
             alt="Engineering Consultancy"
             className="w-full h-full object-cover"
           />
