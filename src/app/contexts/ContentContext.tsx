@@ -1,8 +1,25 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import dikshaImage from "../../imports/diksha1.png";
-import shreyaImage from "../../imports/shreya1.png";
-import satyaImage from "../../imports/Satya1.png";
-import abhishekImage from "../../imports/Abhishek1.png";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+
+import {
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+
+import { db } from "../../firebase"; // Adjust path if needed
+
+/* =========================
+   Interfaces
+========================= */
 
 export interface TeamMember {
   id: string;
@@ -11,6 +28,7 @@ export interface TeamMember {
   bio: string;
   imageUrl: string;
   slug: string;
+  isLeadership?: boolean;
 }
 
 export interface Client {
@@ -25,13 +43,13 @@ export interface Project {
   title: string;
   description: string;
   category: string;
-  projectType: 'Design and Build' | 'Contract';
+  projectType: "Design and Build" | "Contract";
   imageUrl: string;
   startDate: string;
   endDate: string;
-  status: 'ongoing' | 'completed';
+  status: "ongoing" | "completed";
   slug: string;
-  // Enhanced fields for case study layout
+
   client?: string;
   location?: string;
   area?: string;
@@ -61,7 +79,7 @@ export interface Event {
   startDate: string;
   endDate: string;
   duration: string;
-  type: 'Workshop' | 'Training' | 'Seminar';
+  type: "Workshop" | "Training" | "Seminar";
   description: string;
   topics: string[];
   slug: string;
@@ -73,215 +91,448 @@ interface ContentContextType {
   galleryImages: GalleryImage[];
   events: Event[];
   clients: Client[];
-  addTeamMember: (member: Omit<TeamMember, 'id'>) => void;
-  updateTeamMember: (id: string, member: Omit<TeamMember, 'id'>) => void;
-  addProject: (project: Omit<Project, 'id'>) => void;
-  updateProject: (id: string, project: Omit<Project, 'id'>) => void;
-  addGalleryImage: (image: Omit<GalleryImage, 'id'>) => void;
-  updateGalleryImage: (id: string, image: Omit<GalleryImage, 'id'>) => void;
-  addEvent: (event: Omit<Event, 'id'>) => void;
-  updateEvent: (id: string, event: Omit<Event, 'id'>) => void;
-  addClient: (client: Omit<Client, 'id'>) => void;
-  updateClient: (id: string, client: Omit<Client, 'id'>) => void;
-  deleteTeamMember: (id: string) => void;
-  deleteProject: (id: string) => void;
-  deleteGalleryImage: (id: string) => void;
-  deleteEvent: (id: string) => void;
-  deleteClient: (id: string) => void;
+
+  addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
+  updateTeamMember: (
+    id: string,
+    member: Omit<TeamMember, "id">
+  ) => Promise<void>;
+  deleteTeamMember: (id: string) => Promise<void>;
+
+  addProject: (project: Omit<Project, "id">) => Promise<void>;
+  updateProject: (
+    id: string,
+    project: Omit<Project, "id">
+  ) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
+
+  addGalleryImage: (
+    image: Omit<GalleryImage, "id">
+  ) => Promise<void>;
+  updateGalleryImage: (
+    id: string,
+    image: Omit<GalleryImage, "id">
+  ) => Promise<void>;
+  deleteGalleryImage: (id: string) => Promise<void>;
+
+  addEvent: (event: Omit<Event, "id">) => Promise<void>;
+  updateEvent: (
+    id: string,
+    event: Omit<Event, "id">
+  ) => Promise<void>;
+  deleteEvent: (id: string) => Promise<void>;
+
+  addClient: (client: Omit<Client, "id">) => Promise<void>;
+  updateClient: (
+    id: string,
+    client: Omit<Client, "id">
+  ) => Promise<void>;
+  deleteClient: (id: string) => Promise<void>;
 }
 
-const ContentContext = createContext<ContentContextType | undefined>(undefined);
+/* =========================
+   Context
+========================= */
 
-const initialTeamMembers: TeamMember[] = [
-  {
-    id: '1',
-    name: 'Diksha Shrestha',
-    position: 'Managing Director',
-    bio: 'Strong leadership, expert management, and a commitment to delivering innovative consulting and project solutions with excellence.',
-    imageUrl: dikshaImage,
-    slug: 'diksha-shrestha',
-  },
-  {
-    id: '2',
-    name: 'Abhishek Sharma',
-    position: 'Environmental/Civil Engineer',
-    bio: 'Master of Science - MS, Environmental/Environmental Health Engineering, Bachelor of Engineering - BE, Civil Engineering',
-    imageUrl: abhishekImage,
-    slug: 'abhishek-sharma',
-  },
-  {
-    id: '3',
-    name: 'Shreya Tuladhar',
-    position: 'Architect',
-    bio: 'Bachelor of Architecture (B.Arch)',
-    imageUrl: shreyaImage,
-    slug: 'shreya-tuladhar',
-  },
-  {
-    id: '4',
-    name: 'Satya Raj Pandey',
-    position: 'Engineer',
-    bio: 'Bachelors Degree in Civil Engineering',
-    imageUrl: satyaImage,
-    slug: 'satya-raj-pandey',
-  }
-];
+const ContentContext = createContext<ContentContextType | undefined>(
+  undefined
+);
 
-const initialClients: Client[] = [
-  {
-    id: '1',
-    name: 'Gorkha Brewery',
-    logoUrl: 'https://gorkhabrewery.com/media/o13b1o33/gorkha-brewery-carlsberg-group-logo.jpeg?width=172&mode=max',
-    website: 'https://gorkhabrewery.com/en/',
-  },
-  {
-    id: '2',
-    name: 'Iva Tara',
-    logoUrl: 'https://www.ivatara.com/assets/images/logo.svg',
-    website: 'https://www.ivatara.com/',
-  },
-  {
-    id: '3',
-    name: 'Kathmandu Valley Water Supply Management Board (KVWSMB)',
-    logoUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjrSQkI08Tv4eadvR0pJjeqvqMk5fP9T1GwA&s',
-    website: 'http://www.kvwsmb.gov.np/',
-  },
-   {
-    id: '4',
-    name: 'Nepal Oil Corporation (NOC)',
-    logoUrl: 'https://noc.org.np/assets/noctitl-a0600df220658d84cad1b8af45a54370.png',
-    website: 'https://noc.org.np/',
-  },
-  {
-    id: '5',
-    name: 'Special Economic Zone Authority (SEZA)',
-    logoUrl: 'https://giwmscdnone.gov.np/static/assets/image/Emblem_of_Nepal.png',
-    website: 'https://giwmscdnone.gov.np/',
-  },
-  {
-    id: '6',
-    name: 'Kathmandu Upatyaka Khanepani Limited (KUKL)',
-    logoUrl: 'https://www.kukl.org.np/storage/setting/1/logo/6886-kukl-logo.png',
-    website: 'https://www.kukl.org.np/',
-  },
-  {
-    id: '7',
-    name: 'Economic Policy Incubator (EPI)',
-    logoUrl: 'https://sejonnepal.com/wp-content/uploads/2022/07/EPI-1.png',
-    website: '',
-  },
-];
+/* =========================
+   Provider
+========================= */
 
-const initialProjects: Project[] = [
-  {
-    id: '1',
-    title: 'City Bridge Infrastructure',
-    description: 'Complete structural analysis and renovation of major city bridge.',
-    category: 'Infrastructure',
-    projectType: 'Design and Build',
-    imageUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
-    startDate: '2024-01-15',
-    endDate: '2025-12-15',
-    status: 'ongoing',
-    slug: 'city-bridge-infrastructure',
-  },
-];
+export function ContentProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
 
-const initialGalleryImages: GalleryImage[] = [
-  {
-    id: '1',
-    title: 'Construction Projects',
-    category: 'Construction',
-    imageUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
-  },
-];
+  /* =========================
+     Fetch Data
+  ========================= */
 
-const initialEvents: Event[] = [
-  {
-    id: '1',
-    title: 'Advanced Structural Engineering Workshop',
-    startDate: '2024-03-15',
-    endDate: '2024-03-15',
-    duration: '2 hours',
-    type: 'Workshop',
-    description: 'Learn advanced techniques in structural engineering.',
-    topics: ['Finite Element Analysis', 'Material Properties', 'Load Analysis'],
-    slug: 'advanced-structural-engineering-workshop',
-  },
-];
+  useEffect(() => {
+    fetchTeamMembers();
+    fetchProjects();
+    fetchGalleryImages();
+    fetchEvents();
+    fetchClients();
+  }, []);
 
-export function ContentProvider({ children }: { children: ReactNode }) {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
-  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(initialGalleryImages);
-  const [events, setEvents] = useState<Event[]>(initialEvents);
-  const [clients, setClients] = useState<Client[]>(initialClients);
+  /* =========================
+     TEAM MEMBERS
+  ========================= */
 
-  const addTeamMember = (member: Omit<TeamMember, 'id'>) => {
-    const newMember = { ...member, id: Date.now().toString() };
-    setTeamMembers((prev) => [...prev, newMember]);
+  const fetchTeamMembers = async () => {
+    try {
+      const snapshot = await getDocs(
+        collection(db, "teamMembers")
+      );
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<TeamMember, "id">),
+      }));
+
+      setTeamMembers(data);
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+    }
   };
 
-  const updateTeamMember = (id: string, member: Omit<TeamMember, 'id'>) => {
-    setTeamMembers((prev) => prev.map((m) => (m.id === id ? { ...member, id } : m)));
+  const addTeamMember = async (
+    member: Omit<TeamMember, "id">
+  ) => {
+    try {
+      const docRef = await addDoc(
+        collection(db, "teamMembers"),
+        member
+      );
+
+      setTeamMembers((prev) => [
+        ...prev,
+        {
+          ...member,
+          id: docRef.id,
+        },
+      ]);
+    } catch (error) {
+      console.error("Error adding team member:", error);
+    }
   };
 
-  const addProject = (project: Omit<Project, 'id'>) => {
-    const newProject = { ...project, id: Date.now().toString() };
-    setProjects((prev) => [...prev, newProject]);
+  const updateTeamMember = async (
+    id: string,
+    member: Omit<TeamMember, "id">
+  ) => {
+    try {
+      await updateDoc(doc(db, "teamMembers", id), {
+        ...member,
+      });
+
+      setTeamMembers((prev) =>
+        prev.map((m) =>
+          m.id === id ? { ...member, id } : m
+        )
+      );
+    } catch (error) {
+      console.error("Error updating team member:", error);
+    }
   };
 
-  const updateProject = (id: string, project: Omit<Project, 'id'>) => {
-    setProjects((prev) => prev.map((p) => (p.id === id ? { ...project, id } : p)));
+  const deleteTeamMember = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "teamMembers", id));
+
+      setTeamMembers((prev) =>
+        prev.filter((member) => member.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting team member:", error);
+    }
   };
 
-  const addGalleryImage = (image: Omit<GalleryImage, 'id'>) => {
-    const newImage = { ...image, id: Date.now().toString() };
-    setGalleryImages((prev) => [...prev, newImage]);
+  /* =========================
+     PROJECTS
+  ========================= */
+
+  const fetchProjects = async () => {
+    try {
+      const snapshot = await getDocs(
+        collection(db, "projects")
+      );
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Project, "id">),
+      }));
+
+      setProjects(data);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
   };
 
-  const updateGalleryImage = (id: string, image: Omit<GalleryImage, 'id'>) => {
-    setGalleryImages((prev) => prev.map((i) => (i.id === id ? { ...image, id } : i)));
+  const addProject = async (
+    project: Omit<Project, "id">
+  ) => {
+    try {
+      const docRef = await addDoc(
+        collection(db, "projects"),
+        project
+      );
+
+      setProjects((prev) => [
+        ...prev,
+        {
+          ...project,
+          id: docRef.id,
+        },
+      ]);
+    } catch (error) {
+      console.error("Error adding project:", error);
+    }
   };
 
-  const addEvent = (event: Omit<Event, 'id'>) => {
-    const newEvent = { ...event, id: Date.now().toString() };
-    setEvents((prev) => [...prev, newEvent]);
+  const updateProject = async (
+    id: string,
+    project: Omit<Project, "id">
+  ) => {
+    try {
+      await updateDoc(doc(db, "projects", id), {
+        ...project,
+      });
+
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.id === id ? { ...project, id } : p
+        )
+      );
+    } catch (error) {
+      console.error("Error updating project:", error);
+    }
   };
 
-  const updateEvent = (id: string, event: Omit<Event, 'id'>) => {
-    setEvents((prev) => prev.map((e) => (e.id === id ? { ...event, id } : e)));
+  const deleteProject = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "projects", id));
+
+      setProjects((prev) =>
+        prev.filter((project) => project.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    }
   };
 
-  const deleteTeamMember = (id: string) => {
-    setTeamMembers((prev) => prev.filter((member) => member.id !== id));
+  /* =========================
+     GALLERY IMAGES
+  ========================= */
+
+  const fetchGalleryImages = async () => {
+    try {
+      const snapshot = await getDocs(
+        collection(db, "galleryImages")
+      );
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<GalleryImage, "id">),
+      }));
+
+      setGalleryImages(data);
+    } catch (error) {
+      console.error("Error fetching gallery images:", error);
+    }
   };
 
-  const deleteProject = (id: string) => {
-    setProjects((prev) => prev.filter((project) => project.id !== id));
+  const addGalleryImage = async (
+    image: Omit<GalleryImage, "id">
+  ) => {
+    try {
+      const docRef = await addDoc(
+        collection(db, "galleryImages"),
+        image
+      );
+
+      setGalleryImages((prev) => [
+        ...prev,
+        {
+          ...image,
+          id: docRef.id,
+        },
+      ]);
+    } catch (error) {
+      console.error("Error adding gallery image:", error);
+    }
   };
 
-  const deleteGalleryImage = (id: string) => {
-    setGalleryImages((prev) => prev.filter((image) => image.id !== id));
+  const updateGalleryImage = async (
+    id: string,
+    image: Omit<GalleryImage, "id">
+  ) => {
+    try {
+      await updateDoc(doc(db, "galleryImages", id), {
+        ...image,
+      });
+
+      setGalleryImages((prev) =>
+        prev.map((i) =>
+          i.id === id ? { ...image, id } : i
+        )
+      );
+    } catch (error) {
+      console.error("Error updating gallery image:", error);
+    }
   };
 
-  const deleteEvent = (id: string) => {
-    setEvents((prev) => prev.filter((event) => event.id !== id));
+  const deleteGalleryImage = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "galleryImages", id));
+
+      setGalleryImages((prev) =>
+        prev.filter((image) => image.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting gallery image:", error);
+    }
   };
 
-  const addClient = (client: Omit<Client, 'id'>) => {
-    const newClient = { ...client, id: Date.now().toString() };
-    setClients((prev) => [...prev, newClient]);
+  /* =========================
+     EVENTS
+  ========================= */
+
+  const fetchEvents = async () => {
+    try {
+      const snapshot = await getDocs(
+        collection(db, "events")
+      );
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Event, "id">),
+      }));
+
+      setEvents(data);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
   };
 
-  const updateClient = (id: string, client: Omit<Client, 'id'>) => {
-    setClients((prev) => prev.map((c) => (c.id === id ? { ...client, id } : c)));
+  const addEvent = async (
+    event: Omit<Event, "id">
+  ) => {
+    try {
+      const docRef = await addDoc(
+        collection(db, "events"),
+        event
+      );
+
+      setEvents((prev) => [
+        ...prev,
+        {
+          ...event,
+          id: docRef.id,
+        },
+      ]);
+    } catch (error) {
+      console.error("Error adding event:", error);
+    }
   };
 
-  const deleteClient = (id: string) => {
-    setClients((prev) => prev.filter((client) => client.id !== id));
+  const updateEvent = async (
+    id: string,
+    event: Omit<Event, "id">
+  ) => {
+    try {
+      await updateDoc(doc(db, "events", id), {
+        ...event,
+      });
+
+      setEvents((prev) =>
+        prev.map((e) =>
+          e.id === id ? { ...event, id } : e
+        )
+      );
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
   };
 
+  const deleteEvent = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "events", id));
+
+      setEvents((prev) =>
+        prev.filter((event) => event.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
+
+  /* =========================
+     CLIENTS
+  ========================= */
+
+  const fetchClients = async () => {
+    try {
+      const snapshot = await getDocs(
+        collection(db, "clients")
+      );
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Client, "id">),
+      }));
+
+      setClients(data);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+    }
+  };
+
+  const addClient = async (
+    client: Omit<Client, "id">
+  ) => {
+    try {
+      const docRef = await addDoc(
+        collection(db, "clients"),
+        client
+      );
+
+      setClients((prev) => [
+        ...prev,
+        {
+          ...client,
+          id: docRef.id,
+        },
+      ]);
+    } catch (error) {
+      console.error("Error adding client:", error);
+    }
+  };
+
+  const updateClient = async (
+    id: string,
+    client: Omit<Client, "id">
+  ) => {
+    try {
+      await updateDoc(doc(db, "clients", id), {
+        ...client,
+      });
+
+      setClients((prev) =>
+        prev.map((c) =>
+          c.id === id ? { ...client, id } : c
+        )
+      );
+    } catch (error) {
+      console.error("Error updating client:", error);
+    }
+  };
+
+  const deleteClient = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "clients", id));
+
+      setClients((prev) =>
+        prev.filter((client) => client.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting client:", error);
+    }
+  };
+
+  /* =========================
+     Provider Return
+  ========================= */
 
   return (
     <ContentContext.Provider
@@ -291,20 +542,25 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         galleryImages,
         events,
         clients,
+
         addTeamMember,
         updateTeamMember,
+        deleteTeamMember,
+
         addProject,
         updateProject,
+        deleteProject,
+
         addGalleryImage,
         updateGalleryImage,
+        deleteGalleryImage,
+
         addEvent,
         updateEvent,
+        deleteEvent,
+
         addClient,
         updateClient,
-        deleteTeamMember,
-        deleteProject,
-        deleteGalleryImage,
-        deleteEvent,
         deleteClient,
       }}
     >
@@ -313,10 +569,18 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/* =========================
+   Custom Hook
+========================= */
+
 export function useContent() {
   const context = useContext(ContentContext);
-  if (context === undefined) {
-    throw new Error('useContent must be used within a ContentProvider');
+
+  if (!context) {
+    throw new Error(
+      "useContent must be used within ContentProvider"
+    );
   }
+
   return context;
 }
