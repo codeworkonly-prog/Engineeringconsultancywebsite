@@ -18,7 +18,7 @@ import { DashboardHome } from './DashboardHome';
 import { ProjectsSection } from './ProjectsSection';
 import { TeamSection } from './TeamSection';
 import { EventsSection } from './EventsSection';
-import { GallerySection } from './GallerySection';
+import { GallerySection } from './GallerySection.tsx';
 import { ClientsSection } from './ClientsSection';
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
