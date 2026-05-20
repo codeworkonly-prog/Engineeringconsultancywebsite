@@ -31,6 +31,21 @@ export interface Project {
   endDate: string;
   status: 'ongoing' | 'completed';
   slug: string;
+  // Enhanced fields for case study layout
+  client?: string;
+  location?: string;
+  area?: string;
+  completionDate?: string;
+  servicesProvided?: string[];
+  overview?: string;
+  galleryImages?: string[];
+  result?: string;
+  keyFeatures?: string[];
+  beforeImage?: string;
+  afterImage?: string;
+  clientTestimonial?: string;
+  clientName?: string;
+  faqs?: { question: string; answer: string }[];
 }
 
 export interface GalleryImage {
