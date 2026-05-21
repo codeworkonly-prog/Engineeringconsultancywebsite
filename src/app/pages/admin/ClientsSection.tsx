@@ -16,7 +16,7 @@ export function ClientsSection() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.logoUrl || !form.website) {
+    if (!form.name || !form.logoUrl) {
       toast.error('Please fill all fields');
       return;
     }
