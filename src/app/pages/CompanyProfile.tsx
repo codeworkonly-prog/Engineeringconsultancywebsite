@@ -1,8 +1,10 @@
 import { Card, CardContent } from '../components/ui/card';
 import { Link } from 'react-router';
 import { CheckCircle, Building2, Users, Award, Lightbulb } from 'lucide-react';
+import { useContent } from '../contexts/ContentContext';
 
 export function CompanyProfile() {
+   const { clients } = useContent();
   const services = [
     {
       category: 'Engineering Consultancy & Infrastructure Design',
@@ -66,14 +68,6 @@ export function CompanyProfile() {
     },
   ];
 
-  const clients = [
-    'Government of Nepal ministries and departments',
-    'Kathmandu Valley Water Supply Management Board',
-    'Nepal Oil Corporation',
-    'Special Economic Zone Authority',
-    'Department of Urban Development & Building Construction',
-    'International organizations such as UNICEF and UNDP',
-  ];
 
   const projectTypes = [
     'Water supply and wastewater management systems',
@@ -224,18 +218,23 @@ export function CompanyProfile() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {clients.map((client, index) => (
-              <Card key={index}>
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    <Users className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700">{client}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-center">
+              {clients.map((client) => (
+                <a
+                  key={client.id}
+                  href={client.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center p-6 bg-white rounded-lg hover:shadow-lg transition-shadow duration-200"
+                >
+                  <img
+                    src={client.logoUrl}
+                    alt={client.name}
+                    className="max-h-16 max-w-full object-contain"
+                  />
+                </a>
+              ))}
+            </div>
         </div>
       </section>
 
