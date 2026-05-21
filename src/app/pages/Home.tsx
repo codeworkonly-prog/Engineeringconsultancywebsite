@@ -44,27 +44,46 @@ export function Home() {
               efficient execution, and high-impact outcomes.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/about">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="w-full sm:w-auto"
-                >
-                  Learn More
-                </Button>
-              </Link>
+           <div className="flex flex-col sm:flex-row gap-4">
+  <Link to="/about">
+    <Button
+      size="lg"
+      className="
+        w-full sm:w-auto
+        px-6 py-2
+        rounded-full
+        bg-white/10
+        hover:bg-white/20
+        text-white
+        border border-white/30
+        transition-all duration-300
+        backdrop-blur-sm
+      "
+    >
+      Learn More
+    </Button>
+  </Link>
 
-              <Link to="/projects">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto bg-transparent border-white text-white hover:bg-white hover:text-brand-600"
-                >
-                  View Projects
-                </Button>
-              </Link>
-            </div>
+  <Link to="/projects">
+    <Button
+      size="lg"
+      className="
+        w-full sm:w-auto
+        px-6 py-2
+        rounded-full
+        bg-transparent
+        hover:bg-white/10
+        text-white
+        border border-white/30
+        transition-all duration-300
+        backdrop-blur-sm
+      "
+    >
+      View Projects
+    </Button>
+  </Link>
+</div>
+
 
           </div>
         </div>
@@ -149,20 +168,35 @@ export function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProjects.map((project) => (
-              <Card key={project.id} className="overflow-hidden">
-                <img
-                  src={project.imageUrl}
-                  alt={project.title}
-                  className="w-full h-48 object-cover"
-                />
-                <CardContent className="pt-6">
-                  <div className="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full mb-3">
-                    {project.category}
+              <Link
+                key={project.id}
+                to={`/projects/${project.slug}`}
+                className="group"
+              >
+                <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
+                  <div className="overflow-hidden">
+                    <img
+                      src={project.imageUrl}
+                      alt={project.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                  <h3 className="font-semibold mb-2">{project.title}</h3>
-                  <p className="text-sm text-gray-600">{project.description}</p>
-                </CardContent>
-              </Card>
+
+                  <CardContent className="pt-6">
+                    <div className="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full mb-3">
+                      {project.category}
+                    </div>
+
+                    <h3 className="font-semibold mb-2 group-hover:text-brand-600 transition-colors">
+                      {project.title}
+                    </h3>
+
+                    <p className="text-sm text-gray-600">
+                      {project.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
 

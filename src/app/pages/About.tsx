@@ -41,7 +41,7 @@ export function About() {
               About Us
             </h1>
 
-            <p className="text-lg md:text-2xl text-gray-200 leading-relaxed">
+            <p className="text-lg md:text-2xl text-gray-200 leading-relaxed mb-6">
               A multidisciplinary engineering and management consulting firm
               dedicated to excellence.
             </p>
