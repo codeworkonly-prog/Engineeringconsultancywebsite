@@ -49,7 +49,7 @@ export interface Project {
   endDate: string;
   status: "ongoing" | "completed";
   slug: string;
-
+  isFlagship: boolean;
   client?: string;
   location?: string;
   area?: string;

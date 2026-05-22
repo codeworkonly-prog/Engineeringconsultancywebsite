@@ -7,7 +7,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
-import { Edit, Trash2, X } from 'lucide-react';
+import { Edit, Trash2, X, Award } from 'lucide-react';
 import { ProjectForm, defaultProjectForm } from './types';
 
 export function ProjectsSection() {
@@ -38,16 +38,30 @@ export function ProjectsSection() {
     setForm({ ...form, title, slug });
   };
 
+  const handleFlagshipToggle = (checked: boolean) => {
+    setForm({ ...form, isFlagship: checked });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.description || !form.category || !form.imageUrl || !form.startDate || !form.endDate) {
-      toast.error('Please fill all fields');
+      toast.error('Please fill all required fields');
       return;
     }
     if (new Date(form.endDate) < new Date(form.startDate)) {
       toast.error('End date must be after start date');
       return;
     }
+
+    // If this project is being marked as flagship, unmark all others
+    if (form.isFlagship) {
+      projects.forEach((p) => {
+        if (p.id !== editingId && p.isFlagship) {
+          updateProject(p.id, { ...p, isFlagship: false });
+        }
+      });
+    }
+
     if (editingId) {
       updateProject(editingId, form);
       toast.success('Project updated');
@@ -84,6 +98,7 @@ export function ProjectsSection() {
       clientTestimonial: project.clientTestimonial || '',
       clientName: project.clientName || '',
       faqs: project.faqs || [],
+      isFlagship: project.isFlagship || false,
     });
     setEditingId(project.id);
   };
@@ -93,47 +108,95 @@ export function ProjectsSection() {
     setForm(defaultProjectForm);
   };
 
+  const flagshipProject = projects.find((p) => p.isFlagship);
+
   return (
     <div className="space-y-6">
+      {/* Flagship Project Alert */}
+      {flagshipProject && (
+        <Card className="border-brand-200 bg-brand-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <Award className="h-6 w-6 text-brand-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-brand-900 mb-1">Current Flagship Project</h3>
+                <p className="text-sm text-brand-700">
+                  <strong>{flagshipProject.title}</strong> is currently set as your flagship project and will
+                  appear on the company profile page.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>{editingId ? 'Edit Project' : 'Add New Project'}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Flagship Toggle */}
+            <div className="border-2 border-brand-200 rounded-lg p-4 bg-brand-50">
+              <div className="flex items-start gap-3">
+                <Award className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="flagship-toggle"
+                      checked={form.isFlagship}
+                      onChange={(e) => handleFlagshipToggle(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                    />
+                    <Label htmlFor="flagship-toggle" className="font-semibold cursor-pointer">
+                      Mark as Flagship Project
+                    </Label>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1 ml-7">
+                    The flagship project will be prominently featured on your company profile page.
+                    Only one project can be flagship at a time.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div>
-              <Label htmlFor="project-name">Project Name</Label>
+              <Label htmlFor="project-name">Project Name *</Label>
               <Input
                 id="project-name"
                 value={form.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Enter project name"
+                required
               />
             </div>
 
             <div>
-              <Label htmlFor="project-description">Description</Label>
+              <Label htmlFor="project-description">Description *</Label>
               <Textarea
                 id="project-description"
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder="Enter project description"
                 rows={4}
+                required
               />
             </div>
 
             <div>
-              <Label htmlFor="project-category">Category</Label>
+              <Label htmlFor="project-category">Category *</Label>
               <Input
                 id="project-category"
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 placeholder="Enter project category"
+                required
               />
             </div>
 
             <div>
-              <Label htmlFor="project-type">Project Type</Label>
+              <Label htmlFor="project-type">Project Type *</Label>
               <Select
                 value={form.projectType}
                 onValueChange={(value: 'Design and Build' | 'Contract') =>
@@ -151,38 +214,41 @@ export function ProjectsSection() {
             </div>
 
             <div>
-              <Label htmlFor="project-image">Image URL</Label>
+              <Label htmlFor="project-image">Image URL *</Label>
               <Input
                 id="project-image"
                 value={form.imageUrl}
                 onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                 placeholder="https://..."
+                required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="project-start-date">Start Date</Label>
+                <Label htmlFor="project-start-date">Start Date *</Label>
                 <Input
                   id="project-start-date"
                   type="date"
                   value={form.startDate}
                   onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+                  required
                 />
               </div>
               <div>
-                <Label htmlFor="project-end-date">End Date</Label>
+                <Label htmlFor="project-end-date">End Date *</Label>
                 <Input
                   id="project-end-date"
                   type="date"
                   value={form.endDate}
                   onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+                  required
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="project-status">Status</Label>
+              <Label htmlFor="project-status">Status *</Label>
               <Select
                 value={form.status}
                 onValueChange={(value: 'ongoing' | 'completed') =>
@@ -456,8 +522,14 @@ export function ProjectsSection() {
                       className="w-20 h-20 rounded object-cover flex-shrink-0"
                     />
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <h3 className="font-semibold">{project.title}</h3>
+                        {project.isFlagship && (
+                          <span className="px-2 py-1 rounded text-xs bg-amber-100 text-amber-700 font-semibold flex items-center gap-1">
+                            <Award className="h-3 w-3" />
+                            Flagship
+                          </span>
+                        )}
                         <span className="px-2 py-1 rounded text-xs bg-brand-100 text-brand-600">
                           {project.category}
                         </span>

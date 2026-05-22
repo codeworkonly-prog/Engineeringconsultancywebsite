@@ -126,7 +126,7 @@ export function Training() {
                       <ul className="space-y-2 mb-6">
                         {event.topics && event.topics.map((topic, index) => (
                           <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
-                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <CheckCircle className="h-4 w-4 text-brand-500 mt-0.5 flex-shrink-0" />
                             <span>{topic}</span>
                           </li>
                         ))}

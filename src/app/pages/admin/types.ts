@@ -24,6 +24,7 @@ export type ProjectForm = {
   clientTestimonial: string;
   clientName: string;
   faqs: { question: string; answer: string }[];
+  isFlagship: boolean; 
 };
 
 export type TeamForm = {
@@ -81,6 +82,7 @@ export const defaultProjectForm: ProjectForm = {
   clientTestimonial: '',
   clientName: '',
   faqs: [],
+  isFlagship: false, // NEW: defaults to false
 };
 
 export const defaultTeamForm: TeamForm = {

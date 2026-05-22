@@ -67,7 +67,7 @@ export function EventDetail() {
                 <ul className="space-y-4">
                   {event.topics.map((topic, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-1" />
+                      <CheckCircle className="h-6 w-6 text-brand-500 flex-shrink-0 mt-1" />
                       <div>
                         <p className="font-semibold text-lg text-gray-900">{topic}</p>
                       </div>

@@ -169,7 +169,7 @@ export function ConsultingService() {
                     <ul className="space-y-2">
                       {service.services.map((item, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                          <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-brand-500 mt-0.5 flex-shrink-0" />
                           <span>{item}</span>
                         </li>
                       ))}
