@@ -3,15 +3,15 @@ import faviconImage from '../../imports/DCP_logo-1.webp';
 
 export function Favicon() {
   useEffect(() => {
-    // Update favicon
-    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    const link =
+      document.querySelector("link[rel*='icon']") ||
+      document.createElement('link');
+
     link.setAttribute('type', 'image/webp');
     link.setAttribute('rel', 'icon');
     link.setAttribute('href', faviconImage);
-    document.head.appendChild(link);
 
-    // Update title
-    document.title = 'DCP - Diksha Consulting and Projects Pvt. Ltd.';
+    document.head.appendChild(link);
   }, []);
 
   return null;
