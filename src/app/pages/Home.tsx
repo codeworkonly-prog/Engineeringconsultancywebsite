@@ -1,9 +1,9 @@
 import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { CheckCircle, Users, Award, Lightbulb, Star, Quote } from 'lucide-react';
+import { CheckCircle, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
-import engineering from "../../imports/engineering.png";
+import engineering from "../../imports/engineering.webp";
 
 export function Home() {
   const { projects, clients } = useContent();

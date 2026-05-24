@@ -2,8 +2,8 @@ import { Card, CardContent } from '../components/ui/card';
 import { Target, Eye, Award, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
-import aboutUs from "../../imports/About_us.png";
-import aboutUsHeader from "../../imports/aboutUsHeader.jpg";
+import aboutUs from "../../imports/About_us.webp";
+import aboutUsHeader from "../../imports/aboutUsHeader.webp";
 
 export function About() {
   const { teamMembers } = useContent();
