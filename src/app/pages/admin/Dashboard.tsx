@@ -7,36 +7,25 @@ import {
   LayoutDashboard,
   Briefcase,
   Users,
-  Calendar,
-  ImageIcon,
   LogOut,
   Home,
-  Building2,
 } from 'lucide-react';
 import { Section } from './types';
 import { DashboardHome } from './DashboardHome';
-import { ProjectsSection } from './ProjectsSection';
 import { TeamSection } from './TeamSection';
-import { EventsSection } from './EventsSection';
-import { GallerySection } from './GallerySection.tsx';
-import { ClientsSection } from './ClientsSection';
+import { PortfolioSection } from './PortfolioSection';
+
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
-  { id: 'projects', label: 'Projects', icon: <Briefcase className="h-5 w-5" /> },
+  { id: 'portfolio', label: 'Portfolio', icon: <Briefcase className="h-5 w-5" /> },
   { id: 'team', label: 'Team', icon: <Users className="h-5 w-5" /> },
-  { id: 'events', label: 'Events', icon: <Calendar className="h-5 w-5" /> },
-  { id: 'gallery', label: 'Gallery', icon: <ImageIcon className="h-5 w-5" /> },
-  { id: 'clients', label: 'Clients', icon: <Building2 className="h-5 w-5" /> },
 ];
 
 const SECTION_LABELS: Record<Section, string> = {
   dashboard: 'Dashboard',
-  projects: 'Projects',
+  portfolio: 'Portfolio',
   team: 'Team',
-  events: 'Events',
-  gallery: 'Gallery',
-  clients: 'Clients',
 };
 
 export function Dashboard() {
@@ -97,11 +86,8 @@ export function Dashboard() {
 
         <div className="p-8">
           {activeSection === 'dashboard' && <DashboardHome />}
-          {activeSection === 'projects' && <ProjectsSection />}
+          {activeSection === 'portfolio' && <PortfolioSection />}
           {activeSection === 'team' && <TeamSection />}
-          {activeSection === 'events' && <EventsSection />}
-          {activeSection === 'gallery' && <GallerySection />}
-          {activeSection === 'clients' && <ClientsSection />}
         </div>
       </main>
     </div>

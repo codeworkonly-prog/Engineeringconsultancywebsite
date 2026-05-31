@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../../firebase"; // Adjust path if needed
+import { PortfolioItem } from "../../types/portfolio.types";
 
 /* =========================
    Interfaces
@@ -91,6 +92,7 @@ interface ContentContextType {
   galleryImages: GalleryImage[];
   events: Event[];
   clients: Client[];
+  portfolio: PortfolioItem[];
 
   addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
   updateTeamMember: (
@@ -128,6 +130,13 @@ interface ContentContextType {
     client: Omit<Client, "id">
   ) => Promise<void>;
   deleteClient: (id: string) => Promise<void>;
+
+  addPortfolioItem: (item: Omit<PortfolioItem, "id">) => Promise<void>;
+  updatePortfolioItem: (
+    id: string,
+    item: Omit<PortfolioItem, "id">
+  ) => Promise<void>;
+  deletePortfolioItem: (id: string) => Promise<void>;
 }
 
 /* =========================
@@ -152,6 +161,7 @@ export function ContentProvider({
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
+  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
 
   /* =========================
      Fetch Data
@@ -163,6 +173,7 @@ export function ContentProvider({
     fetchGalleryImages();
     fetchEvents();
     fetchClients();
+    fetchPortfolio();
   }, []);
 
   /* =========================
@@ -531,6 +542,75 @@ export function ContentProvider({
   };
 
   /* =========================
+     PORTFOLIO
+  ========================= */
+
+  const fetchPortfolio = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "portfolio"));
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<PortfolioItem, "id">),
+      }));
+
+      setPortfolio(data);
+    } catch (error) {
+      console.error("Error fetching portfolio:", error);
+    }
+  };
+
+  const addPortfolioItem = async (item: Omit<PortfolioItem, "id">) => {
+    try {
+      const docRef = await addDoc(collection(db, "portfolio"), item);
+
+      setPortfolio((prev) => [
+        ...prev,
+        {
+          ...item,
+          id: docRef.id,
+        },
+      ]);
+    } catch (error) {
+      console.error("Error adding portfolio item:", error);
+      throw error;
+    }
+  };
+
+  const updatePortfolioItem = async (
+    id: string,
+    item: Omit<PortfolioItem, "id">
+  ) => {
+    try {
+      await updateDoc(doc(db, "portfolio", id), {
+        ...item,
+      });
+
+      setPortfolio((prev) =>
+        prev.map((portfolioItem) =>
+          portfolioItem.id === id ? { ...item, id } : portfolioItem
+        )
+      );
+    } catch (error) {
+      console.error("Error updating portfolio item:", error);
+      throw error;
+    }
+  };
+
+  const deletePortfolioItem = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "portfolio", id));
+
+      setPortfolio((prev) =>
+        prev.filter((portfolioItem) => portfolioItem.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting portfolio item:", error);
+      throw error;
+    }
+  };
+
+  /* =========================
      Provider Return
   ========================= */
 
@@ -542,6 +622,7 @@ export function ContentProvider({
         galleryImages,
         events,
         clients,
+        portfolio,
 
         addTeamMember,
         updateTeamMember,
@@ -562,6 +643,10 @@ export function ContentProvider({
         addClient,
         updateClient,
         deleteClient,
+
+        addPortfolioItem,
+        updatePortfolioItem,
+        deletePortfolioItem,
       }}
     >
       {children}
