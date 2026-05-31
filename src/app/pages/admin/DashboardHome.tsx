@@ -7,7 +7,7 @@ export function DashboardHome() {
   const stats = [
     { label: 'Total Projects', value: projects.length },
     { label: 'Team Members', value: teamMembers.length },
-    { label: 'Events', value: events.length },
+    { label: 'Training', value: events.length },
     { label: 'Gallery Images', value: galleryImages.length },
     { label: 'Clients', value: clients.length },
   ];

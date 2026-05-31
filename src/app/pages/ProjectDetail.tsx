@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Calendar, ArrowLeft, MapPin, Ruler, CheckCircle2, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
+import { PortfolioItemDetail } from './PortfolioItemDetail';
 
 export function ProjectDetail() {
   const { slug } = useParams();
@@ -13,20 +14,7 @@ export function ProjectDetail() {
   const project = projects.find((p) => p.slug === slug);
 
   if (!project) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Project Not Found</h1>
-          <p className="text-gray-600 mb-8">The project you're looking for doesn't exist.</p>
-          <Link to="/projects">
-            <Button>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Projects
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
+    return <PortfolioItemDetail expectedType="project" />;
   }
 
   // Get related projects (same type or category, excluding current)

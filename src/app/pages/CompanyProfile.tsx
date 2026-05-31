@@ -51,7 +51,7 @@ export function CompanyProfile() {
     },
     {
       category: 'Research & Development Programs',
-      href: '/events',
+      href: '/training',
       items: [
         'Socio-economic Studies',
         'Policy & Institutional Framework Development',
@@ -60,7 +60,7 @@ export function CompanyProfile() {
     },
     {
       category: 'Training & Capacity Building',
-      href: '/events',
+      href: '/training',
       items: [
         'Public Procurement & Contract Management',
         'Project Planning & Management Tools (Primavera, etc.)',

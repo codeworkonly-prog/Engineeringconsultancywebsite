@@ -1,9 +1,13 @@
 import { Card, CardContent } from '../components/ui/card';
-import { CheckCircle, FileText, Users, Target, BarChart, Briefcase, Lightbulb, Settings } from 'lucide-react';
+import { ArrowRight, Calendar, CheckCircle, FileText, MapPin, Users, Target, BarChart, Briefcase, Lightbulb, Settings } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
+import { useContent } from '../contexts/ContentContext';
 
 export function ConsultingService() {
+  const { portfolio } = useContent();
+  const consultingAssignments = portfolio.filter((item) => item.type === 'consulting');
+
   const consultingServices = [
     {
       title: 'Engineering Design & Planning',
@@ -181,6 +185,83 @@ export function ConsultingService() {
           </div>
         </div>
       </section>
+
+      {consultingAssignments.length > 0 && (
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Consulting Assignments</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Selected consulting work delivered for institutional and infrastructure clients.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {consultingAssignments.map((assignment) => (
+                <Link key={assignment.id} to={`/consulting-service/${assignment.slug}`}>
+                  <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full group">
+                    <div className="relative overflow-hidden">
+                      {assignment.featuredImage ? (
+                        <img
+                          src={assignment.featuredImage}
+                          alt={assignment.title}
+                          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="h-64 bg-gradient-to-br from-brand-600 via-brand-500 to-slate-800" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                      <div className="absolute top-4 right-4">
+                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-800 text-white capitalize">
+                          {assignment.status || 'completed'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <CardContent className="pt-6">
+                      <div className="mb-3">
+                        <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full font-medium">
+                          {assignment.serviceType || 'Consulting'}
+                        </span>
+                      </div>
+
+                      <h3 className="font-semibold text-xl mb-2 group-hover:text-brand-600 transition-colors">
+                        {assignment.title}
+                      </h3>
+
+                      {assignment.location && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                          <MapPin className="h-4 w-4" />
+                          <span>{assignment.location}</span>
+                        </div>
+                      )}
+
+                      <p className="text-sm text-gray-600 line-clamp-3 mb-4">
+                        {assignment.shortDescription}
+                      </p>
+
+                      <div className="text-sm text-gray-500 space-y-1 mb-4">
+                        {assignment.client && <p>Client: {assignment.client}</p>}
+                        {assignment.fiscalYear && (
+                          <p className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            <span>Fiscal Year: {assignment.fiscalYear}</span>
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center text-brand-600 text-sm font-medium group-hover:gap-2 transition-all">
+                        <span>View Assignment</span>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Sectors We Serve Section */}
       <section className="py-16">

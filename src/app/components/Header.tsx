@@ -21,7 +21,8 @@ export function Header() {
     { path: '/company-profile', label: 'Company Profile' },
     { path: '/consulting-service', label: 'Consulting Service' },
     { path: '/projects', label: 'Projects' },
-    { path: '/events', label: 'Events' },
+    { path: '/portfolio', label: 'Portfolio' },
+    { path: '/training', label: 'Training' },
     { path: '/contact', label: 'Contact Us' },
   ];
 

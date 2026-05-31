@@ -1,310 +1,409 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router';
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Input } from '../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { ArrowRight, BriefcaseBusiness, CalendarClock, GraduationCap, Search, Users } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Search, ArrowUpDown } from 'lucide-react';
+import { Input } from '../components/ui/input';
 import {
-  PortfolioItem,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import { useContent } from '../contexts/ContentContext';
+import {
+  PortfolioFilterType,
   PortfolioFilters,
-  PortfolioSortKey,
-  PortfolioSortOrder,
+  PortfolioItem,
+  PortfolioType,
 } from '../../types/portfolio.types';
 import {
   filterPortfolioItems,
-  sortPortfolioItems,
+  formatContractAmount,
   getUniqueFilterValues,
+  sortPortfolioItems,
 } from '../../services/portfolio.service';
 
-interface PortfolioTableProps {
-  items: PortfolioItem[];
-  title?: string;
-  showTypeFilter?: boolean; // Show project/consulting/training filter
+const PAGE_SIZE = 10;
+
+const categoryLabels: Record<PortfolioType, string> = {
+  project: 'Project',
+  consulting: 'Consulting',
+  training: 'Training',
+};
+
+const categoryStyles: Record<PortfolioType, string> = {
+  project: 'bg-blue-50 text-blue-700 ring-blue-100',
+  consulting: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
+  training: 'bg-violet-50 text-violet-700 ring-violet-100',
+};
+
+function getItemLink(item: PortfolioItem) {
+  switch (item.type) {
+    case 'project':
+      return `/projects/${item.slug}`;
+    case 'consulting':
+      return `/consulting-service/${item.slug}`;
+    case 'training':
+      return `/training/${item.slug}`;
+    default:
+      return '/portfolio';
+  }
 }
 
-export function PortfolioTable({ items, title = 'Portfolio', showTypeFilter = true }: PortfolioTableProps) {
+function getFiscalYearSortValue(year?: string) {
+  return year || '0000';
+}
+
+export function Portfolio() {
+  const navigate = useNavigate();
+  const { portfolio } = useContent();
+  const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<PortfolioFilters>({
     type: 'all',
     sector: undefined,
-    client: undefined,
     fiscalYear: undefined,
+    client: undefined,
     search: '',
   });
 
-  const [sortKey, setSortKey] = useState<PortfolioSortKey>('fiscalYear');
-  const [sortOrder, setSortOrder] = useState<PortfolioSortOrder>('desc');
+  const filterValues = useMemo(() => getUniqueFilterValues(portfolio), [portfolio]);
 
-  // Get unique filter values
-  const filterValues = useMemo(() => getUniqueFilterValues(items), [items]);
-
-  // Apply filters and sorting
   const filteredItems = useMemo(() => {
-    const filtered = filterPortfolioItems(items, filters);
-    return sortPortfolioItems(filtered, sortKey, sortOrder);
-  }, [items, filters, sortKey, sortOrder]);
+    const filtered = filterPortfolioItems(portfolio, filters);
+    return sortPortfolioItems(filtered, 'fiscalYear', 'desc').sort((a, b) =>
+      getFiscalYearSortValue(b.fiscalYear).localeCompare(getFiscalYearSortValue(a.fiscalYear))
+    );
+  }, [portfolio, filters]);
 
-  const handleSort = (key: PortfolioSortKey) => {
-    if (sortKey === key) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortKey(key);
-      setSortOrder('desc');
-    }
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
+  const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const stats = useMemo(() => {
+    const completedAssignments = portfolio.filter(
+      (item) => item.status === 'completed' || item.type === 'project'
+    ).length;
+    const institutionalClients = new Set(
+      portfolio.map((item) => item.client).filter(Boolean)
+    ).size;
+    const trainingPrograms = portfolio.filter((item) => item.type === 'training').length;
+
+    return [
+      {
+        label: 'Completed Assignments',
+        value: `${completedAssignments}+`,
+        icon: BriefcaseBusiness,
+      },
+      {
+        label: 'Institutional Clients',
+        value: `${institutionalClients}+`,
+        icon: Users,
+      },
+      {
+        label: 'Training Programs',
+        value: `${trainingPrograms}+`,
+        icon: GraduationCap,
+      },
+      {
+        label: 'Years of Experience',
+        value: '15+',
+        icon: CalendarClock,
+      },
+    ];
+  }, [portfolio]);
+
+  const updateFilters = (updates: Partial<PortfolioFilters>) => {
+    setFilters((current) => ({ ...current, ...updates }));
+    setPage(1);
   };
 
   const clearFilters = () => {
     setFilters({
       type: 'all',
       sector: undefined,
-      client: undefined,
       fiscalYear: undefined,
+      client: undefined,
       search: '',
     });
+    setPage(1);
   };
 
-  const getItemLink = (item: PortfolioItem) => {
-    switch (item.type) {
-      case 'project':
-        return `/projects/${item.slug}`;
-      case 'consulting':
-        return `/consulting/${item.slug}`;
-      case 'training':
-        return `/events/${item.slug}`;
-      default:
-        return '#';
-    }
-  };
+  const hasActiveFilters =
+    filters.type !== 'all' ||
+    Boolean(filters.sector) ||
+    Boolean(filters.fiscalYear) ||
+    Boolean(filters.client) ||
+    Boolean(filters.search);
 
-  const getTypeBadge = (type: string) => {
-    const badges = {
-      project: 'bg-blue-100 text-blue-700',
-      consulting: 'bg-green-100 text-green-700',
-      training: 'bg-purple-100 text-purple-700',
-    };
-    return badges[type as keyof typeof badges] || 'bg-gray-100 text-gray-700';
+  const handleRowClick = (item: PortfolioItem) => {
+    navigate(getItemLink(item));
   };
 
   return (
-    <div className="space-y-6">
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Search */}
+    <div className="bg-slate-50">
+      <section className="relative overflow-hidden bg-slate-950 text-white">
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(14,165,233,0.24),transparent_38%),linear-gradient(45deg,rgba(16,185,129,0.16),transparent_45%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="max-w-4xl">
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+              Our Portfolio
+            </h1>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">
+              15+ Years of Engineering Consultancy, Infrastructure Development,
+              Project Management, and Capacity-Building Experience Across Nepal.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map(({ label, value, icon: Icon }) => (
+            <div
+              key={label}
+              className="rounded-lg border border-slate-200 bg-white p-5 shadow-lg shadow-slate-900/5"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">{label}</p>
+                  <p className="mt-2 text-3xl font-bold text-slate-950">{value}</p>
+                </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700">
+                  <Icon className="h-5 w-5" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <section className="mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.25fr_repeat(4,minmax(0,1fr))_auto]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
-                type="text"
-                placeholder="Search by title, client, or sector..."
                 value={filters.search || ''}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                onChange={(event) => updateFilters({ search: event.target.value })}
+                placeholder="Search keyword"
                 className="pl-10"
               />
             </div>
 
-            {/* Filter Row */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {showTypeFilter && (
-                <Select
-                  value={filters.type || 'all'}
-                  onValueChange={(value: any) => setFilters({ ...filters, type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="project">Projects</SelectItem>
-                    <SelectItem value="consulting">Consulting Services</SelectItem>
-                    <SelectItem value="training">Training & Events</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
+            <Select
+              value={filters.type || 'all'}
+              onValueChange={(value) =>
+                updateFilters({ type: value as PortfolioFilterType })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="project">Project</SelectItem>
+                <SelectItem value="consulting">Consulting</SelectItem>
+                <SelectItem value="training">Training</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select
-                value={filters.sector || 'all'}
-                onValueChange={(value) =>
-                  setFilters({ ...filters, sector: value === 'all' ? undefined : value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sector" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Sectors</SelectItem>
-                  {filterValues.sectors.map((sector) => (
-                    <SelectItem key={sector} value={sector}>
-                      {sector}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <Select
+              value={filters.sector || 'all'}
+              onValueChange={(value) =>
+                updateFilters({ sector: value === 'all' ? undefined : value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sector" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sectors</SelectItem>
+                {filterValues.sectors.map((sector) => (
+                  <SelectItem key={sector} value={sector}>
+                    {sector}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-              <Select
-                value={filters.client || 'all'}
-                onValueChange={(value) =>
-                  setFilters({ ...filters, client: value === 'all' ? undefined : value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Client" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Clients</SelectItem>
-                  {filterValues.clients.map((client) => (
-                    <SelectItem key={client} value={client}>
-                      {client}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <Select
+              value={filters.fiscalYear || 'all'}
+              onValueChange={(value) =>
+                updateFilters({ fiscalYear: value === 'all' ? undefined : value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Fiscal Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Years</SelectItem>
+                {filterValues.fiscalYears.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-              <Select
-                value={filters.fiscalYear || 'all'}
-                onValueChange={(value) =>
-                  setFilters({ ...filters, fiscalYear: value === 'all' ? undefined : value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Fiscal Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Years</SelectItem>
-                  {filterValues.fiscalYears.map((year) => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={filters.client || 'all'}
+              onValueChange={(value) =>
+                updateFilters({ client: value === 'all' ? undefined : value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Client" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Clients</SelectItem>
+                {filterValues.clients.map((client) => (
+                  <SelectItem key={client} value={client}>
+                    {client}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-600">
-                Showing {filteredItems.length} of {items.length} items
-              </p>
-              {(filters.search || filters.type !== 'all' || filters.sector || filters.client || filters.fiscalYear) && (
-                <Button variant="outline" size="sm" onClick={clearFilters}>
-                  Clear Filters
-                </Button>
-              )}
-            </div>
+            <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
+              Clear
+            </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Table */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-4 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              Showing {visibleItems.length} of {filteredItems.length} assignments
+            </span>
+            <span>Page {page} of {totalPages}</span>
+          </div>
+        </section>
+
+        <section className="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-slate-900 text-white">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    SN
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button
-                      onClick={() => handleSort('title')}
-                      className="flex items-center gap-1 hover:text-gray-700"
-                    >
-                      Assignment
-                      <ArrowUpDown className="h-3 w-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button
-                      onClick={() => handleSort('fiscalYear')}
-                      className="flex items-center gap-1 hover:text-gray-700"
-                    >
-                      Fiscal Year
-                      <ArrowUpDown className="h-3 w-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button
-                      onClick={() => handleSort('contractAmount')}
-                      className="flex items-center gap-1 hover:text-gray-700"
-                    >
-                      Contract Amount (NRs.)
-                      <ArrowUpDown className="h-3 w-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button
-                      onClick={() => handleSort('client')}
-                      className="flex items-center gap-1 hover:text-gray-700"
-                    >
-                      Client
-                      <ArrowUpDown className="h-3 w-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Partner Firms
-                  </th>
-                  {showTypeFilter && (
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Type
-                    </th>
+                  {['SN', 'Assignment', 'Category', 'Fiscal Year', 'Client', 'Contract Amount'].map(
+                    (heading) => (
+                      <th
+                        key={heading}
+                        className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"
+                      >
+                        {heading}
+                      </th>
+                    )
                   )}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredItems.length === 0 ? (
+              <tbody className="divide-y divide-slate-100">
+                {visibleItems.length === 0 ? (
                   <tr>
-                    <td colSpan={showTypeFilter ? 7 : 6} className="px-6 py-12 text-center text-gray-500">
-                      No items found matching your criteria.
+                    <td colSpan={6} className="px-5 py-12 text-center text-slate-500">
+                      No portfolio items match the selected filters.
                     </td>
                   </tr>
                 ) : (
-                  filteredItems.map((item, index) => (
+                  visibleItems.map((item, index) => (
                     <tr
                       key={item.id}
-                      className="hover:bg-gray-50 cursor-pointer transition-colors"
-                      onClick={() => (window.location.href = getItemLink(item))}
+                      onClick={() => handleRowClick(item)}
+                      className="cursor-pointer transition-colors hover:bg-cyan-50/60"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {index + 1}
+                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-500">
+                        {(page - 1) * PAGE_SIZE + index + 1}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <Link to={getItemLink(item)} className="hover:text-brand-600 font-medium">
-                          {item.title}
-                        </Link>
-                        <p className="text-xs text-gray-500 mt-1">{item.sector}</p>
+                      <td className="px-5 py-4">
+                        <div className="font-semibold text-slate-950">{item.title}</div>
+                        <div className="mt-1 text-xs text-slate-500">{item.sector || item.location || item.slug}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {item.fiscalYear || '—'}
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${categoryStyles[item.type]}`}
+                        >
+                          {categoryLabels[item.type]}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {item.contractAmount ? `${item.contractAmount}` : '—'}
+                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">
+                        {item.fiscalYear || '-'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{item.client || '—'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {item.partnerFirms || '—'}
+                      <td className="px-5 py-4 text-sm text-slate-700">
+                        {item.client || '-'}
                       </td>
-                      {showTypeFilter && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${getTypeBadge(
-                              item.type
-                            )}`}
-                          >
-                            {item.type}
-                          </span>
-                        </td>
-                      )}
+                      <td className="whitespace-nowrap px-5 py-4 text-sm font-medium text-slate-900">
+                        {formatContractAmount(item.contractAmount || '')}
+                      </td>
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="space-y-3 p-4 md:hidden">
+            {visibleItems.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">
+                No portfolio items match the selected filters.
+              </div>
+            ) : (
+              visibleItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleRowClick(item)}
+                  className="w-full rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-cyan-200 hover:bg-cyan-50/50"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        SN {(page - 1) * PAGE_SIZE + index + 1}
+                      </div>
+                      <h3 className="mt-1 font-semibold text-slate-950">{item.title}</h3>
+                    </div>
+                    <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-slate-400" />
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-xs text-slate-500">Category</p>
+                      <p className="font-medium text-slate-900">{categoryLabels[item.type]}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Fiscal Year</p>
+                      <p className="font-medium text-slate-900">{item.fiscalYear || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Client</p>
+                      <p className="font-medium text-slate-900">{item.client || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Contract Amount</p>
+                      <p className="font-medium text-slate-900">
+                        {formatContractAmount(item.contractAmount || '')}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </section>
+
+        <div className="mt-6 flex items-center justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </Button>
+          <div className="text-sm font-medium text-slate-600">
+            {page} / {totalPages}
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      </main>
     </div>
   );
 }

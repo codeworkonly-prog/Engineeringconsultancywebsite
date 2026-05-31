@@ -24,8 +24,10 @@ import {
 
 type TypeFilter = PortfolioType | 'all';
 type StatusFilter = PortfolioStatus | 'all';
+type PortfolioFormErrors = Partial<Record<keyof PortfolioItem, string>>;
 
 const createEmptyForm = (): PortfolioItem => ({ ...defaultPortfolioFormData });
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const formatType = (type: PortfolioType) => {
   const labels: Record<PortfolioType, string> = {
@@ -36,6 +38,26 @@ const formatType = (type: PortfolioType) => {
 
   return labels[type];
 };
+
+const isValidFiscalYear = (value: string) => {
+  const match = value.match(/^(\d{4})\/(\d{2})$/);
+  if (!match) return false;
+
+  const startYear = Number(match[1]);
+  const endYear = Number(match[2]);
+  const expectedEndYear = (startYear + 1) % 100;
+
+  return endYear === expectedEndYear;
+};
+
+const isValidImagePath = (value: string) =>
+  /^(https?:\/\/|data:image\/|\/|\.\/|\.\.\/).+/.test(value) ||
+  /^[\w./-]+\.(?:avif|gif|jpe?g|png|svg|webp)(?:\?.*)?$/.test(value);
+
+const getFieldError = (errors: PortfolioFormErrors, field: keyof PortfolioItem) =>
+  errors[field] ? (
+    <p className="mt-1 text-sm text-red-600">{errors[field]}</p>
+  ) : null;
 
 export function PortfolioSection() {
   const {
@@ -50,6 +72,7 @@ export function PortfolioSection() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [form, setForm] = useState<PortfolioItem>(createEmptyForm);
+  const [errors, setErrors] = useState<PortfolioFormErrors>({});
   const selectedTypeLabel = formatType(form.type).toLowerCase();
 
   const currentFlagshipItem = useMemo(
@@ -62,6 +85,13 @@ export function PortfolioSection() {
     value: PortfolioItem[K]
   ) => {
     setForm((current) => ({ ...current, [key]: value }));
+    setErrors((current) => {
+      if (!current[key]) return current;
+
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
   };
 
   const generateSlug = (title: string, existingId?: string) => {
@@ -93,26 +123,99 @@ export function PortfolioSection() {
       title,
       slug: generateSlug(title, editingId || undefined),
     }));
+    setErrors((current) => {
+      if (!current.title && !current.slug) return current;
+
+      const next = { ...current };
+      delete next.title;
+      delete next.slug;
+      return next;
+    });
   };
 
   const resetForm = () => {
     setForm(createEmptyForm());
     setEditingId(null);
+    setErrors({});
   };
 
   const getPayload = () => {
     const { id, ...payload } = form;
     const now = new Date().toISOString();
+    const slug = form.slug.trim() || generateSlug(form.title, editingId || undefined);
 
     return {
       ...payload,
       title: form.title.trim(),
-      slug: form.slug || generateSlug(form.title, editingId || undefined),
+      slug,
       shortDescription: form.shortDescription.trim(),
+      overview: form.overview?.trim(),
       featuredImage: form.featuredImage.trim(),
+      sector: form.sector?.trim(),
+      client: form.client?.trim(),
+      clientLogo: form.clientLogo?.trim(),
+      partnerFirms: form.partnerFirms?.trim(),
+      fiscalYear: form.fiscalYear?.trim(),
+      location: form.location?.trim(),
+      projectType: form.projectType?.trim(),
+      contractAmount: form.contractAmount?.trim(),
+      serviceType: form.serviceType?.trim(),
+      trainingType: form.trainingType?.trim(),
       updatedAt: now,
       createdAt: form.createdAt || now,
     };
+  };
+
+  const validateForm = () => {
+    const nextErrors: PortfolioFormErrors = {};
+    const title = form.title.trim();
+    const slug = form.slug.trim() || generateSlug(title, editingId || undefined);
+    const fiscalYear = form.fiscalYear?.trim();
+    const featuredImage = form.featuredImage.trim();
+    const clientLogo = form.clientLogo?.trim();
+
+    if (!title) nextErrors.title = 'Title is required';
+    if (!slug) nextErrors.slug = 'Slug is required';
+    if (slug && !slugPattern.test(slug)) {
+      nextErrors.slug = 'Use lowercase letters, numbers, and hyphens only';
+    }
+    if (
+      slug &&
+      portfolio.some((item) => item.slug === slug && item.id !== editingId)
+    ) {
+      nextErrors.slug = 'This slug is already used by another portfolio item';
+    }
+    if (!form.shortDescription.trim()) {
+      nextErrors.shortDescription = 'Short description is required';
+    }
+    if (!featuredImage) {
+      nextErrors.featuredImage = 'Featured image is required';
+    } else if (!isValidImagePath(featuredImage)) {
+      nextErrors.featuredImage = 'Enter a valid image URL or relative path';
+    }
+    if (clientLogo && !isValidImagePath(clientLogo)) {
+      nextErrors.clientLogo = 'Enter a valid logo URL or relative path';
+    }
+    if (fiscalYear && !isValidFiscalYear(fiscalYear)) {
+      nextErrors.fiscalYear = 'Use YYYY/YY with the next year, e.g. 2080/81';
+    }
+    if (form.startDate && form.endDate && form.endDate < form.startDate) {
+      nextErrors.endDate = 'End date cannot be before start date';
+    }
+
+    if (form.type === 'project') {
+      if (!form.projectType?.trim()) nextErrors.projectType = 'Project type is required';
+      if (!form.contractAmount?.trim()) nextErrors.contractAmount = 'Contract amount is required';
+    }
+    if (form.type === 'consulting' && !form.serviceType?.trim()) {
+      nextErrors.serviceType = 'Service type is required';
+    }
+    if (form.type === 'training') {
+      if (!form.trainingType?.trim()) nextErrors.trainingType = 'Training type is required';
+      if (!form.mode) nextErrors.mode = 'Mode is required';
+    }
+
+    return nextErrors;
   };
 
   const clearOtherFlagshipItems = async (
@@ -143,8 +246,11 @@ export function PortfolioSection() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!form.title.trim() || !form.shortDescription.trim() || !form.featuredImage.trim()) {
-      toast.error('Please fill title, short description, and featured image');
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error('Please fix the highlighted fields');
       return;
     }
 
@@ -236,7 +342,7 @@ export function PortfolioSection() {
                   <SelectContent>
                     <SelectItem value="project">Project</SelectItem>
                     <SelectItem value="consulting">Consulting Services</SelectItem>
-                    <SelectItem value="training">Training & Events</SelectItem>
+                    <SelectItem value="training">Training</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -264,7 +370,9 @@ export function PortfolioSection() {
                   value={form.fiscalYear || ''}
                   onChange={(event) => updateForm('fiscalYear', event.target.value)}
                   placeholder="2080/81"
+                  aria-invalid={Boolean(errors.fiscalYear)}
                 />
+                {getFieldError(errors, 'fiscalYear')}
               </div>
             </div>
 
@@ -275,7 +383,9 @@ export function PortfolioSection() {
                   value={form.title}
                   onChange={(event) => handleTitleChange(event.target.value)}
                   required
+                  aria-invalid={Boolean(errors.title)}
                 />
+                {getFieldError(errors, 'title')}
               </div>
 
               <div>
@@ -284,7 +394,9 @@ export function PortfolioSection() {
                   value={form.slug}
                   onChange={(event) => updateForm('slug', event.target.value)}
                   placeholder="auto-generated-from-title"
+                  aria-invalid={Boolean(errors.slug)}
                 />
+                {getFieldError(errors, 'slug')}
               </div>
             </div>
 
@@ -294,7 +406,9 @@ export function PortfolioSection() {
                 value={form.shortDescription}
                 onChange={(event) => updateForm('shortDescription', event.target.value)}
                 required
+                aria-invalid={Boolean(errors.shortDescription)}
               />
+              {getFieldError(errors, 'shortDescription')}
             </div>
 
             <div>
@@ -358,7 +472,9 @@ export function PortfolioSection() {
                   type="date"
                   value={form.endDate || ''}
                   onChange={(event) => updateForm('endDate', event.target.value)}
+                  aria-invalid={Boolean(errors.endDate)}
                 />
+                {getFieldError(errors, 'endDate')}
               </div>
             </div>
 
@@ -370,7 +486,9 @@ export function PortfolioSection() {
                   onChange={(event) => updateForm('featuredImage', event.target.value)}
                   placeholder="https://..."
                   required
+                  aria-invalid={Boolean(errors.featuredImage)}
                 />
+                {getFieldError(errors, 'featuredImage')}
               </div>
 
               <div>
@@ -379,7 +497,9 @@ export function PortfolioSection() {
                   value={form.clientLogo || ''}
                   onChange={(event) => updateForm('clientLogo', event.target.value)}
                   placeholder="https://..."
+                  aria-invalid={Boolean(errors.clientLogo)}
                 />
+                {getFieldError(errors, 'clientLogo')}
               </div>
             </div>
 
@@ -399,13 +519,17 @@ export function PortfolioSection() {
                     placeholder="Project Type"
                     value={form.projectType || ''}
                     onChange={(event) => updateForm('projectType', event.target.value)}
+                    aria-invalid={Boolean(errors.projectType)}
                   />
                   <Input
                     placeholder="Contract Amount"
                     value={form.contractAmount || ''}
                     onChange={(event) => updateForm('contractAmount', event.target.value)}
+                    aria-invalid={Boolean(errors.contractAmount)}
                   />
                 </div>
+                {getFieldError(errors, 'projectType')}
+                {getFieldError(errors, 'contractAmount')}
               </div>
             )}
 
@@ -416,7 +540,9 @@ export function PortfolioSection() {
                   placeholder="Service Type"
                   value={form.serviceType || ''}
                   onChange={(event) => updateForm('serviceType', event.target.value)}
+                  aria-invalid={Boolean(errors.serviceType)}
                 />
+                {getFieldError(errors, 'serviceType')}
               </div>
             )}
 
@@ -428,6 +554,7 @@ export function PortfolioSection() {
                     placeholder="Training Type"
                     value={form.trainingType || ''}
                     onChange={(event) => updateForm('trainingType', event.target.value)}
+                    aria-invalid={Boolean(errors.trainingType)}
                   />
                   <Select
                     value={form.mode || 'physical'}
@@ -445,6 +572,8 @@ export function PortfolioSection() {
                     </SelectContent>
                   </Select>
                 </div>
+                {getFieldError(errors, 'trainingType')}
+                {getFieldError(errors, 'mode')}
               </div>
             )}
 
@@ -504,7 +633,7 @@ export function PortfolioSection() {
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="project">Projects</SelectItem>
                   <SelectItem value="consulting">Consulting Services</SelectItem>
-                  <SelectItem value="training">Training & Events</SelectItem>
+                  <SelectItem value="training">Training</SelectItem>
                 </SelectContent>
               </Select>
 

@@ -3,6 +3,7 @@ import { useContent } from '../contexts/ContentContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Calendar, Clock, CheckCircle, ArrowLeft, Tag } from 'lucide-react';
+import { PortfolioItemDetail } from './PortfolioItemDetail';
 
 export function EventDetail() {
   const { slug } = useParams();
@@ -11,20 +12,7 @@ export function EventDetail() {
   const event = events.find((e) => e.slug === slug);
 
   if (!event) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Event Not Found</h1>
-          <p className="text-gray-600 mb-8">The event you're looking for doesn't exist.</p>
-          <Link to="/events">
-            <Button>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
+    return <PortfolioItemDetail expectedType="training" />;
   }
 
   return (
@@ -32,10 +20,10 @@ export function EventDetail() {
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link to="/events">
+          <Link to="/training">
             <Button variant="secondary" size="sm" className="mb-6">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
+              Back to Training
             </Button>
           </Link>
           <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
@@ -82,10 +70,10 @@ export function EventDetail() {
         </div>
       </section>
 
-      {/* Event Info Section */}
+      {/* Training Info Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold mb-8">Event Information</h2>
+          <h2 className="text-2xl font-bold mb-8">Training Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardContent className="pt-6">
@@ -123,7 +111,7 @@ export function EventDetail() {
       {/* CTA Section */}
       <section className="py-16 bg-brand-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Interested in This Event?</h2>
+          <h2 className="text-3xl font-bold mb-4">Interested in This Training?</h2>
           <p className="text-xl mb-8 text-brand-50 max-w-2xl mx-auto">
             Contact us for more information or to register for this {event.type.toLowerCase()}.
           </p>
@@ -135,16 +123,16 @@ export function EventDetail() {
         </div>
       </section>
 
-      {/* Related Events */}
+      {/* Related Training */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold mb-8">More Events</h2>
+          <h2 className="text-2xl font-bold mb-8">More Training</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {events
               .filter((e) => e.id !== event.id)
               .slice(0, 3)
               .map((relatedEvent) => (
-                <Link key={relatedEvent.id} to={`/events/${relatedEvent.slug}`}>
+                <Link key={relatedEvent.id} to={`/training/${relatedEvent.slug}`}>
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                     <CardContent className="pt-6">
                       <div className="flex justify-between items-start mb-3">
@@ -164,7 +152,7 @@ export function EventDetail() {
               ))}
           </div>
           {events.filter((e) => e.id !== event.id).length === 0 && (
-            <p className="text-gray-500 text-center">No other events available.</p>
+            <p className="text-gray-500 text-center">No other training programs available.</p>
           )}
         </div>
       </section>

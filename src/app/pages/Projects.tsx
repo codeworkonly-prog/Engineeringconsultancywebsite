@@ -7,57 +7,66 @@ import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
 import { Search, MapPin, Calendar, ArrowRight } from 'lucide-react';
 
+type ProjectStatus = 'upcoming' | 'ongoing' | 'completed';
+
 export function Projects() {
-  const { projects, galleryImages } = useContent();
+  const { projects, galleryImages, portfolio } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'Design and Build' | 'Contract'>('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | ProjectStatus>('all');
   const [visibleCount, setVisibleCount] = useState(6);
 
-  // Get unique locations from projects
-  const locations = ['all', ...new Set(projects.map((p) => p.location).filter(Boolean))];
+  const projectItems = [
+    ...projects.map((project) => ({
+      id: `project-${project.id}`,
+      title: project.title,
+      description: project.description,
+      projectType: project.projectType,
+      imageUrl: project.imageUrl,
+      status: project.status as ProjectStatus,
+      slug: project.slug,
+      location: project.location,
+      completionDate: project.completionDate,
+    })),
+    ...portfolio
+      .filter((item) => item.type === 'project')
+      .map((item) => ({
+        id: `portfolio-${item.id}`,
+        title: item.title,
+        description: item.shortDescription,
+        projectType: item.projectType || 'Project',
+        imageUrl: item.featuredImage,
+        status: item.status || 'ongoing',
+        slug: item.slug,
+        location: item.location,
+        completionDate: item.endDate,
+      })),
+  ];
 
-  // Reset visible count whenever any filter changes
-  const handleTypeFilter = (value: 'all' | 'Design and Build' | 'Contract') => {
-    setTypeFilter(value);
-    setVisibleCount(6);
-  };
+  const locations = ['all', ...new Set(projectItems.map((p) => p.location).filter(Boolean))];
+  const projectTypes = ['all', ...new Set(projectItems.map((p) => p.projectType).filter(Boolean))];
 
-  const handleLocationFilter = (value: string) => {
-    setLocationFilter(value);
-    setVisibleCount(6);
-  };
-
-  const handleStatusFilter = (value: 'all' | 'ongoing' | 'completed') => {
-    setStatusFilter(value);
-    setVisibleCount(6);
-  };
-
-  const handleSearchQuery = (value: string) => {
-    setSearchQuery(value);
-    setVisibleCount(6);
-  };
+  const resetVisibleCount = () => setVisibleCount(6);
 
   const clearFilters = () => {
     setSearchQuery('');
     setTypeFilter('all');
     setLocationFilter('all');
     setStatusFilter('all');
-    setVisibleCount(6);
+    resetVisibleCount();
   };
 
-  // Filter projects
-  const filteredProjects = projects.filter((p) => {
+  const filteredProjects = projectItems.filter((project) => {
+    const search = searchQuery.toLowerCase();
     const matchesSearch =
-      searchQuery === '' ||
-      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.location && p.location.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    const matchesType = typeFilter === 'all' || p.projectType === typeFilter;
-    const matchesLocation = locationFilter === 'all' || p.location === locationFilter;
-    const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+      !search ||
+      project.title.toLowerCase().includes(search) ||
+      project.description.toLowerCase().includes(search) ||
+      (project.location || '').toLowerCase().includes(search);
+    const matchesType = typeFilter === 'all' || project.projectType === typeFilter;
+    const matchesLocation = locationFilter === 'all' || project.location === locationFilter;
+    const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
 
     return matchesSearch && matchesType && matchesLocation && matchesStatus;
   });
@@ -65,16 +74,30 @@ export function Projects() {
   const visibleProjects = filteredProjects.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProjects.length;
 
+  const statusLabel = (status: ProjectStatus) => {
+    if (status === 'upcoming') return 'Upcoming';
+    if (status === 'ongoing') return 'Ongoing';
+    return 'Completed';
+  };
+
+  const statusClass = (status: ProjectStatus) => {
+    if (status === 'upcoming') return 'bg-blue-500 text-white';
+    if (status === 'ongoing') return 'bg-green-500 text-white';
+    return 'bg-gray-800 text-white';
+  };
+
   return (
     <div>
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="text-5xl font-bold mb-4">Our Projects</h1>
             <div className="flex items-center gap-2 mb-8">
               <button
-                onClick={() => handleTypeFilter('Design and Build')}
+                onClick={() => {
+                  setTypeFilter('Design and Build');
+                  resetVisibleCount();
+                }}
                 className={`text-xl transition-all ${
                   typeFilter === 'Design and Build'
                     ? 'text-white font-semibold underline underline-offset-4'
@@ -85,7 +108,10 @@ export function Projects() {
               </button>
               <span className="text-xl text-brand-50">|</span>
               <button
-                onClick={() => handleTypeFilter('Contract')}
+                onClick={() => {
+                  setTypeFilter('Contract');
+                  resetVisibleCount();
+                }}
                 className={`text-xl transition-all ${
                   typeFilter === 'Contract'
                     ? 'text-white font-semibold underline underline-offset-4'
@@ -98,7 +124,10 @@ export function Projects() {
                 <>
                   <span className="text-xl text-brand-50">|</span>
                   <button
-                    onClick={() => handleTypeFilter('all')}
+                    onClick={() => {
+                      setTypeFilter('all');
+                      resetVisibleCount();
+                    }}
                     className="text-lg text-brand-100 hover:text-white transition-colors"
                   >
                     View All
@@ -107,14 +136,16 @@ export function Projects() {
               )}
             </div>
 
-            {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
                 type="text"
                 placeholder="Search projects by name, description, or location..."
                 value={searchQuery}
-                onChange={(e) => handleSearchQuery(e.target.value)}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  resetVisibleCount();
+                }}
                 className="pl-12 h-14 text-lg bg-white text-gray-900"
               />
             </div>
@@ -122,32 +153,45 @@ export function Projects() {
         </div>
       </section>
 
-      {/* Filter Bar */}
       <section className="bg-white border-b sticky top-16 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             <div className="flex flex-wrap gap-3 items-center">
               <span className="text-sm font-medium text-gray-700">Filter by:</span>
 
-              <Select value={typeFilter} onValueChange={handleTypeFilter}>
+              <Select
+                value={typeFilter}
+                onValueChange={(value) => {
+                  setTypeFilter(value);
+                  resetVisibleCount();
+                }}
+              >
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Design and Build">Design and Build</SelectItem>
-                  <SelectItem value="Contract">Contract</SelectItem>
+                  {projectTypes.map((projectType) => (
+                    <SelectItem key={projectType} value={projectType}>
+                      {projectType === 'all' ? 'All Types' : projectType}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
-              <Select value={locationFilter} onValueChange={handleLocationFilter}>
+              <Select
+                value={locationFilter}
+                onValueChange={(value) => {
+                  setLocationFilter(value);
+                  resetVisibleCount();
+                }}
+              >
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Location" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Locations</SelectItem>
                   {locations
-                    .filter((l) => l !== 'all')
+                    .filter((location) => location !== 'all')
                     .map((location) => (
                       <SelectItem key={location} value={location as string}>
                         {location}
@@ -156,12 +200,19 @@ export function Projects() {
                 </SelectContent>
               </Select>
 
-              <Select value={statusFilter} onValueChange={handleStatusFilter}>
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value as 'all' | ProjectStatus);
+                  resetVisibleCount();
+                }}
+              >
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="upcoming">Upcoming</SelectItem>
                   <SelectItem value="ongoing">Ongoing</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
@@ -175,7 +226,6 @@ export function Projects() {
         </div>
       </section>
 
-      {/* Project Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {filteredProjects.length === 0 ? (
@@ -198,14 +248,8 @@ export function Projects() {
                           className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                         />
                         <div className="absolute top-4 right-4">
-                          <span
-                            className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                              project.status === 'ongoing'
-                                ? 'bg-green-500 text-white'
-                                : 'bg-gray-800 text-white'
-                            }`}
-                          >
-                            {project.status === 'ongoing' ? 'Ongoing' : 'Completed'}
+                          <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusClass(project.status)}`}>
+                            {statusLabel(project.status)}
                           </span>
                         </div>
                       </div>
@@ -234,9 +278,7 @@ export function Projects() {
                         {project.completionDate && (
                           <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                             <Calendar className="h-4 w-4" />
-                            <span>
-                              Completed: {new Date(project.completionDate).toLocaleDateString()}
-                            </span>
+                            <span>Completed: {new Date(project.completionDate).toLocaleDateString()}</span>
                           </div>
                         )}
 
@@ -250,14 +292,9 @@ export function Projects() {
                 ))}
               </div>
 
-              {/* Load More */}
               {hasMore && (
                 <div className="text-center mt-12">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => setVisibleCount((prev) => prev + 6)}
-                  >
+                  <Button size="lg" variant="outline" onClick={() => setVisibleCount((prev) => prev + 6)}>
                     Load More Projects
                   </Button>
                 </div>
@@ -267,7 +304,6 @@ export function Projects() {
         </div>
       </section>
 
-      {/* Gallery Section */}
       {galleryImages.length > 0 && (
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -278,10 +314,7 @@ export function Projects() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {galleryImages.slice(0, 6).map((image) => (
-                <div
-                  key={image.id}
-                  className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow group"
-                >
+                <div key={image.id} className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow group">
                   <img
                     src={image.imageUrl}
                     alt={image.title}
@@ -300,7 +333,6 @@ export function Projects() {
         </section>
       )}
 
-      {/* CTA Section */}
       <section className="py-16 bg-brand-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">Have a Project in Mind?</h2>

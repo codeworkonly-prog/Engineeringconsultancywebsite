@@ -113,10 +113,10 @@ export function NotFound() {
       color: 'from-green-500 to-green-600',
     },
     {
-      title: 'Events',
+      title: 'Training',
       description: 'Check out our upcoming workshops, training sessions, and seminars',
       icon: Calendar,
-      path: '/events',
+      path: '/training',
       color: 'from-purple-500 to-purple-600',
     },
   ];

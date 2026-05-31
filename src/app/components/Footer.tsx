@@ -64,8 +64,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/events" className="hover:text-white transition-colors">
-                  Events
+                <Link to="/training" className="hover:text-white transition-colors">
+                  Training
                 </Link>
               </li>
               <li>
