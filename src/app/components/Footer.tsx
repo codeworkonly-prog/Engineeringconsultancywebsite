@@ -58,6 +58,11 @@ export function Footer() {
                   Company Profile
                 </Link>
               </li>
+               <li>
+                <Link to="/portfolio" className="hover:text-white transition-colors">
+                  Portfolio
+                </Link>
+              </li>
               <li>
                 <Link to="/consulting-service" className="hover:text-white transition-colors">
                   Consulting Service

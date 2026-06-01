@@ -80,35 +80,25 @@ function escapeCsvValue(value?: string | number | boolean) {
 }
 
 function getPortfolioCsv(items: PortfolioItem[]) {
-  const headers = [
-    'SN',
-    'Assignment',
-    'Category',
-    'Fiscal Year',
-    'Client',
-    'Sector',
-    'Location',
-    'Status',
-    'Project Type',
-    'Service Type',
-    'Training Type',
-    'Contract Amount',
-  ];
+const headers = [
+  'S.N',
+  'Work',
+  'Type',
+  'Fiscal Year',
+  'Client',
+  'Sector',
+  'Partner Firms',
+];
 
-  const rows = items.map((item, index) => [
-    index + 1,
-    item.title,
-    categoryLabels[item.type],
-    item.fiscalYear,
-    item.client,
-    item.sector,
-    item.location,
-    item.status,
-    item.projectType,
-    item.serviceType,
-    item.trainingType,
-    item.contractAmount,
-  ]);
+const rows = items.map((item, index) => [
+  index + 1,
+  item.title,
+  categoryLabels[item.type],
+  item.fiscalYear,
+  item.client,
+  item.sector,
+  item.partnerFirms,
+]);
 
   return [headers, ...rows]
     .map((row) => row.map((value) => escapeCsvValue(value)).join(','))
@@ -356,7 +346,15 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
             <table className="w-full">
               <thead className="bg-slate-900 text-white">
                 <tr>
-                  {['SN', 'Assignment', 'Category', 'Fiscal Year', 'Client', 'Contract Amount'].map(
+                  {[
+  'S.N',
+  'Work',
+  'Type',
+  'Fiscal Year',
+  'Client',
+  'Sector',
+  'Partner Firms',
+].map(
                     (heading) => (
                       <th
                         key={heading}
@@ -371,7 +369,7 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
               <tbody className="divide-y divide-slate-100">
                 {visibleItems.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-5 py-12 text-center text-slate-500">
+                    <td colSpan={8} className="px-5 py-12 text-center text-slate-500">
                       No portfolio items match the selected filters.
                     </td>
                   </tr>
@@ -383,28 +381,38 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
                       className="cursor-pointer transition-colors hover:bg-cyan-50/60"
                     >
                       <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-500">
-                        {(page - 1) * PAGE_SIZE + index + 1}
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="font-semibold text-slate-950">{item.title}</div>
-                        <div className="mt-1 text-xs text-slate-500">{item.sector || item.location || item.slug}</div>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${categoryStyles[item.type]}`}
-                        >
-                          {categoryLabels[item.type]}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">
-                        {item.fiscalYear || '-'}
-                      </td>
-                      <td className="px-5 py-4 text-sm text-slate-700">
-                        {item.client || '-'}
-                      </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-sm font-medium text-slate-900">
-                        {formatContractAmount(item.contractAmount || '')}
-                      </td>
+  {(page - 1) * PAGE_SIZE + index + 1}
+</td>
+
+<td className="px-5 py-4">
+  <div className="font-semibold text-slate-950">
+    {item.title}
+  </div>
+</td>
+
+<td className="px-5 py-4">
+  <span
+    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${categoryStyles[item.type]}`}
+  >
+    {categoryLabels[item.type]}
+  </span>
+</td>
+
+<td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">
+  {item.fiscalYear || '-'}
+</td>
+
+<td className="px-5 py-4 text-sm text-slate-700">
+  {item.client || '-'}
+</td>
+
+<td className="px-5 py-4 text-sm text-slate-700">
+  {item.sector || '-'}
+</td>
+
+<td className="px-5 py-4 text-sm text-slate-700">
+  {item.partnerFirms || '-'}
+</td>
                     </tr>
                   ))
                 )}
@@ -436,7 +444,7 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-xs text-slate-500">Category</p>
+                      <p className="text-xs text-slate-500">Type</p>
                       <p className="font-medium text-slate-900">{categoryLabels[item.type]}</p>
                     </div>
                     <div>
@@ -448,11 +456,18 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
                       <p className="font-medium text-slate-900">{item.client || '-'}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Contract Amount</p>
-                      <p className="font-medium text-slate-900">
-                        {formatContractAmount(item.contractAmount || '')}
-                      </p>
-                    </div>
+  <p className="text-xs text-slate-500">Sector</p>
+  <p className="font-medium text-slate-900">
+    {item.sector || '-'}
+  </p>
+</div>
+
+<div>
+  <p className="text-xs text-slate-500">Partner Firms</p>
+  <p className="font-medium text-slate-900">
+    {item.partnerFirms || '-'}
+  </p>
+</div>
                   </div>
                 </button>
               ))
