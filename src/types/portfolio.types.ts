@@ -64,6 +64,9 @@ export interface PortfolioItem {
   trainingType?: string;
   mode?: 'online' | 'physical' | 'hybrid';
 
+  // Home Screen Display
+  displayOnHome?: boolean;
+
   createdAt?: string;
   updatedAt?: string;
 }
@@ -100,4 +103,5 @@ export const defaultPortfolioFormData: PortfolioItem = {
 
   trainingType: '',
   mode: 'physical',
+  displayOnHome: false,
 };

@@ -1,14 +1,39 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
 import { CheckCircle, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
-import engineering from "../../imports/engineering.webp";
+import { PortfolioItem, PortfolioType } from '../../types/portfolio.types';
+const engineering = new URL('../../imports/engineering.webp', import.meta.url).href;
 import { Helmet } from 'react-helmet-async';
 
+const portfolioTypeLabels: Record<PortfolioType, string> = {
+  project: 'Project',
+  consulting: 'Consulting Services',
+  training: 'Training',
+};
+
 export function Home() {
-  const { projects, clients } = useContent();
-  const featuredProjects = projects.slice(0, 3);
+  const { clients, portfolio } = useContent();
+  const [selectedPortfolioType, setSelectedPortfolioType] = useState<PortfolioType>('project');
+
+  const featuredPortfolioItems = portfolio
+    .filter((item) => item.type === selectedPortfolioType && item.displayOnHome)
+    .slice(0, 4);
+
+  const getPortfolioLink = (item: PortfolioItem) => {
+    if (item.type === 'project') return `/projects/${item.slug}`;
+    if (item.type === 'consulting') return `/consulting-service/${item.slug}`;
+    return `/training/${item.slug}`;
+  };
 
   return (
     <>
@@ -207,53 +232,77 @@ export function Home() {
           </div>
         </section>
 
-        {/* Featured Projects */}
+        {/* Featured Work */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Featured Projects</h2>
-              <p className="text-gray-600">
-                Take a look at some of our recent work
-              </p>
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-12">
+              <div className="text-center md:text-left">
+                <h2 className="text-3xl font-bold mb-4">Featured Work</h2>
+                <p className="text-gray-600">
+                  Explore our portfolio by selecting the type of work you want to view.
+                </p>
+              </div>
+
+              <div className="w-full max-w-xs">
+                <Select
+                  value={selectedPortfolioType}
+                  onValueChange={(value) => setSelectedPortfolioType(value as PortfolioType)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select work type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="project">Project</SelectItem>
+                    <SelectItem value="consulting">Consulting Services</SelectItem>
+                    <SelectItem value="training">Training</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {featuredProjects.map((project) => (
-                <Link
-                  key={project.id}
-                  to={`/projects/${project.slug}`}
-                  className="group"
-                >
-                  <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
-                    <div className="overflow-hidden">
-                      <img
-                        src={project.imageUrl}
-                        alt={project.title}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-
-                    <CardContent className="pt-6">
-                      <div className="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full mb-3">
-                        {project.category}
+            {featuredPortfolioItems.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {featuredPortfolioItems.map((item) => (
+                  <Link
+                    key={item.id}
+                    to={getPortfolioLink(item)}
+                    className="group"
+                  >
+                    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
+                      <div className="overflow-hidden">
+                        <img
+                          src={item.featuredImage}
+                          alt={item.title}
+                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
                       </div>
 
-                      <h3 className="font-semibold mb-2 group-hover:text-brand-600 transition-colors">
-                        {project.title}
-                      </h3>
+                      <CardContent className="pt-6">
+                        <div className="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full mb-3">
+                          {item.sector || portfolioTypeLabels[item.type]}
+                        </div>
 
-                      <p className="text-sm text-gray-600">
-                        {project.description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+                        <h3 className="font-semibold mb-2 group-hover:text-brand-600 transition-colors">
+                          {item.title}
+                        </h3>
+
+                        <p className="text-sm text-gray-600">
+                          {item.shortDescription}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-600">
+                No featured work available for {portfolioTypeLabels[selectedPortfolioType]}.
+              </p>
+            )}
 
             <div className="text-center mt-8">
-              <Link to="/projects">
-                <Button variant="outline">View All Projects</Button>
+              <Link to="/portfolio">
+                <Button variant="outline">View All Portfolio</Button>
               </Link>
             </div>
           </div>

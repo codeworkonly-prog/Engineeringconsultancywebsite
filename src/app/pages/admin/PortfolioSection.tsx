@@ -161,6 +161,7 @@ export function PortfolioSection() {
       contractAmount: form.contractAmount?.trim(),
       serviceType: form.serviceType?.trim(),
       trainingType: form.trainingType?.trim(),
+      displayOnHome: Boolean(form.displayOnHome),
       updatedAt: now,
       createdAt: form.createdAt || now,
     };
@@ -577,6 +578,19 @@ export function PortfolioSection() {
               </div>
             )}
 
+            <div className="space-y-3 rounded-lg border border-dashed p-4">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <Checkbox
+                  checked={Boolean(form.displayOnHome)}
+                  onCheckedChange={(checked) => updateForm('displayOnHome', checked === true)}
+                />
+                Display on Home Screen
+              </label>
+              <p className="text-sm text-gray-500">
+                Marking this item will make it eligible for the home screen featured section (up to 4 items per type).
+              </p>
+            </div>
+
             <label className="flex items-center gap-2 text-sm font-medium">
               <Checkbox
                 checked={Boolean(form.isFlagship)}
@@ -672,6 +686,11 @@ export function PortfolioSection() {
                       <h3 className="font-semibold">{item.title}</h3>
                       {item.isFlagship && (
                         <Award className="h-4 w-4 text-yellow-500" />
+                      )}
+                      {item.displayOnHome && (
+                        <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700">
+                          Featured on Home
+                        </span>
                       )}
                       <span className="rounded bg-gray-100 px-2 py-1 text-xs">
                         {formatType(item.type)}
