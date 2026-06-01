@@ -33,6 +33,9 @@ import {
 } from '../../services/portfolio.service';
 
 const PAGE_SIZE = 10;
+const COMPANY_START_BS_YEAR = 2072;
+const NEPALI_NEW_YEAR_MONTH_INDEX = 3;
+const NEPALI_NEW_YEAR_DAY = 14;
 
 const categoryLabels: Record<PortfolioType, string> = {
   project: 'Project',
@@ -61,6 +64,14 @@ function getItemLink(item: PortfolioItem) {
 
 function getFiscalYearSortValue(year?: string) {
   return year || '0000';
+}
+
+function getCurrentBsYear(date = new Date()) {
+  const hasReachedNepaliNewYear =
+    date.getMonth() > NEPALI_NEW_YEAR_MONTH_INDEX ||
+    (date.getMonth() === NEPALI_NEW_YEAR_MONTH_INDEX && date.getDate() >= NEPALI_NEW_YEAR_DAY);
+
+  return date.getFullYear() + (hasReachedNepaliNewYear ? 57 : 56);
 }
 
 function escapeCsvValue(value?: string | number | boolean) {
@@ -127,6 +138,7 @@ export function Portfolio() {
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
   const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
 
   const stats = useMemo(() => {
     const projects = portfolio.filter((item) => item.type === 'project').length;
@@ -151,7 +163,7 @@ export function Portfolio() {
       },
       {
         label: 'Years of Experience',
-        value: '15+',
+        value: `${yearsOfExperience}+`,
         icon: CalendarClock,
       },
     ];
@@ -208,7 +220,7 @@ export function Portfolio() {
               Our Portfolio
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">
-              15+ Years of Engineering Consultancy, Infrastructure Development,
+              {yearsOfExperience}+ Years of Engineering Consultancy, Infrastructure Development,
               Project Management, and Capacity-Building Experience Across Nepal.
             </p>
           </div>
