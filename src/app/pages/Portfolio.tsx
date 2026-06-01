@@ -1,6 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowRight, BriefcaseBusiness, CalendarClock, GraduationCap, Search, Users } from 'lucide-react';
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  CalendarClock,
+  Download,
+  GraduationCap,
+  Search,
+  Users,
+} from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import {
@@ -55,6 +63,47 @@ function getFiscalYearSortValue(year?: string) {
   return year || '0000';
 }
 
+function escapeCsvValue(value?: string | number | boolean) {
+  const text = value === undefined || value === null ? '' : String(value);
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function getPortfolioCsv(items: PortfolioItem[]) {
+  const headers = [
+    'SN',
+    'Assignment',
+    'Category',
+    'Fiscal Year',
+    'Client',
+    'Sector',
+    'Location',
+    'Status',
+    'Project Type',
+    'Service Type',
+    'Training Type',
+    'Contract Amount',
+  ];
+
+  const rows = items.map((item, index) => [
+    index + 1,
+    item.title,
+    categoryLabels[item.type],
+    item.fiscalYear,
+    item.client,
+    item.sector,
+    item.location,
+    item.status,
+    item.projectType,
+    item.serviceType,
+    item.trainingType,
+    item.contractAmount,
+  ]);
+
+  return [headers, ...rows]
+    .map((row) => row.map((value) => escapeCsvValue(value)).join(','))
+    .join('\r\n');
+}
+
 export function Portfolio() {
   const navigate = useNavigate();
   const { portfolio } = useContent();
@@ -80,23 +129,19 @@ export function Portfolio() {
   const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const stats = useMemo(() => {
-    const completedAssignments = portfolio.filter(
-      (item) => item.status === 'completed' || item.type === 'project'
-    ).length;
-    const institutionalClients = new Set(
-      portfolio.map((item) => item.client).filter(Boolean)
-    ).size;
+    const projects = portfolio.filter((item) => item.type === 'project').length;
+    const consultingServices = portfolio.filter((item) => item.type === 'consulting').length;
     const trainingPrograms = portfolio.filter((item) => item.type === 'training').length;
 
     return [
       {
-        label: 'Completed Assignments',
-        value: `${completedAssignments}+`,
+        label: 'Projects',
+        value: `${projects}+`,
         icon: BriefcaseBusiness,
       },
       {
-        label: 'Institutional Clients',
-        value: `${institutionalClients}+`,
+        label: 'Consulting Services',
+        value: `${consultingServices}+`,
         icon: Users,
       },
       {
@@ -139,6 +184,20 @@ export function Portfolio() {
     navigate(getItemLink(item));
   };
 
+  const handleDownloadCsv = () => {
+    const csv = getPortfolioCsv(filteredItems);
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'dcp portfolio.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="bg-slate-50">
       <section className="relative overflow-hidden bg-slate-950 text-white">
@@ -177,7 +236,7 @@ export function Portfolio() {
         </section>
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.25fr_repeat(4,minmax(0,1fr))_auto]">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.25fr_repeat(4,minmax(0,1fr))_auto_auto]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
@@ -264,6 +323,11 @@ export function Portfolio() {
 
             <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
               Clear
+            </Button>
+
+            <Button onClick={handleDownloadCsv} disabled={portfolio.length === 0}>
+              <Download className="mr-2 h-4 w-4" />
+              CSV
             </Button>
           </div>
 
