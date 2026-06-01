@@ -8,6 +8,8 @@ import {
   GraduationCap,
   Search,
   Users,
+  ArrowDown,
+  ArrowUp,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -80,25 +82,25 @@ function escapeCsvValue(value?: string | number | boolean) {
 }
 
 function getPortfolioCsv(items: PortfolioItem[]) {
-const headers = [
-  'S.N',
-  'Work',
-  'Type',
-  'Fiscal Year',
-  'Client',
-  'Sector',
-  'Partner Firms',
-];
+  const headers = [
+    'S.N',
+    'Work',
+    'Type',
+    'Fiscal Year',
+    'Client',
+    'Sector',
+    'Partner Firms',
+  ];
 
-const rows = items.map((item, index) => [
-  index + 1,
-  item.title,
-  categoryLabels[item.type],
-  item.fiscalYear,
-  item.client,
-  item.sector,
-  item.partnerFirms,
-]);
+  const rows = items.map((item, index) => [
+    index + 1,
+    item.title,
+    categoryLabels[item.type],
+    item.fiscalYear,
+    item.client,
+    item.sector,
+    item.partnerFirms,
+  ]);
 
   return [headers, ...rows]
     .map((row) => row.map((value) => escapeCsvValue(value)).join(','))
@@ -109,6 +111,7 @@ export function Portfolio() {
   const navigate = useNavigate();
   const { portfolio } = useContent();
   const [page, setPage] = useState(1);
+  const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
   const [filters, setFilters] = useState<PortfolioFilters>({
     type: 'all',
     sector: undefined,
@@ -121,14 +124,20 @@ export function Portfolio() {
 
   const filteredItems = useMemo(() => {
     const filtered = filterPortfolioItems(portfolio, filters);
-    return sortPortfolioItems(filtered, 'fiscalYear', 'desc').sort((a, b) =>
-      getFiscalYearSortValue(b.fiscalYear).localeCompare(getFiscalYearSortValue(a.fiscalYear))
-    );
-  }, [portfolio, filters]);
+
+    return [...filtered].sort((a, b) => {
+      const yearA = getFiscalYearSortValue(a.fiscalYear);
+      const yearB = getFiscalYearSortValue(b.fiscalYear);
+
+      return fySortOrder === 'desc'
+        ? yearB.localeCompare(yearA)
+        : yearA.localeCompare(yearB);
+    });
+  }, [portfolio, filters, fySortOrder]);
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
   const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
+  const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
 
   const stats = useMemo(() => {
     const projects = portfolio.filter((item) => item.type === 'project').length;
@@ -238,7 +247,7 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
         </section>
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.25fr_repeat(4,minmax(0,1fr))_auto_auto]">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.25fr_repeat(5,minmax(0,1fr))_auto_auto]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
@@ -322,7 +331,6 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
                 ))}
               </SelectContent>
             </Select>
-
             <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
               Clear
             </Button>
@@ -346,24 +354,47 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
             <table className="w-full">
               <thead className="bg-slate-900 text-white">
                 <tr>
-                  {[
-  'S.N',
-  'Work',
-  'Type',
-  'Fiscal Year',
-  'Client',
-  'Sector',
-  'Partner Firms',
-].map(
-                    (heading) => (
-                      <th
-                        key={heading}
-                        className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"
-                      >
-                        {heading}
-                      </th>
-                    )
-                  )}
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    S.N
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    Work
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    Type
+                  </th>
+
+                  <th
+                    onClick={() =>
+                      setFySortOrder(prev =>
+                        prev === 'desc' ? 'asc' : 'desc'
+                      )
+                    }
+                    className="cursor-pointer px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"
+                  >
+                    <div className="flex items-center gap-2">
+                      Fiscal Year
+                      {fySortOrder === 'desc' ? (
+                        <ArrowDown className="h-3 w-3" />
+                      ) : (
+                        <ArrowUp className="h-3 w-3" />
+                      )}
+                    </div>
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    Client
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    Sector
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    Partner Firms
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -381,38 +412,38 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
                       className="cursor-pointer transition-colors hover:bg-cyan-50/60"
                     >
                       <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-500">
-  {(page - 1) * PAGE_SIZE + index + 1}
-</td>
+                        {(page - 1) * PAGE_SIZE + index + 1}
+                      </td>
 
-<td className="px-5 py-4">
-  <div className="font-semibold text-slate-950">
-    {item.title}
-  </div>
-</td>
+                      <td className="px-5 py-4">
+                        <div className="font-semibold text-slate-950">
+                          {item.title}
+                        </div>
+                      </td>
 
-<td className="px-5 py-4">
-  <span
-    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${categoryStyles[item.type]}`}
-  >
-    {categoryLabels[item.type]}
-  </span>
-</td>
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${categoryStyles[item.type]}`}
+                        >
+                          {categoryLabels[item.type]}
+                        </span>
+                      </td>
 
-<td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">
-  {item.fiscalYear || '-'}
-</td>
+                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">
+                        {item.fiscalYear || '-'}
+                      </td>
 
-<td className="px-5 py-4 text-sm text-slate-700">
-  {item.client || '-'}
-</td>
+                      <td className="px-5 py-4 text-sm text-slate-700">
+                        {item.client || '-'}
+                      </td>
 
-<td className="px-5 py-4 text-sm text-slate-700">
-  {item.sector || '-'}
-</td>
+                      <td className="px-5 py-4 text-sm text-slate-700">
+                        {item.sector || '-'}
+                      </td>
 
-<td className="px-5 py-4 text-sm text-slate-700">
-  {item.partnerFirms || '-'}
-</td>
+                      <td className="px-5 py-4 text-sm text-slate-700">
+                        {item.partnerFirms || '-'}
+                      </td>
                     </tr>
                   ))
                 )}
@@ -456,18 +487,18 @@ const yearsOfExperience = getCurrentBsYear() - COMPANY_START_BS_YEAR;
                       <p className="font-medium text-slate-900">{item.client || '-'}</p>
                     </div>
                     <div>
-  <p className="text-xs text-slate-500">Sector</p>
-  <p className="font-medium text-slate-900">
-    {item.sector || '-'}
-  </p>
-</div>
+                      <p className="text-xs text-slate-500">Sector</p>
+                      <p className="font-medium text-slate-900">
+                        {item.sector || '-'}
+                      </p>
+                    </div>
 
-<div>
-  <p className="text-xs text-slate-500">Partner Firms</p>
-  <p className="font-medium text-slate-900">
-    {item.partnerFirms || '-'}
-  </p>
-</div>
+                    <div>
+                      <p className="text-xs text-slate-500">Partner Firms</p>
+                      <p className="font-medium text-slate-900">
+                        {item.partnerFirms || '-'}
+                      </p>
+                    </div>
                   </div>
                 </button>
               ))
