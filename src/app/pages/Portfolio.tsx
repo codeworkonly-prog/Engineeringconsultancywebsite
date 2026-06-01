@@ -208,7 +208,7 @@ export function Portfolio() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-
+const isEmpty = filteredItems.length === 0;
   return (
     <div className="bg-slate-50">
       <section className="relative overflow-hidden bg-slate-950 text-white">
@@ -265,10 +265,10 @@ export function Portfolio() {
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="project">Project</SelectItem>
                 <SelectItem value="consulting">Consulting</SelectItem>
                 <SelectItem value="training">Training</SelectItem>
@@ -335,9 +335,18 @@ export function Portfolio() {
               Clear
             </Button>
 
-            <Button onClick={handleDownloadCsv} disabled={portfolio.length === 0}>
+            <Button
+              onClick={handleDownloadCsv}
+              disabled={isEmpty}
+              className={isEmpty ? "cursor-not-allowed" : "cursor-pointer"}
+              title={
+                isEmpty
+                  ? "No portfolio items match the selected filters"
+                  : "Download the currently displayed portfolio table data as CSV"
+              }
+            >
               <Download className="mr-2 h-4 w-4" />
-              CSV
+              Export CSV
             </Button>
           </div>
 
