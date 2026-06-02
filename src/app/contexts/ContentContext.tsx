@@ -585,7 +585,12 @@ export function ContentProvider({
 
   const addPortfolioItem = async (item: Omit<PortfolioItem, "id">) => {
     try {
-      const docRef = await addDoc(collection(db, "portfolio"), item);
+      // remove undefined fields so Firestore doesn't receive `undefined`
+      const payload = Object.fromEntries(
+        Object.entries(item).filter(([, v]) => v !== undefined)
+      );
+
+      const docRef = await addDoc(collection(db, "portfolio"), payload as any);
 
       setPortfolio((prev) => [
         ...prev,
@@ -605,9 +610,11 @@ export function ContentProvider({
     item: Omit<PortfolioItem, "id">
   ) => {
     try {
-      await updateDoc(doc(db, "portfolio", id), {
-        ...item,
-      });
+      const payload = Object.fromEntries(
+        Object.entries(item).filter(([, v]) => v !== undefined)
+      );
+
+      await updateDoc(doc(db, "portfolio", id), payload as any);
 
       setPortfolio((prev) =>
         prev.map((portfolioItem) =>
