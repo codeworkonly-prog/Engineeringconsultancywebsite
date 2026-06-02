@@ -8,7 +8,7 @@ import { PortfolioItemDetail } from './PortfolioItemDetail';
 
 export function ProjectDetail() {
   const { slug } = useParams();
-  const { projects } = useContent();
+  const { projects, clients } = useContent();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   const project = projects.find((p) => p.slug === slug);
@@ -25,6 +25,9 @@ export function ProjectDetail() {
         (p.projectType === project.projectType || p.category === project.category)
     )
     .slice(0, 3);
+
+  const clientName =
+    clients.find((c) => c.id === project.clientId)?.name || project.clientName;
 
   return (
     <div>
@@ -64,14 +67,15 @@ export function ProjectDetail() {
       </section>
 
       {/* Quick Info Grid */}
-      {(project.client || project.location || project.area || project.completionDate) && (
+
+      {(clientName || project.location || project.area || project.completionDate) && (
         <section className="py-12 bg-gray-50 border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {project.client && (
+              {clientName && (
                 <div className="text-center">
                   <p className="text-sm text-gray-500 mb-1">Client</p>
-                  <p className="font-semibold text-lg">{project.client}</p>
+                  <p className="font-semibold text-lg">{clientName}</p>
                 </div>
               )}
               {project.location && (

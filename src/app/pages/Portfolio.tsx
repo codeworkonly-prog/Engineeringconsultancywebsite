@@ -81,7 +81,7 @@ function escapeCsvValue(value?: string | number | boolean) {
   return `"${text.replace(/"/g, '""')}"`;
 }
 
-function getPortfolioCsv(items: PortfolioItem[]) {
+function getPortfolioCsv(items: PortfolioItem[], clients: { id: string; name: string }[]) {
   const headers = [
     'S.N',
     'Work',
@@ -97,7 +97,7 @@ function getPortfolioCsv(items: PortfolioItem[]) {
     item.title,
     categoryLabels[item.type],
     item.fiscalYear,
-    item.client,
+    clients.find((c) => c.id === item.clientId)?.name || '',
     item.sector,
     item.partnerFirms,
   ]);
@@ -109,7 +109,7 @@ function getPortfolioCsv(items: PortfolioItem[]) {
 
 export function Portfolio() {
   const navigate = useNavigate();
-  const { portfolio } = useContent();
+  const { portfolio, clients } = useContent();
   const [page, setPage] = useState(1);
   const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
   const [filters, setFilters] = useState<PortfolioFilters>({
@@ -196,7 +196,7 @@ export function Portfolio() {
   };
 
   const handleDownloadCsv = () => {
-    const csv = getPortfolioCsv(filteredItems);
+    const csv = getPortfolioCsv(filteredItems, clients);
     const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -324,9 +324,9 @@ const isEmpty = filteredItems.length === 0;
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Clients</SelectItem>
-                {filterValues.clients.map((client) => (
-                  <SelectItem key={client} value={client}>
-                    {client}
+                {clients.map((client) => (
+                  <SelectItem key={client.id} value={client.id}>
+                    {client.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -443,7 +443,7 @@ const isEmpty = filteredItems.length === 0;
                       </td>
 
                       <td className="px-5 py-4 text-sm text-slate-700">
-                        {item.client || '-'}
+                        {clients.find((c) => c.id === item.clientId)?.name || '-'}
                       </td>
 
                       <td className="px-5 py-4 text-sm text-slate-700">
@@ -493,7 +493,7 @@ const isEmpty = filteredItems.length === 0;
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">Client</p>
-                      <p className="font-medium text-slate-900">{item.client || '-'}</p>
+                      <p className="font-medium text-slate-900">{clients.find((c) => c.id === item.clientId)?.name || '-'}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">Sector</p>

@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
 
 export function Training() {
-  const { events, portfolio } = useContent();
+  const { events, portfolio, clients } = useContent();
   const trainingItems = [
     ...events.map((event) => ({
       id: `event-${event.id}`,
@@ -31,9 +31,10 @@ export function Training() {
         startDate: item.startDate || item.fiscalYear || '',
         endDate: item.endDate || '',
         duration: item.mode ? `${item.mode} mode` : 'Program',
-        topics: [item.sector, item.client, item.location].filter(Boolean) as string[],
+        topics: [item.sector, clients.find((c) => c.id === item.clientId)?.name, item.location]
+          .filter(Boolean) as string[],
         imageUrl: item.featuredImage,
-        location: item.location || item.client || '',
+        location: item.location || clients.find((c) => c.id === item.clientId)?.name || '',
       })),
   ];
 

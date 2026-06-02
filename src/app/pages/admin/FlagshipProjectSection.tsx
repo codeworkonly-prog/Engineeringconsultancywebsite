@@ -2,7 +2,7 @@ import { useContent } from '../../contexts/ContentContext';
 import { Award, CheckCircle } from 'lucide-react';
 
 export function FlagshipProjectSection() {
-  const { projects } = useContent();
+  const { projects, clients } = useContent();
 
   // Find the flagship project
   const flagshipProject = projects.find((p) => p.isFlagship);
@@ -48,32 +48,32 @@ export function FlagshipProjectSection() {
 
               {/* Testimonial or Result Section */}
               <div className="bg-white rounded-lg p-6">
-                {flagshipProject.clientTestimonial ? (
-                  <div>
-                    <p className="text-gray-700 italic mb-3">"{flagshipProject.clientTestimonial}"</p>
-                    {flagshipProject.clientName && (
-                      <p className="text-sm text-gray-600 font-medium">— {flagshipProject.clientName}</p>
-                    )}
-                  </div>
-                ) : flagshipProject.result ? (
-                  <p className="text-gray-700 italic">{flagshipProject.result}</p>
-                ) : (
-                  <p className="text-gray-700 italic">
-                    This project demonstrates our capability to handle complex, large-scale infrastructure
-                    projects with technical precision and professional excellence.
-                  </p>
-                )}
-              </div>
+                  {flagshipProject.clientTestimonial ? (
+                    <div>
+                      <p className="text-gray-700 italic mb-3">"{flagshipProject.clientTestimonial}"</p>
+                      {clients.find((c) => c.id === flagshipProject.clientId)?.name && (
+                        <p className="text-sm text-gray-600 font-medium">— {clients.find((c) => c.id === flagshipProject.clientId)?.name}</p>
+                      )}
+                    </div>
+                  ) : flagshipProject.result ? (
+                    <p className="text-gray-700 italic">{flagshipProject.result}</p>
+                  ) : (
+                    <p className="text-gray-700 italic">
+                      This project demonstrates our capability to handle complex, large-scale infrastructure
+                      projects with technical precision and professional excellence.
+                    </p>
+                  )}
+                </div>
             </div>
 
             {/* Optional: Project Details */}
-            {(flagshipProject.client || flagshipProject.location || flagshipProject.area) && (
+            {(clients.find((c) => c.id === flagshipProject.clientId)?.name || flagshipProject.location || flagshipProject.area) && (
               <div className="mt-6 pt-6 border-t border-brand-200">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                  {flagshipProject.client && (
+                  {clients.find((c) => c.id === flagshipProject.clientId)?.name && (
                     <div>
                       <span className="text-gray-600">Client:</span>
-                      <span className="ml-2 font-semibold text-gray-800">{flagshipProject.client}</span>
+                      <span className="ml-2 font-semibold text-gray-800">{clients.find((c) => c.id === flagshipProject.clientId)?.name}</span>
                     </div>
                   )}
                   {flagshipProject.location && (

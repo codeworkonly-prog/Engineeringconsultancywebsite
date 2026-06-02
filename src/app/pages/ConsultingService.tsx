@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
 
 export function ConsultingService() {
-  const { portfolio } = useContent();
+  const { portfolio, clients } = useContent();
   const consultingAssignments = portfolio.filter((item) => item.type === 'consulting');
 
   const consultingServices = [
@@ -241,7 +241,9 @@ export function ConsultingService() {
                       </p>
 
                       <div className="text-sm text-gray-500 space-y-1 mb-4">
-                        {assignment.client && <p>Client: {assignment.client}</p>}
+                        {clients.find((c) => c.id === assignment.clientId)?.name && (
+                          <p>Client: {clients.find((c) => c.id === assignment.clientId)?.name}</p>
+                        )}
                         {assignment.fiscalYear && (
                           <p className="flex items-center gap-2">
                             <Calendar className="h-4 w-4" />

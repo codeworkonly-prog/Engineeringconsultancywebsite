@@ -27,8 +27,8 @@ export function filterPortfolioItems(
       return false;
     }
 
-    // Client filter
-    if (filters.client && item.client !== filters.client) {
+    // Client filter (clientId)
+    if (filters.client && item.clientId !== filters.client) {
       return false;
     }
 
@@ -44,7 +44,7 @@ export function filterPortfolioItems(
         item.title.toLowerCase().includes(searchLower) ||
         item.shortDescription.toLowerCase().includes(searchLower) ||
         (item.overview || item.fullDescription || '').toLowerCase().includes(searchLower) ||
-        (item.client || '').toLowerCase().includes(searchLower) ||
+        (item.clientId || '').toLowerCase().includes(searchLower) ||
         (item.sector || '').toLowerCase().includes(searchLower);
 
       if (!matchesSearch) return false;
@@ -76,9 +76,9 @@ export function sortPortfolioItems(
       case 'fiscalYear':
         comparison = (a.fiscalYear || '').localeCompare(b.fiscalYear || '');
         break;
-      case 'client':
-        comparison = (a.client || '').localeCompare(b.client || '');
-        break;
+        case 'client':
+          comparison = (a.clientId || '').localeCompare(b.clientId || '');
+          break;
       case 'contractAmount':
         const amountA = parseFloat((a.contractAmount || '').replace(/,/g, '')) || 0;
         const amountB = parseFloat((b.contractAmount || '').replace(/,/g, '')) || 0;
@@ -142,8 +142,8 @@ export function getItemsBySector(items: PortfolioItem[], sector: string): Portfo
 /**
  * Get items by client
  */
-export function getItemsByClient(items: PortfolioItem[], client: string): PortfolioItem[] {
-  return items.filter((item) => item.client === client);
+export function getItemsByClient(items: PortfolioItem[], clientId: string): PortfolioItem[] {
+  return items.filter((item) => item.clientId === clientId);
 }
 
 /**
@@ -193,7 +193,7 @@ export function getUniqueFilterValues(items: PortfolioItem[]) {
 
   items.forEach((item) => {
     if (item.sector) sectors.add(item.sector);
-    if (item.client) clients.add(item.client);
+    if (item.clientId) clients.add(item.clientId);
     if (item.fiscalYear) fiscalYears.add(item.fiscalYear);
   });
 

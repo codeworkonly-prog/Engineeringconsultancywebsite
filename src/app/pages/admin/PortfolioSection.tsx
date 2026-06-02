@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -12,9 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from '../../components/ui/dialog';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
-import { Award, Edit, Search, Trash2, X } from 'lucide-react';
+import { Award, Edit, Search, Trash2, X, Plus,Check, ChevronsUpDown } from 'lucide-react';
 import {
   PortfolioItem,
   PortfolioStatus,
@@ -62,6 +70,8 @@ const getFieldError = (errors: PortfolioFormErrors, field: keyof PortfolioItem) 
 export function PortfolioSection() {
   const {
     portfolio,
+    clients,
+    addClient,
     addPortfolioItem,
     updatePortfolioItem,
     deletePortfolioItem,
@@ -74,6 +84,53 @@ export function PortfolioSection() {
   const [form, setForm] = useState<PortfolioItem>(createEmptyForm);
   const [errors, setErrors] = useState<PortfolioFormErrors>({});
   const selectedTypeLabel = formatType(form.type).toLowerCase();
+
+  // Client modal state for adding a new client directly from portfolio form
+  const [clientModalOpen, setClientModalOpen] = useState(false);
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientLogo, setNewClientLogo] = useState('');
+  const [newClientWebsite, setNewClientWebsite] = useState('');
+  const [customFiscalYears, setCustomFiscalYears] = useState<string[]>([]);
+
+  const handleAddClientFromModal = async () => {
+    const name = newClientName.trim();
+    if (!name) return toast.error('Client name is required');
+
+    try {
+      const id = await addClient({ name, logoUrl: newClientLogo.trim(), website: newClientWebsite.trim() });
+      updateForm('clientId', id);
+      setClientModalOpen(false);
+      setNewClientName('');
+      setNewClientLogo('');
+      setNewClientWebsite('');
+      toast.success('Client added');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to add client');
+    }
+  };
+
+  const fiscalYearOptions = useMemo(() => {
+    const years = new Set<string>();
+
+    // Default fiscal years
+    for (let year = 2072; year <= 2085; year++) {
+      years.add(`${year}/${String((year + 1) % 100).padStart(2, '0')}`);
+    }
+
+    // Existing data
+    portfolio.forEach((item) => {
+      if (item.fiscalYear?.trim()) {
+        years.add(item.fiscalYear.trim());
+      }
+    });
+
+    // Added years
+    customFiscalYears.forEach((year) => years.add(year));
+
+    return Array.from(years).sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: true })
+    );
+  }, [portfolio, customFiscalYears]);
 
   const currentFlagshipItem = useMemo(
     () => portfolio.find((item) => item.isFlagship && item.type === form.type),
@@ -92,6 +149,22 @@ export function PortfolioSection() {
       delete next[key];
       return next;
     });
+  };
+
+  const handleAddFiscalYear = () => {
+    const latestYear = fiscalYearOptions
+      .map((fy) => Number(fy.split('/')[0]))
+      .sort((a, b) => b - a)[0];
+
+    const nextYear = latestYear + 1;
+    const nextFiscalYear = `${nextYear}/${String(
+      (nextYear + 1) % 100
+    ).padStart(2, '0')}`;
+
+    setCustomFiscalYears((prev) => [...prev, nextFiscalYear]);
+    updateForm('fiscalYear', nextFiscalYear);
+
+    toast.success(`Fiscal year ${nextFiscalYear} added`);
   };
 
   const generateSlug = (title: string, existingId?: string) => {
@@ -152,8 +225,7 @@ export function PortfolioSection() {
       overview: form.overview?.trim(),
       featuredImage: form.featuredImage.trim(),
       sector: form.sector?.trim(),
-      client: form.client?.trim(),
-      clientLogo: form.clientLogo?.trim(),
+      clientId: form.clientId?.trim(),
       partnerFirms: form.partnerFirms?.trim(),
       fiscalYear: form.fiscalYear?.trim(),
       location: form.location?.trim(),
@@ -173,7 +245,6 @@ export function PortfolioSection() {
     const slug = form.slug.trim() || generateSlug(title, editingId || undefined);
     const fiscalYear = form.fiscalYear?.trim();
     const featuredImage = form.featuredImage.trim();
-    const clientLogo = form.clientLogo?.trim();
 
     if (!title) nextErrors.title = 'Title is required';
     if (!slug) nextErrors.slug = 'Slug is required';
@@ -193,9 +264,6 @@ export function PortfolioSection() {
       nextErrors.featuredImage = 'Featured image is required';
     } else if (!isValidImagePath(featuredImage)) {
       nextErrors.featuredImage = 'Enter a valid image URL or relative path';
-    }
-    if (clientLogo && !isValidImagePath(clientLogo)) {
-      nextErrors.clientLogo = 'Enter a valid logo URL or relative path';
     }
     if (fiscalYear && !isValidFiscalYear(fiscalYear)) {
       nextErrors.fiscalYear = 'Use YYYY/YY with the next year, e.g. 2080/81';
@@ -302,12 +370,13 @@ export function PortfolioSection() {
       const matchesType = typeFilter === 'all' || item.type === typeFilter;
       const matchesStatus =
         statusFilter === 'all' || item.status === statusFilter;
+      const clientName = clients.find((c) => c.id === item.clientId)?.name;
       const matchesSearch =
         !search ||
         [
           item.title,
           item.shortDescription,
-          item.client,
+          clientName,
           item.sector,
           item.location,
           item.fiscalYear,
@@ -367,12 +436,35 @@ export function PortfolioSection() {
 
               <div>
                 <Label>Fiscal Year</Label>
-                <Input
-                  value={form.fiscalYear || ''}
-                  onChange={(event) => updateForm('fiscalYear', event.target.value)}
-                  placeholder="2080/81"
-                  aria-invalid={Boolean(errors.fiscalYear)}
-                />
+
+                <div className="flex gap-2">
+                  <Select
+                    value={form.fiscalYear || ''}
+                    onValueChange={(value) => updateForm('fiscalYear', value)}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select Fiscal Year" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {fiscalYearOptions.map((year) => (
+                        <SelectItem key={year} value={year}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAddFiscalYear}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </div>
+
                 {getFieldError(errors, 'fiscalYear')}
               </div>
             </div>
@@ -424,10 +516,59 @@ export function PortfolioSection() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label>Client</Label>
-                <Input
-                  value={form.client || ''}
-                  onChange={(event) => updateForm('client', event.target.value)}
-                />
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={form.clientId || undefined}
+                    onValueChange={(value) =>
+                      updateForm('clientId', value === 'none' ? undefined : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select client" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {clients.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Dialog open={clientModalOpen} onOpenChange={setClientModalOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-2" /> Add
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add Client</DialogTitle>
+                      </DialogHeader>
+
+                      <div className="space-y-3">
+                        <div>
+                          <Label>Name *</Label>
+                          <Input value={newClientName} onChange={(e) => setNewClientName(e.target.value)} />
+                        </div>
+
+                        <div>
+                          <Label>Logo URL</Label>
+                          <Input value={newClientLogo} onChange={(e) => setNewClientLogo(e.target.value)} placeholder="https://..." />
+                        </div>
+
+                        <div>
+                          <Label>Website</Label>
+                          <Input value={newClientWebsite} onChange={(e) => setNewClientWebsite(e.target.value)} placeholder="https://..." />
+                        </div>
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="button" onClick={handleAddClientFromModal}>Add Client</Button>
+                        <Button variant="outline" onClick={() => setClientModalOpen(false)}>Cancel</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
 
               <div>
@@ -492,16 +633,7 @@ export function PortfolioSection() {
                 {getFieldError(errors, 'featuredImage')}
               </div>
 
-              <div>
-                <Label>Client Logo</Label>
-                <Input
-                  value={form.clientLogo || ''}
-                  onChange={(event) => updateForm('clientLogo', event.target.value)}
-                  placeholder="https://..."
-                  aria-invalid={Boolean(errors.clientLogo)}
-                />
-                {getFieldError(errors, 'clientLogo')}
-              </div>
+
             </div>
 
             {form.featuredImage && (
@@ -707,7 +839,11 @@ export function PortfolioSection() {
                     </p>
 
                     <p className="mt-2 text-xs text-gray-500">
-                      {[item.client, item.sector, item.fiscalYear]
+                      {[
+                        clients.find((c) => c.id === item.clientId)?.name,
+                        item.sector,
+                        item.fiscalYear,
+                      ]
                         .filter(Boolean)
                         .join(' • ') || item.slug}
                     </p>

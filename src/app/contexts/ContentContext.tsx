@@ -52,6 +52,7 @@ export interface Project {
   slug: string;
   isFlagship: boolean;
   client?: string;
+  clientId?: string;
   location?: string;
   area?: string;
   completionDate?: string;
@@ -124,7 +125,7 @@ interface ContentContextType {
   ) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
 
-  addClient: (client: Omit<Client, "id">) => Promise<void>;
+  addClient: (client: Omit<Client, "id">) => Promise<string>;
   updateClient: (
     id: string,
     client: Omit<Client, "id">
@@ -491,12 +492,18 @@ export function ContentProvider({
 
   const addClient = async (
     client: Omit<Client, "id">
-  ) => {
+  ): Promise<string> => {
     try {
-      const docRef = await addDoc(
-        collection(db, "clients"),
-        client
+      // enforce unique client names (case-insensitive)
+      const exists = clients.some(
+        (c) => c.name.trim().toLowerCase() === client.name.trim().toLowerCase()
       );
+
+      if (exists) {
+        throw new Error('Client with this name already exists');
+      }
+
+      const docRef = await addDoc(collection(db, "clients"), client);
 
       setClients((prev) => [
         ...prev,
@@ -505,8 +512,10 @@ export function ContentProvider({
           id: docRef.id,
         },
       ]);
+      return docRef.id;
     } catch (error) {
       console.error("Error adding client:", error);
+      throw error;
     }
   };
 
@@ -515,29 +524,43 @@ export function ContentProvider({
     client: Omit<Client, "id">
   ) => {
     try {
+      // enforce unique client names (case-insensitive), excluding current
+      const exists = clients.some(
+        (c) => c.id !== id && c.name.trim().toLowerCase() === client.name.trim().toLowerCase()
+      );
+
+      if (exists) {
+        throw new Error('Another client with this name already exists');
+      }
+
       await updateDoc(doc(db, "clients", id), {
         ...client,
       });
 
       setClients((prev) =>
-        prev.map((c) =>
-          c.id === id ? { ...client, id } : c
-        )
+        prev.map((c) => (c.id === id ? { ...client, id } : c))
       );
     } catch (error) {
       console.error("Error updating client:", error);
+      throw error;
     }
   };
 
   const deleteClient = async (id: string) => {
     try {
+      // prevent deletion if any portfolio item references this client
+      const referenced = portfolio.some((p) => p.clientId === id);
+
+      if (referenced) {
+        throw new Error('Cannot delete client: referenced by portfolio items');
+      }
+
       await deleteDoc(doc(db, "clients", id));
 
-      setClients((prev) =>
-        prev.filter((client) => client.id !== id)
-      );
+      setClients((prev) => prev.filter((client) => client.id !== id));
     } catch (error) {
       console.error("Error deleting client:", error);
+      throw error;
     }
   };
 

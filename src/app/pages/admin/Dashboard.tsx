@@ -14,18 +14,21 @@ import { Section } from './types';
 import { DashboardHome } from './DashboardHome';
 import { TeamSection } from './TeamSection';
 import { PortfolioSection } from './PortfolioSection';
+import { ClientsManagement } from './Clients';
 
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
   { id: 'portfolio', label: 'Portfolio', icon: <Briefcase className="h-5 w-5" /> },
   { id: 'team', label: 'Team', icon: <Users className="h-5 w-5" /> },
+  { id: 'clients', label: 'Clients', icon: <Briefcase className="h-5 w-5" /> },
 ];
 
 const SECTION_LABELS: Record<Section, string> = {
   dashboard: 'Dashboard',
   portfolio: 'Portfolio',
   team: 'Team',
+  clients: 'Clients',
 };
 
 export function Dashboard() {
@@ -88,6 +91,7 @@ export function Dashboard() {
           {activeSection === 'dashboard' && <DashboardHome />}
           {activeSection === 'portfolio' && <PortfolioSection />}
           {activeSection === 'team' && <TeamSection />}
+          {activeSection === 'clients' && <ClientsManagement />}
         </div>
       </main>
     </div>

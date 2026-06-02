@@ -29,7 +29,7 @@ function getSpecificLabel(item: PortfolioItem) {
 
 export function PortfolioItemDetail({ expectedType }: PortfolioItemDetailProps) {
   const { slug } = useParams();
-  const { portfolio } = useContent();
+  const { portfolio, clients } = useContent();
 
   const item = portfolio.find(
     (portfolioItem) =>
@@ -100,7 +100,7 @@ export function PortfolioItemDetail({ expectedType }: PortfolioItemDetailProps) 
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <UserRound className="mb-3 h-5 w-5 text-cyan-700" />
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Client</p>
-            <p className="mt-1 font-semibold text-slate-950">{item.client || '-'}</p>
+            <p className="mt-1 font-semibold text-slate-950">{clients.find((c) => c.id === item.clientId)?.name || '-'}</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <BriefcaseBusiness className="mb-3 h-5 w-5 text-cyan-700" />
