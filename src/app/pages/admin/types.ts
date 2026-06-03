@@ -1,4 +1,4 @@
-export type Section = 'dashboard' | 'portfolio' | 'team';
+export type Section = 'dashboard' | 'portfolio' | 'team' | 'clients' | 'sectors';
 
 
 export type TeamForm = {

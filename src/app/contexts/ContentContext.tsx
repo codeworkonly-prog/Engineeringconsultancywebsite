@@ -39,6 +39,11 @@ export interface Client {
   website: string;
 }
 
+export interface Sector {
+  id: string;
+  name: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -93,6 +98,7 @@ interface ContentContextType {
   galleryImages: GalleryImage[];
   events: Event[];
   clients: Client[];
+  sectors: Sector[];
   portfolio: PortfolioItem[];
 
   addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
@@ -131,6 +137,9 @@ interface ContentContextType {
     client: Omit<Client, "id">
   ) => Promise<void>;
   deleteClient: (id: string) => Promise<void>;
+  addSector: (sector: Omit<Sector, "id">) => Promise<string>;
+  updateSector: (id: string, sector: Omit<Sector, "id">) => Promise<void>;
+  deleteSector: (id: string) => Promise<void>;
 
   addPortfolioItem: (item: Omit<PortfolioItem, "id">) => Promise<void>;
   updatePortfolioItem: (
@@ -162,6 +171,7 @@ export function ContentProvider({
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
+  const [sectors, setSectors] = useState<Sector[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
 
   /* =========================
@@ -174,6 +184,7 @@ export function ContentProvider({
     fetchGalleryImages();
     fetchEvents();
     fetchClients();
+    fetchSectors();
     fetchPortfolio();
   }, []);
 
@@ -565,6 +576,88 @@ export function ContentProvider({
   };
 
   /* =========================
+     SECTORS
+  ========================= */
+
+  const fetchSectors = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "sectors"));
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Sector, "id">),
+      }));
+
+      setSectors(data);
+    } catch (error) {
+      console.error("Error fetching sectors:", error);
+    }
+  };
+
+  const addSector = async (sector: Omit<Sector, "id">): Promise<string> => {
+    try {
+      const exists = sectors.some(
+        (s) => s.name.trim().toLowerCase() === sector.name.trim().toLowerCase()
+      );
+
+      if (exists) {
+        throw new Error('Sector with this name already exists');
+      }
+
+      const docRef = await addDoc(collection(db, "sectors"), sector);
+
+      setSectors((prev) => [
+        ...prev,
+        {
+          ...sector,
+          id: docRef.id,
+        },
+      ]);
+
+      return docRef.id;
+    } catch (error) {
+      console.error("Error adding sector:", error);
+      throw error;
+    }
+  };
+
+  const updateSector = async (id: string, sector: Omit<Sector, "id">) => {
+    try {
+      const exists = sectors.some(
+        (s) => s.id !== id && s.name.trim().toLowerCase() === sector.name.trim().toLowerCase()
+      );
+
+      if (exists) {
+        throw new Error('Another sector with this name already exists');
+      }
+
+      await updateDoc(doc(db, "sectors", id), { ...sector });
+
+      setSectors((prev) => prev.map((s) => (s.id === id ? { ...sector, id } : s)));
+    } catch (error) {
+      console.error("Error updating sector:", error);
+      throw error;
+    }
+  };
+
+  const deleteSector = async (id: string) => {
+    try {
+      const referenced = portfolio.some((p) => p.sector?.trim() && p.sector === sectors.find(s => s.id === id)?.name);
+
+      if (referenced) {
+        throw new Error('Cannot delete sector: referenced by portfolio items');
+      }
+
+      await deleteDoc(doc(db, "sectors", id));
+
+      setSectors((prev) => prev.filter((s) => s.id !== id));
+    } catch (error) {
+      console.error("Error deleting sector:", error);
+      throw error;
+    }
+  };
+
+  /* =========================
      PORTFOLIO
   ========================= */
 
@@ -673,6 +766,10 @@ export function ContentProvider({
         addClient,
         updateClient,
         deleteClient,
+        sectors,
+        addSector,
+        updateSector,
+        deleteSector,
 
         addPortfolioItem,
         updatePortfolioItem,

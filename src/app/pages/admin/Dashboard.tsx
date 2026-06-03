@@ -15,6 +15,7 @@ import { DashboardHome } from './DashboardHome';
 import { TeamSection } from './TeamSection';
 import { PortfolioSection } from './PortfolioSection';
 import { ClientsManagement } from './Clients';
+import { SectorsManagement } from './Sectors';
 
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
@@ -22,6 +23,7 @@ const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: 'portfolio', label: 'Portfolio', icon: <Briefcase className="h-5 w-5" /> },
   { id: 'team', label: 'Team', icon: <Users className="h-5 w-5" /> },
   { id: 'clients', label: 'Clients', icon: <Briefcase className="h-5 w-5" /> },
+  { id: 'sectors', label: 'Sectors', icon: <Briefcase className="h-5 w-5" /> },
 ];
 
 const SECTION_LABELS: Record<Section, string> = {
@@ -29,6 +31,7 @@ const SECTION_LABELS: Record<Section, string> = {
   portfolio: 'Portfolio',
   team: 'Team',
   clients: 'Clients',
+  sectors: 'Sectors',
 };
 
 export function Dashboard() {
@@ -92,6 +95,7 @@ export function Dashboard() {
           {activeSection === 'portfolio' && <PortfolioSection />}
           {activeSection === 'team' && <TeamSection />}
           {activeSection === 'clients' && <ClientsManagement />}
+          {activeSection === 'sectors' && <SectorsManagement />}
         </div>
       </main>
     </div>

@@ -75,6 +75,8 @@ export function PortfolioSection() {
     addPortfolioItem,
     updatePortfolioItem,
     deletePortfolioItem,
+    sectors,
+    addSector,
   } = useContent();
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -91,6 +93,8 @@ export function PortfolioSection() {
   const [newClientLogo, setNewClientLogo] = useState('');
   const [newClientWebsite, setNewClientWebsite] = useState('');
   const [customFiscalYears, setCustomFiscalYears] = useState<string[]>([]);
+  const [newSectorName, setNewSectorName] = useState('');
+  const [sectorModalOpen, setSectorModalOpen] = useState(false);
 
   const handleAddClientFromModal = async () => {
     const name = newClientName.trim();
@@ -131,6 +135,33 @@ export function PortfolioSection() {
       a.localeCompare(b, undefined, { numeric: true })
     );
   }, [portfolio, customFiscalYears]);
+
+  const sectorOptions = useMemo(() => {
+    const setS = new Set<string>();
+
+    portfolio.forEach((item) => {
+      if (item.sector?.trim()) setS.add(item.sector.trim());
+    });
+
+    sectors.forEach((s) => s.name && setS.add(s.name.trim()));
+
+    return Array.from(setS).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }, [portfolio, sectors]);
+
+  const handleAddSector = async () => {
+    const name = newSectorName.trim();
+    if (!name) return toast.error('Sector name is required');
+
+    try {
+      await addSector({ name });
+      updateForm('sector', name);
+      setNewSectorName('');
+      setSectorModalOpen(false);
+      toast.success(`Sector "${name}" added`);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to add sector');
+    }
+  };
 
   const currentFlagshipItem = useMemo(
     () => portfolio.find((item) => item.isFlagship && item.type === form.type),
@@ -537,7 +568,7 @@ export function PortfolioSection() {
                   <Dialog open={clientModalOpen} onOpenChange={setClientModalOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
-                        <Plus className="h-4 w-4 mr-2" /> Add
+                        <Plus className="h-4 w-4 mr-2" /> Add Client
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -583,10 +614,50 @@ export function PortfolioSection() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label>Sector</Label>
-                <Input
-                  value={form.sector || ''}
-                  onChange={(event) => updateForm('sector', event.target.value)}
-                />
+                <div className="flex gap-2">
+                  <Select
+                    value={form.sector || ''}
+                    onValueChange={(value) => updateForm('sector', value)}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select sector" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {sectorOptions.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Dialog open={sectorModalOpen} onOpenChange={setSectorModalOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-2" /> Add Sector
+                      </Button>
+                    </DialogTrigger>
+
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add Sector</DialogTitle>
+                      </DialogHeader>
+
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Name *</Label>
+                          <Input value={newSectorName} onChange={(e) => setNewSectorName(e.target.value)} placeholder="Sector name" />
+                        </div>
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="button" onClick={handleAddSector}>
+                          <Plus className="h-4 w-4 mr-1" /> Add Sector
+                        </Button>
+                        <Button variant="outline" onClick={() => setSectorModalOpen(false)}>Cancel</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
 
               <div>
