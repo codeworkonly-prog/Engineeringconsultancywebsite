@@ -263,7 +263,10 @@ export function PortfolioSection() {
   const getPayload = () => {
     const { id, ...payload } = form;
     const now = new Date().toISOString();
-    const slug = form.slug.trim() || generateSlug(form.title, editingId || undefined);
+    const slug =
+      form.slug.trim() ||
+      generateSlug(form.title, editingId || undefined) ||
+      `portfolio-item-${Date.now()}`;
 
     return {
       ...payload,
@@ -290,12 +293,13 @@ export function PortfolioSection() {
   const validateForm = () => {
     const nextErrors: PortfolioFormErrors = {};
     const title = form.title.trim();
-    const slug = form.slug.trim() || generateSlug(title, editingId || undefined);
+    const slug = form.slug.trim();
     const fiscalYear = form.fiscalYear?.trim();
     const featuredImage = form.featuredImage.trim();
 
     if (!title) nextErrors.title = 'Title is required';
-    if (!slug) nextErrors.slug = 'Slug is required';
+    if (!fiscalYear) nextErrors.fiscalYear = 'Fiscal year is required';
+    if (!form.sector?.trim()) nextErrors.sector = 'Sector is required';
     if (slug && !slugPattern.test(slug)) {
       nextErrors.slug = 'Use lowercase letters, numbers, and hyphens only';
     }
@@ -305,12 +309,7 @@ export function PortfolioSection() {
     ) {
       nextErrors.slug = 'This slug is already used by another portfolio item';
     }
-    if (!form.shortDescription.trim()) {
-      nextErrors.shortDescription = 'Short description is required';
-    }
-    if (!featuredImage) {
-      nextErrors.featuredImage = 'Featured image is required';
-    } else if (!isValidImagePath(featuredImage)) {
+    if (featuredImage && !isValidImagePath(featuredImage)) {
       nextErrors.featuredImage = 'Enter a valid image URL or relative path';
     }
     if (fiscalYear && !isValidFiscalYear(fiscalYear)) {
@@ -318,18 +317,6 @@ export function PortfolioSection() {
     }
     if (form.startDate && form.endDate && form.endDate < form.startDate) {
       nextErrors.endDate = 'End date cannot be before start date';
-    }
-
-    if (form.type === 'project') {
-      if (!form.projectType?.trim()) nextErrors.projectType = 'Project type is required';
-      if (!form.contractAmount?.trim()) nextErrors.contractAmount = 'Contract amount is required';
-    }
-    if (form.type === 'consulting' && !form.serviceType?.trim()) {
-      nextErrors.serviceType = 'Service type is required';
-    }
-    if (form.type === 'training') {
-      if (!form.trainingType?.trim()) nextErrors.trainingType = 'Training type is required';
-      if (!form.mode) nextErrors.mode = 'Mode is required';
     }
 
     return nextErrors;
@@ -459,7 +446,7 @@ export function PortfolioSection() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
-                <Label>Type *</Label>
+                <Label>Type</Label>
                 <Select
                   value={form.type}
                   onValueChange={(value) => updateForm('type', value as PortfolioType)}
@@ -493,7 +480,7 @@ export function PortfolioSection() {
               </div>
 
               <div>
-                <Label>Fiscal Year</Label>
+                <Label>Fiscal Year *</Label>
 
                 <div className="flex gap-2">
                   <Select
@@ -552,11 +539,10 @@ export function PortfolioSection() {
             </div>
 
             <div>
-              <Label>Short Description *</Label>
+              <Label>Short Description</Label>
               <Textarea
                 value={form.shortDescription}
                 onChange={(event) => updateForm('shortDescription', event.target.value)}
-                required
                 aria-invalid={Boolean(errors.shortDescription)}
               />
               {getFieldError(errors, 'shortDescription')}
@@ -640,7 +626,7 @@ export function PortfolioSection() {
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <Label>Sector</Label>
+                <Label>Sector *</Label>
                 <div className="flex gap-2">
                   <Select
                     value={form.sector || ''}
@@ -685,6 +671,7 @@ export function PortfolioSection() {
                     </DialogContent>
                   </Dialog>
                 </div>
+                {getFieldError(errors, 'sector')}
               </div>
 
               <div>
@@ -720,12 +707,11 @@ export function PortfolioSection() {
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <Label>Featured Image *</Label>
+                <Label>Featured Image</Label>
                 <Input
                   value={form.featuredImage}
                   onChange={(event) => updateForm('featuredImage', event.target.value)}
                   placeholder="https://..."
-                  required
                   aria-invalid={Boolean(errors.featuredImage)}
                 />
                 {getFieldError(errors, 'featuredImage')}
@@ -767,13 +753,22 @@ export function PortfolioSection() {
             {form.type === 'consulting' && (
               <div className="space-y-3 rounded-lg border p-4">
                 <h3 className="font-semibold">Consulting Details</h3>
-                <Input
-                  placeholder="Service Type"
-                  value={form.serviceType || ''}
-                  onChange={(event) => updateForm('serviceType', event.target.value)}
-                  aria-invalid={Boolean(errors.serviceType)}
-                />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <Input
+                    placeholder="Service Type"
+                    value={form.serviceType || ''}
+                    onChange={(event) => updateForm('serviceType', event.target.value)}
+                    aria-invalid={Boolean(errors.serviceType)}
+                  />
+                  <Input
+                    placeholder="Contract Amount (NRs.)"
+                    value={form.contractAmount || ''}
+                    onChange={(event) => updateForm('contractAmount', event.target.value)}
+                    aria-invalid={Boolean(errors.contractAmount)}
+                  />
+                </div>
                 {getFieldError(errors, 'serviceType')}
+                {getFieldError(errors, 'contractAmount')}
               </div>
             )}
 
@@ -786,6 +781,12 @@ export function PortfolioSection() {
                     value={form.trainingType || ''}
                     onChange={(event) => updateForm('trainingType', event.target.value)}
                     aria-invalid={Boolean(errors.trainingType)}
+                  />
+                  <Input
+                    placeholder="Contract Amount (NRs.)"
+                    value={form.contractAmount || ''}
+                    onChange={(event) => updateForm('contractAmount', event.target.value)}
+                    aria-invalid={Boolean(errors.contractAmount)}
                   />
                   <Select
                     value={form.mode || 'physical'}
@@ -804,6 +805,7 @@ export function PortfolioSection() {
                   </Select>
                 </div>
                 {getFieldError(errors, 'trainingType')}
+                {getFieldError(errors, 'contractAmount')}
                 {getFieldError(errors, 'mode')}
               </div>
             )}

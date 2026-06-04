@@ -2,10 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { useContent } from '../../contexts/ContentContext';
 
 export function DashboardHome() {
-  const { teamMembers, projects, galleryImages, events, clients } = useContent();
+  const { teamMembers, projects, galleryImages, events, clients, portfolio } = useContent();
+  const consultingCount = portfolio.filter((item) => item.type === 'consulting').length;
 
   const stats = [
-    { label: 'Total Projects', value: projects.length },
+    { label: 'Projects', value: projects.length },
+    { label: 'Consulting', value: consultingCount },
     { label: 'Team Members', value: teamMembers.length },
     { label: 'Training', value: events.length },
     { label: 'Gallery Images', value: galleryImages.length },
