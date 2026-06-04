@@ -119,7 +119,7 @@ export function PortfolioSection() {
     const years = new Set<string>();
 
     // Default fiscal years
-    for (let year = 2072; year <= 2085; year++) {
+    for (let year = 2070; year <= 2085; year++) {
       years.add(`${year}/${String((year + 1) % 100).padStart(2, '0')}`);
     }
 
@@ -261,7 +261,7 @@ export function PortfolioSection() {
   };
 
   const getPayload = () => {
-    const { id, ...payload } = form;
+    const { id, status, ...payload } = form;
     const now = new Date().toISOString();
     const slug =
       form.slug.trim() ||
@@ -270,6 +270,7 @@ export function PortfolioSection() {
 
     return {
       ...payload,
+      ...(status ? { status } : {}),
       title: form.title.trim(),
       slug,
       shortDescription: form.shortDescription.trim(),
@@ -465,11 +466,11 @@ export function PortfolioSection() {
               <div>
                 <Label>Status</Label>
                 <Select
-                  value={form.status || 'ongoing'}
+                  value={form.status}
                   onValueChange={(value) => updateForm('status', value as PortfolioStatus)}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="upcoming">Upcoming</SelectItem>

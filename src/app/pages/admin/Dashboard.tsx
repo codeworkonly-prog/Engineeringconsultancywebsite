@@ -9,6 +9,7 @@ import {
   Users,
   LogOut,
   Home,
+  CircleHelp,
 } from 'lucide-react';
 import { Section } from './types';
 import { DashboardHome } from './DashboardHome';
@@ -16,6 +17,7 @@ import { TeamSection } from './TeamSection';
 import { PortfolioSection } from './PortfolioSection';
 import { ClientsManagement } from './Clients';
 import { SectorsManagement } from './Sectors';
+import { FaqsSection } from './FaqsSection';
 
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
@@ -24,6 +26,7 @@ const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: 'team', label: 'Team', icon: <Users className="h-5 w-5" /> },
   { id: 'clients', label: 'Clients', icon: <Briefcase className="h-5 w-5" /> },
   { id: 'sectors', label: 'Sectors', icon: <Briefcase className="h-5 w-5" /> },
+  { id: 'faqs', label: 'FAQs', icon: <CircleHelp className="h-5 w-5" /> },
 ];
 
 const SECTION_LABELS: Record<Section, string> = {
@@ -32,6 +35,7 @@ const SECTION_LABELS: Record<Section, string> = {
   team: 'Team',
   clients: 'Clients',
   sectors: 'Sectors',
+  faqs: 'FAQs',
 };
 
 export function Dashboard() {
@@ -96,6 +100,7 @@ export function Dashboard() {
           {activeSection === 'team' && <TeamSection />}
           {activeSection === 'clients' && <ClientsManagement />}
           {activeSection === 'sectors' && <SectorsManagement />}
+          {activeSection === 'faqs' && <FaqsSection />}
         </div>
       </main>
     </div>

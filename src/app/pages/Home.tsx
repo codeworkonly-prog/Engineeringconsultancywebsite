@@ -9,6 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../components/ui/accordion';
 import { CheckCircle, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 import { PortfolioItem, PortfolioType } from '../../types/portfolio.types';
@@ -23,7 +29,7 @@ const portfolioTypeLabels: Record<PortfolioType, string> = {
 };
 
 export function Home() {
-  const { clients, portfolio } = useContent();
+  const { clients, portfolio, homeFaqs } = useContent();
   const [selectedPortfolioType, setSelectedPortfolioType] = useState<PortfolioType>('project');
 
   const featuredPortfolioItems = portfolio
@@ -91,6 +97,22 @@ export function Home() {
             ],
           })}
         </script>
+        {homeFaqs.length > 0 && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: homeFaqs.map((faq) => ({
+                "@type": "Question",
+                name: faq.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: faq.answer,
+                },
+              })),
+            })}
+          </script>
+        )}
       </Helmet>
 
       <div>
@@ -341,6 +363,32 @@ export function Home() {
                   </Link>
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {homeFaqs.length > 0 && (
+          <section className="py-16 bg-white">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+                <p className="text-gray-600">
+                  Helpful answers about our engineering consultancy, project support, and training services.
+                </p>
+              </div>
+
+              <Accordion type="single" collapsible className="rounded-lg border bg-white px-4">
+                {homeFaqs.map((faq) => (
+                  <AccordionItem key={faq.id} value={faq.id}>
+                    <AccordionTrigger className="text-base font-semibold text-gray-900 hover:text-brand-600">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-base leading-relaxed text-gray-600">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </section>
         )}

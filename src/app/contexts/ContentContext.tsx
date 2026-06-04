@@ -95,6 +95,14 @@ export interface Event {
   slug: string;
 }
 
+export interface HomeFaq {
+  id: string;
+  question: string;
+  answer: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface ContentContextType {
   teamMembers: TeamMember[];
   projects: Project[];
@@ -103,6 +111,7 @@ interface ContentContextType {
   clients: Client[];
   sectors: Sector[];
   portfolio: PortfolioItem[];
+  homeFaqs: HomeFaq[];
 
   addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
   updateTeamMember: (
@@ -150,6 +159,10 @@ interface ContentContextType {
     item: Omit<PortfolioItem, "id">
   ) => Promise<void>;
   deletePortfolioItem: (id: string) => Promise<void>;
+
+  addHomeFaq: (faq: Omit<HomeFaq, "id">) => Promise<void>;
+  updateHomeFaq: (id: string, faq: Omit<HomeFaq, "id">) => Promise<void>;
+  deleteHomeFaq: (id: string) => Promise<void>;
 }
 
 /* =========================
@@ -176,6 +189,7 @@ export function ContentProvider({
   const [clients, setClients] = useState<Client[]>([]);
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
+  const [homeFaqs, setHomeFaqs] = useState<HomeFaq[]>([]);
 
   /* =========================
      Fetch Data
@@ -189,6 +203,7 @@ export function ContentProvider({
     fetchClients();
     fetchSectors();
     fetchPortfolio();
+    fetchHomeFaqs();
   }, []);
 
   /* =========================
@@ -817,6 +832,73 @@ export function ContentProvider({
   };
 
   /* =========================
+     HOME FAQS
+  ========================= */
+
+  const sortHomeFaqs = (items: HomeFaq[]) =>
+    [...items].sort((a, b) =>
+      (a.createdAt || '').localeCompare(b.createdAt || '')
+    );
+
+  const fetchHomeFaqs = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "homeFaqs"));
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<HomeFaq, "id">),
+      }));
+
+      setHomeFaqs(sortHomeFaqs(data));
+    } catch (error) {
+      console.error("Error fetching home FAQs:", error);
+    }
+  };
+
+  const addHomeFaq = async (faq: Omit<HomeFaq, "id">) => {
+    try {
+      const docRef = await addDoc(collection(db, "homeFaqs"), faq);
+
+      setHomeFaqs((prev) =>
+        sortHomeFaqs([
+          ...prev,
+          {
+            ...faq,
+            id: docRef.id,
+          },
+        ])
+      );
+    } catch (error) {
+      console.error("Error adding home FAQ:", error);
+      throw error;
+    }
+  };
+
+  const updateHomeFaq = async (id: string, faq: Omit<HomeFaq, "id">) => {
+    try {
+      await updateDoc(doc(db, "homeFaqs", id), { ...faq });
+
+      setHomeFaqs((prev) =>
+        sortHomeFaqs(prev.map((item) => (item.id === id ? { ...faq, id } : item)))
+      );
+    } catch (error) {
+      console.error("Error updating home FAQ:", error);
+      throw error;
+    }
+  };
+
+  const deleteHomeFaq = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "homeFaqs", id));
+
+      setHomeFaqs((prev) => prev.filter((faq) => faq.id !== id));
+    } catch (error) {
+      console.error("Error deleting home FAQ:", error);
+      throw error;
+    }
+  };
+
+  /* =========================
      Provider Return
   ========================= */
 
@@ -829,6 +911,7 @@ export function ContentProvider({
         events,
         clients,
         portfolio,
+        homeFaqs,
 
         addTeamMember,
         updateTeamMember,
@@ -857,6 +940,10 @@ export function ContentProvider({
         addPortfolioItem,
         updatePortfolioItem,
         deletePortfolioItem,
+
+        addHomeFaq,
+        updateHomeFaq,
+        deleteHomeFaq,
       }}
     >
       {children}

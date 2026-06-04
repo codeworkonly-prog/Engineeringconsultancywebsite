@@ -86,8 +86,6 @@ export const defaultPortfolioFormData: PortfolioItem = {
   clientId: '',
   fiscalYear: '',
 
-  status: 'ongoing',
-
   location: '',
   startDate: '',
   endDate: '',
