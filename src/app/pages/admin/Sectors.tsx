@@ -13,18 +13,34 @@ import {
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import { Edit, Trash2, Plus } from 'lucide-react';
+import { getUniqueSlug, slugPattern, slugify } from '../../../utils/slug';
 
 export function SectorsManagement() {
   const { sectors, addSector, updateSector, deleteSector } = useContent();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const reset = () => {
     setEditingId(null);
     setName('');
+    setSlug('');
+  };
+
+  const generateSlug = (value: string, existingId?: string) =>
+    getUniqueSlug(
+      value,
+      sectors
+        .filter((sector) => sector.id !== existingId)
+        .map((sector) => sector.slug || slugify(sector.name))
+    );
+
+  const handleNameChange = (value: string) => {
+    setName(value);
+    setSlug(generateSlug(value, editingId || undefined));
   };
 
   const handleEdit = (id: string) => {
@@ -32,20 +48,26 @@ export function SectorsManagement() {
     if (!s) return;
     setEditingId(id);
     setName(s.name || '');
+    setSlug(s.slug || slugify(s.name || ''));
   };
 
   const handleSave = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
     const trimmed = name.trim();
+    const trimmedSlug = slug.trim();
     if (!trimmed) return toast.error('Sector name is required');
+    if (!trimmedSlug) return toast.error('Sector slug is required');
+    if (!slugPattern.test(trimmedSlug)) {
+      return toast.error('Use lowercase letters, numbers, and hyphens only for the slug');
+    }
 
     try {
       if (editingId) {
-        await updateSector(editingId, { name: trimmed });
+        await updateSector(editingId, { name: trimmed, slug: trimmedSlug });
         toast.success('Sector updated');
       } else {
-        await addSector({ name: trimmed });
+        await addSector({ name: trimmed, slug: trimmedSlug });
         toast.success('Sector added');
       }
 
@@ -85,7 +107,17 @@ export function SectorsManagement() {
           <form onSubmit={(e) => handleSave(e)} className="space-y-4">
             <div>
               <Label>Name *</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} required />
+              <Input value={name} onChange={(e) => handleNameChange(e.target.value)} required />
+            </div>
+
+            <div>
+              <Label>Slug *</Label>
+              <Input
+                value={slug}
+                onChange={(e) => setSlug(slugify(e.target.value))}
+                placeholder="sector-name"
+                required
+              />
             </div>
 
             <div className="flex gap-2">
@@ -110,6 +142,7 @@ export function SectorsManagement() {
                   <div className="flex items-center gap-4">
                     <div>
                       <div className="font-semibold">{s.name}</div>
+                      <div className="text-xs text-gray-500">/portfolio?sector={s.slug || slugify(s.name)}</div>
                     </div>
                   </div>
 

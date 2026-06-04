@@ -17,6 +17,7 @@ import {
 
 import { db } from "../../firebase"; // Adjust path if needed
 import { PortfolioItem } from "../../types/portfolio.types";
+import { getUniqueSlug, slugPattern, slugify } from "../../utils/slug";
 
 /* =========================
    Interfaces
@@ -37,11 +38,13 @@ export interface Client {
   name: string;
   logoUrl: string;
   website: string;
+  slug?: string;
 }
 
 export interface Sector {
   id: string;
   name: string;
+  slug?: string;
 }
 
 export interface Project {
@@ -505,6 +508,15 @@ export function ContentProvider({
     client: Omit<Client, "id">
   ): Promise<string> => {
     try {
+      const slug = client.slug?.trim() || getUniqueSlug(
+        client.name,
+        clients.map((c) => c.slug || slugify(c.name))
+      );
+
+      if (!slug || !slugPattern.test(slug)) {
+        throw new Error('Client slug must use lowercase letters, numbers, and hyphens only');
+      }
+
       // enforce unique client names (case-insensitive)
       const exists = clients.some(
         (c) => c.name.trim().toLowerCase() === client.name.trim().toLowerCase()
@@ -514,12 +526,21 @@ export function ContentProvider({
         throw new Error('Client with this name already exists');
       }
 
-      const docRef = await addDoc(collection(db, "clients"), client);
+      const slugExists = clients.some(
+        (c) => (c.slug || slugify(c.name)).trim().toLowerCase() === slug.toLowerCase()
+      );
+
+      if (slugExists) {
+        throw new Error('Client with this slug already exists');
+      }
+
+      const payload = { ...client, slug };
+      const docRef = await addDoc(collection(db, "clients"), payload);
 
       setClients((prev) => [
         ...prev,
         {
-          ...client,
+          ...payload,
           id: docRef.id,
         },
       ]);
@@ -535,6 +556,16 @@ export function ContentProvider({
     client: Omit<Client, "id">
   ) => {
     try {
+      const slug = client.slug?.trim() || getUniqueSlug(
+        client.name,
+        clients.map((c) => c.slug || slugify(c.name)),
+        clients.find((c) => c.id === id)?.slug || slugify(clients.find((c) => c.id === id)?.name || '')
+      );
+
+      if (!slug || !slugPattern.test(slug)) {
+        throw new Error('Client slug must use lowercase letters, numbers, and hyphens only');
+      }
+
       // enforce unique client names (case-insensitive), excluding current
       const exists = clients.some(
         (c) => c.id !== id && c.name.trim().toLowerCase() === client.name.trim().toLowerCase()
@@ -544,12 +575,24 @@ export function ContentProvider({
         throw new Error('Another client with this name already exists');
       }
 
+      const slugExists = clients.some(
+        (c) =>
+          c.id !== id &&
+          (c.slug || slugify(c.name)).trim().toLowerCase() === slug.toLowerCase()
+      );
+
+      if (slugExists) {
+        throw new Error('Another client with this slug already exists');
+      }
+
+      const payload = { ...client, slug };
+
       await updateDoc(doc(db, "clients", id), {
-        ...client,
+        ...payload,
       });
 
       setClients((prev) =>
-        prev.map((c) => (c.id === id ? { ...client, id } : c))
+        prev.map((c) => (c.id === id ? { ...payload, id } : c))
       );
     } catch (error) {
       console.error("Error updating client:", error);
@@ -596,6 +639,15 @@ export function ContentProvider({
 
   const addSector = async (sector: Omit<Sector, "id">): Promise<string> => {
     try {
+      const slug = sector.slug?.trim() || getUniqueSlug(
+        sector.name,
+        sectors.map((s) => s.slug || slugify(s.name))
+      );
+
+      if (!slug || !slugPattern.test(slug)) {
+        throw new Error('Sector slug must use lowercase letters, numbers, and hyphens only');
+      }
+
       const exists = sectors.some(
         (s) => s.name.trim().toLowerCase() === sector.name.trim().toLowerCase()
       );
@@ -604,12 +656,21 @@ export function ContentProvider({
         throw new Error('Sector with this name already exists');
       }
 
-      const docRef = await addDoc(collection(db, "sectors"), sector);
+      const slugExists = sectors.some(
+        (s) => (s.slug || slugify(s.name)).trim().toLowerCase() === slug.toLowerCase()
+      );
+
+      if (slugExists) {
+        throw new Error('Sector with this slug already exists');
+      }
+
+      const payload = { ...sector, slug };
+      const docRef = await addDoc(collection(db, "sectors"), payload);
 
       setSectors((prev) => [
         ...prev,
         {
-          ...sector,
+          ...payload,
           id: docRef.id,
         },
       ]);
@@ -623,6 +684,16 @@ export function ContentProvider({
 
   const updateSector = async (id: string, sector: Omit<Sector, "id">) => {
     try {
+      const slug = sector.slug?.trim() || getUniqueSlug(
+        sector.name,
+        sectors.map((s) => s.slug || slugify(s.name)),
+        sectors.find((s) => s.id === id)?.slug || slugify(sectors.find((s) => s.id === id)?.name || '')
+      );
+
+      if (!slug || !slugPattern.test(slug)) {
+        throw new Error('Sector slug must use lowercase letters, numbers, and hyphens only');
+      }
+
       const exists = sectors.some(
         (s) => s.id !== id && s.name.trim().toLowerCase() === sector.name.trim().toLowerCase()
       );
@@ -631,9 +702,21 @@ export function ContentProvider({
         throw new Error('Another sector with this name already exists');
       }
 
-      await updateDoc(doc(db, "sectors", id), { ...sector });
+      const slugExists = sectors.some(
+        (s) =>
+          s.id !== id &&
+          (s.slug || slugify(s.name)).trim().toLowerCase() === slug.toLowerCase()
+      );
 
-      setSectors((prev) => prev.map((s) => (s.id === id ? { ...sector, id } : s)));
+      if (slugExists) {
+        throw new Error('Another sector with this slug already exists');
+      }
+
+      const payload = { ...sector, slug };
+
+      await updateDoc(doc(db, "sectors", id), { ...payload });
+
+      setSectors((prev) => prev.map((s) => (s.id === id ? { ...payload, id } : s)));
     } catch (error) {
       console.error("Error updating sector:", error);
       throw error;

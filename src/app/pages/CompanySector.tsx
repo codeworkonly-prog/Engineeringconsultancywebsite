@@ -1,5 +1,7 @@
 import { Card, CardContent } from '../components/ui/card';
+import { Link } from 'react-router';
 import { CheckCircle, Building2, Factory, Droplet, Zap, Home, Hammer } from 'lucide-react';
+import { slugify } from '../../utils/slug';
 
 export function CompanySector() {
   const sectors = [
@@ -127,23 +129,25 @@ export function CompanySector() {
             {sectors.map((sector, index) => {
               const Icon = sector.icon;
               return (
-                <Card key={index} className="hover:shadow-lg transition-shadow duration-200">
-                  <CardContent className="pt-6">
-                    <div className="bg-brand-100 p-3 rounded-full w-fit mb-4">
-                      <Icon className="h-8 w-8 text-brand-600" />
-                    </div>
-                    <h3 className="font-semibold text-xl mb-2">{sector.title}</h3>
-                    <p className="text-sm text-gray-600 mb-4">{sector.description}</p>
-                    <ul className="space-y-2">
-                      {sector.services.map((service, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                          <CheckCircle className="h-4 w-4 text-brand-500 mt-0.5 flex-shrink-0" />
-                          <span>{service}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
+                <Link key={index} to={`/portfolio?sector=${slugify(sector.title)}`} className="block h-full">
+                  <Card className="h-full hover:shadow-lg transition-shadow duration-200">
+                    <CardContent className="pt-6">
+                      <div className="bg-brand-100 p-3 rounded-full w-fit mb-4">
+                        <Icon className="h-8 w-8 text-brand-600" />
+                      </div>
+                      <h3 className="font-semibold text-xl mb-2">{sector.title}</h3>
+                      <p className="text-sm text-gray-600 mb-4">{sector.description}</p>
+                      <ul className="space-y-2">
+                        {sector.services.map((service, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+                            <CheckCircle className="h-4 w-4 text-brand-500 mt-0.5 flex-shrink-0" />
+                            <span>{service}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </Link>
               );
             })}
           </div>

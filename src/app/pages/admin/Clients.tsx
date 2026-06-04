@@ -13,12 +13,14 @@ import {
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import { Edit, Trash2, Plus } from 'lucide-react';
+import { getUniqueSlug, slugPattern, slugify } from '../../../utils/slug';
 
 export function ClientsManagement() {
   const { clients, addClient, updateClient, deleteClient } = useContent();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [website, setWebsite] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -27,8 +29,22 @@ export function ClientsManagement() {
   const reset = () => {
     setEditingId(null);
     setName('');
+    setSlug('');
     setLogoUrl('');
     setWebsite('');
+  };
+
+  const generateSlug = (value: string, existingId?: string) =>
+    getUniqueSlug(
+      value,
+      clients
+        .filter((client) => client.id !== existingId)
+        .map((client) => client.slug || slugify(client.name))
+    );
+
+  const handleNameChange = (value: string) => {
+    setName(value);
+    setSlug(generateSlug(value, editingId || undefined));
   };
 
   const handleEdit = (id: string) => {
@@ -36,6 +52,7 @@ export function ClientsManagement() {
     if (!c) return;
     setEditingId(id);
     setName(c.name || '');
+    setSlug(c.slug || slugify(c.name || ''));
     setLogoUrl(c.logoUrl || '');
     setWebsite(c.website || '');
   };
@@ -44,14 +61,19 @@ export function ClientsManagement() {
     e?.preventDefault();
 
     const trimmed = name.trim();
+    const trimmedSlug = slug.trim();
     if (!trimmed) return toast.error('Client name is required');
+    if (!trimmedSlug) return toast.error('Client slug is required');
+    if (!slugPattern.test(trimmedSlug)) {
+      return toast.error('Use lowercase letters, numbers, and hyphens only for the slug');
+    }
 
     try {
       if (editingId) {
-        await updateClient(editingId, { name: trimmed, logoUrl: logoUrl.trim(), website: website.trim() });
+        await updateClient(editingId, { name: trimmed, slug: trimmedSlug, logoUrl: logoUrl.trim(), website: website.trim() });
         toast.success('Client updated');
       } else {
-        await addClient({ name: trimmed, logoUrl: logoUrl.trim(), website: website.trim() });
+        await addClient({ name: trimmed, slug: trimmedSlug, logoUrl: logoUrl.trim(), website: website.trim() });
         toast.success('Client added');
       }
 
@@ -91,7 +113,17 @@ export function ClientsManagement() {
           <form onSubmit={(e) => handleSave(e)} className="space-y-4">
             <div>
               <Label>Name *</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} required />
+              <Input value={name} onChange={(e) => handleNameChange(e.target.value)} required />
+            </div>
+
+            <div>
+              <Label>Slug *</Label>
+              <Input
+                value={slug}
+                onChange={(e) => setSlug(slugify(e.target.value))}
+                placeholder="client-name"
+                required
+              />
             </div>
 
             <div>
@@ -131,6 +163,7 @@ export function ClientsManagement() {
                     )}
                     <div>
                       <div className="font-semibold">{c.name}</div>
+                      <div className="text-xs text-gray-500">/portfolio?client={c.slug || slugify(c.name)}</div>
                       <div className="text-xs text-gray-500">{c.website}</div>
                     </div>
                   </div>

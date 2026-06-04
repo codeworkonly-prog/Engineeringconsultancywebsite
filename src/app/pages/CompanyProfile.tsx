@@ -3,11 +3,15 @@ import { Link } from 'react-router';
 import { CheckCircle, Building2, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 import { FlagshipProjectSection } from '../pages/admin/FlagshipProjectSection';
+import { slugify } from '../../utils/slug';
 
 export function CompanyProfile() {
    const { clients } = useContent();
   const getClientPortfolioLink = (clientId: string) =>
-    `/portfolio?client=${encodeURIComponent(clientId)}`;
+    `/portfolio?client=${encodeURIComponent(
+      clients.find((client) => client.id === clientId)?.slug ||
+        slugify(clients.find((client) => client.id === clientId)?.name || clientId)
+    )}`;
 
   const services = [
     {

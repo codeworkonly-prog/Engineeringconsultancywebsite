@@ -14,6 +14,7 @@ import { useContent } from '../contexts/ContentContext';
 import { PortfolioItem, PortfolioType } from '../../types/portfolio.types';
 const engineering = new URL('../../imports/engineering.webp', import.meta.url).href;
 import { Helmet } from 'react-helmet-async';
+import { slugify } from '../../utils/slug';
 
 const portfolioTypeLabels: Record<PortfolioType, string> = {
   project: 'Project',
@@ -36,7 +37,10 @@ export function Home() {
   };
 
   const getClientPortfolioLink = (clientId: string) =>
-    `/portfolio?client=${encodeURIComponent(clientId)}`;
+    `/portfolio?client=${encodeURIComponent(
+      clients.find((client) => client.id === clientId)?.slug ||
+        slugify(clients.find((client) => client.id === clientId)?.name || clientId)
+    )}`;
 
   return (
     <>

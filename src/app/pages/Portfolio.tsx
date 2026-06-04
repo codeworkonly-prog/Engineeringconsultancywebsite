@@ -33,6 +33,7 @@ import {
   getUniqueFilterValues,
   sortPortfolioItems,
 } from '../../services/portfolio.service';
+import { slugify } from '../../utils/slug';
 
 const PAGE_SIZE = 10;
 const COMPANY_START_BS_YEAR = 2072;
@@ -110,24 +111,61 @@ function getPortfolioCsv(items: PortfolioItem[], clients: { id: string; name: st
 export function Portfolio() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const selectedClientId = searchParams.get('client') || undefined;
-  const { portfolio, clients } = useContent();
+  const selectedClientParam = searchParams.get('client') || undefined;
+  const selectedSectorParam = searchParams.get('sector') || undefined;
+  const { portfolio, clients, sectors } = useContent();
   const [page, setPage] = useState(1);
   const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
   const [filters, setFilters] = useState<PortfolioFilters>({
     type: 'all',
     sector: undefined,
     fiscalYear: undefined,
-    client: selectedClientId,
+    client: undefined,
     search: '',
   });
 
-  useEffect(() => {
-    setFilters((current) => ({ ...current, client: selectedClientId }));
-    setPage(1);
-  }, [selectedClientId]);
-
   const filterValues = useMemo(() => getUniqueFilterValues(portfolio), [portfolio]);
+
+  const selectedClientId = useMemo(() => {
+    if (!selectedClientParam) return undefined;
+
+    const client = clients.find(
+      (item) =>
+        item.id === selectedClientParam ||
+        item.slug === selectedClientParam ||
+        slugify(item.name) === selectedClientParam
+    );
+
+    return client?.id || selectedClientParam;
+  }, [clients, selectedClientParam]);
+
+  const selectedSector = useMemo(() => {
+    if (!selectedSectorParam) return undefined;
+
+    const savedSector = sectors.find(
+      (sector) =>
+        sector.name === selectedSectorParam ||
+        sector.slug === selectedSectorParam ||
+        slugify(sector.name) === selectedSectorParam
+    );
+
+    if (savedSector) return savedSector.name;
+
+    const portfolioSector = filterValues.sectors.find(
+      (sector) => sector === selectedSectorParam || slugify(sector) === selectedSectorParam
+    );
+
+    return portfolioSector || selectedSectorParam;
+  }, [filterValues.sectors, sectors, selectedSectorParam]);
+
+  useEffect(() => {
+    setFilters((current) => ({
+      ...current,
+      client: selectedClientId,
+      sector: selectedSector,
+    }));
+    setPage(1);
+  }, [selectedClientId, selectedSector]);
 
   const filteredItems = useMemo(() => {
     const filtered = filterPortfolioItems(portfolio, filters);
@@ -180,9 +218,23 @@ export function Portfolio() {
       const nextParams = new URLSearchParams(searchParams);
 
       if (updates.client) {
-        nextParams.set('client', updates.client);
+        const client = clients.find((item) => item.id === updates.client);
+        nextParams.set('client', client?.slug || slugify(client?.name || updates.client));
       } else {
         nextParams.delete('client');
+      }
+
+      setSearchParams(nextParams, { replace: true });
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updates, 'sector')) {
+      const nextParams = new URLSearchParams(searchParams);
+
+      if (updates.sector) {
+        const sector = sectors.find((item) => item.name === updates.sector);
+        nextParams.set('sector', sector?.slug || slugify(updates.sector));
+      } else {
+        nextParams.delete('sector');
       }
 
       setSearchParams(nextParams, { replace: true });
@@ -195,6 +247,7 @@ export function Portfolio() {
   const clearFilters = () => {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.delete('client');
+    nextParams.delete('sector');
     setSearchParams(nextParams, { replace: true });
 
     setFilters({
