@@ -137,16 +137,31 @@ export function PortfolioSection() {
   }, [portfolio, customFiscalYears]);
 
   const sectorOptions = useMemo(() => {
-    const setS = new Set<string>();
+    const options = sectors
+      .map((s) => s.name.trim())
+      .filter(Boolean);
 
-    portfolio.forEach((item) => {
-      if (item.sector?.trim()) setS.add(item.sector.trim());
-    });
+    const currentValue = form.sector?.trim();
+    if (currentValue && !options.some((option) => option.toLowerCase() === currentValue.toLowerCase())) {
+      options.push(currentValue);
+    }
 
-    sectors.forEach((s) => s.name && setS.add(s.name.trim()));
+    return Array.from(new Set(options)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }, [sectors, form.sector]);
 
-    return Array.from(setS).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-  }, [portfolio, sectors]);
+  const findSectorByName = (name: string) =>
+    sectors.find(
+      (s) => s.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+
+  const ensureSectorRecord = async (name?: string) => {
+    const sectorName = name?.trim();
+    if (!sectorName) return;
+
+    if (findSectorByName(sectorName)) return;
+
+    await addSector({ name: sectorName });
+  };
 
   const handleAddSector = async () => {
     const name = newSectorName.trim();
@@ -355,6 +370,7 @@ export function PortfolioSection() {
     }
 
     try {
+      await ensureSectorRecord(form.sector?.trim());
       const payload = getPayload();
 
       if (editingId) {
