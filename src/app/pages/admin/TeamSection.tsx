@@ -5,6 +5,13 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Checkbox } from '../../components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from '../../components/ui/dialog';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import { Edit, Trash2, X, UserCheck } from 'lucide-react';
@@ -16,6 +23,8 @@ export function TeamSection() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<TeamForm>(defaultTeamForm);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // Generate unique slug
   const generateSlug = (name: string, existingId?: string) => {
@@ -100,6 +109,27 @@ export function TeamSection() {
   const cancelEdit = () => {
     setEditingId(null);
     setForm(defaultTeamForm);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTargetId) return;
+
+    try {
+      await deleteTeamMember(deleteTargetId);
+      toast.success('Team member deleted');
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
+    } catch (error) {
+      console.error(error);
+      toast.error('Delete failed');
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
+    }
+  };
+
+  const openDeleteDialog = (id: string) => {
+    setDeleteTargetId(id);
+    setDeleteDialogOpen(true);
   };
 
   return (
@@ -323,10 +353,7 @@ export function TeamSection() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        deleteTeamMember(member.id);
-                        toast.success('Team member deleted');
-                      }}
+                      onClick={() => openDeleteDialog(member.id)}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
@@ -337,6 +364,27 @@ export function TeamSection() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Team Member</DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-gray-600">
+            Are you sure you want to delete this team member? This action cannot be undone.
+          </p>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

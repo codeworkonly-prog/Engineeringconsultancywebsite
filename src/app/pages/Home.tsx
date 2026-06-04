@@ -17,7 +17,7 @@ import { Helmet } from 'react-helmet-async';
 
 const portfolioTypeLabels: Record<PortfolioType, string> = {
   project: 'Project',
-  consulting: 'Consulting Services',
+  consulting: 'Consulting',
   training: 'Training',
 };
 
@@ -31,9 +31,12 @@ export function Home() {
 
   const getPortfolioLink = (item: PortfolioItem) => {
     if (item.type === 'project') return `/projects/${item.slug}`;
-    if (item.type === 'consulting') return `/consulting-service/${item.slug}`;
+    if (item.type === 'consulting') return `/consulting/${item.slug}`;
     return `/training/${item.slug}`;
   };
+
+  const getClientPortfolioLink = (clientId: string) =>
+    `/portfolio?client=${encodeURIComponent(clientId)}`;
 
   return (
     <>
@@ -321,11 +324,9 @@ export function Home() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-center">
                 {clients.map((client) => (
-                  <a
+                  <Link
                     key={client.id}
-                    href={client.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    to={getClientPortfolioLink(client.id)}
                     className="flex items-center justify-center p-6 bg-white rounded-lg hover:shadow-lg transition-shadow duration-200"
                   >
                     <img
@@ -333,7 +334,7 @@ export function Home() {
                       alt={client.name}
                       className="max-h-16 max-w-full object-contain"
                     />
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>

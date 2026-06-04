@@ -86,6 +86,8 @@ export function PortfolioSection() {
   const [form, setForm] = useState<PortfolioItem>(createEmptyForm);
   const [errors, setErrors] = useState<PortfolioFormErrors>({});
   const selectedTypeLabel = formatType(form.type).toLowerCase();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // Client modal state for adding a new client directly from portfolio form
   const [clientModalOpen, setClientModalOpen] = useState(false);
@@ -397,17 +399,26 @@ export function PortfolioSection() {
     setEditingId(item.id);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this portfolio item?')) return;
+  const handleDelete = async () => {
+    if (!deleteTargetId) return;
 
     try {
-      await deletePortfolioItem(id);
-      if (editingId === id) resetForm();
+      await deletePortfolioItem(deleteTargetId);
+      if (editingId === deleteTargetId) resetForm();
       toast.success('Portfolio item deleted');
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
     } catch (error) {
       console.error(error);
       toast.error('Delete failed');
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
     }
+  };
+
+  const openDeleteDialog = (id: string) => {
+    setDeleteTargetId(id);
+    setDeleteDialogOpen(true);
   };
 
   const filteredPortfolio = useMemo(() => {
@@ -950,7 +961,7 @@ export function PortfolioSection() {
                       size="sm"
                       variant="ghost"
                       type="button"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => openDeleteDialog(item.id)}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
@@ -961,6 +972,27 @@ export function PortfolioSection() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Portfolio Item</DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-gray-600">
+            Are you sure you want to delete this portfolio item? This action cannot be undone.
+          </p>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

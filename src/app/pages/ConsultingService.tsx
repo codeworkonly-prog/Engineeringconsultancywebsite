@@ -198,7 +198,7 @@ export function ConsultingService() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {consultingAssignments.map((assignment) => (
-                <Link key={assignment.id} to={`/consulting-service/${assignment.slug}`}>
+                <Link key={assignment.id} to={`/consulting/${assignment.slug}`}>
                   <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full group">
                     <div className="relative overflow-hidden">
                       {assignment.featuredImage ? (

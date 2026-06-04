@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -56,7 +56,7 @@ function getItemLink(item: PortfolioItem) {
     case 'project':
       return `/projects/${item.slug}`;
     case 'consulting':
-      return `/consulting-service/${item.slug}`;
+      return `/consulting/${item.slug}`;
     case 'training':
       return `/training/${item.slug}`;
     default:
@@ -109,6 +109,8 @@ function getPortfolioCsv(items: PortfolioItem[], clients: { id: string; name: st
 
 export function Portfolio() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedClientId = searchParams.get('client') || undefined;
   const { portfolio, clients } = useContent();
   const [page, setPage] = useState(1);
   const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
@@ -116,9 +118,14 @@ export function Portfolio() {
     type: 'all',
     sector: undefined,
     fiscalYear: undefined,
-    client: undefined,
+    client: selectedClientId,
     search: '',
   });
+
+  useEffect(() => {
+    setFilters((current) => ({ ...current, client: selectedClientId }));
+    setPage(1);
+  }, [selectedClientId]);
 
   const filterValues = useMemo(() => getUniqueFilterValues(portfolio), [portfolio]);
 
@@ -169,11 +176,27 @@ export function Portfolio() {
   }, [portfolio]);
 
   const updateFilters = (updates: Partial<PortfolioFilters>) => {
+    if (Object.prototype.hasOwnProperty.call(updates, 'client')) {
+      const nextParams = new URLSearchParams(searchParams);
+
+      if (updates.client) {
+        nextParams.set('client', updates.client);
+      } else {
+        nextParams.delete('client');
+      }
+
+      setSearchParams(nextParams, { replace: true });
+    }
+
     setFilters((current) => ({ ...current, ...updates }));
     setPage(1);
   };
 
   const clearFilters = () => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete('client');
+    setSearchParams(nextParams, { replace: true });
+
     setFilters({
       type: 'all',
       sector: undefined,

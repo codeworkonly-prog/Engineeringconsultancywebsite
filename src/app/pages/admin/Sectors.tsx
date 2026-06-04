@@ -3,6 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Button } from '../../components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from '../../components/ui/dialog';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import { Edit, Trash2, Plus } from 'lucide-react';
@@ -12,6 +19,8 @@ export function SectorsManagement() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const reset = () => {
     setEditingId(null);
@@ -46,15 +55,24 @@ export function SectorsManagement() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this sector?')) return;
+  const handleDelete = async () => {
+    if (!deleteTargetId) return;
 
     try {
-      await deleteSector(id);
+      await deleteSector(deleteTargetId);
       toast.success('Sector deleted');
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
     } catch (err: any) {
       toast.error(err?.message || 'Delete failed');
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
     }
+  };
+
+  const openDeleteDialog = (id: string) => {
+    setDeleteTargetId(id);
+    setDeleteDialogOpen(true);
   };
 
   return (
@@ -99,7 +117,7 @@ export function SectorsManagement() {
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(s.id)}>
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(s.id)}>
+                    <Button variant="ghost" size="sm" onClick={() => openDeleteDialog(s.id)}>
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
                   </div>
@@ -109,6 +127,27 @@ export function SectorsManagement() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Sector</DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-gray-600">
+            Are you sure you want to delete this sector? This action cannot be undone.
+          </p>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

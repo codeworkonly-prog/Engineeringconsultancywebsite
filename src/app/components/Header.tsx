@@ -20,7 +20,7 @@ export function Header() {
     { path: '/about', label: 'About Us' },
     { path: '/company-profile', label: 'Company Profile' },
     { path: '/portfolio', label: 'Portfolio' },
-    { path: '/consulting-service', label: 'Consulting Service' },
+    { path: '/consulting', label: 'Consulting' },
     { path: '/projects', label: 'Projects' },
     { path: '/training', label: 'Training' },
     { path: '/contact', label: 'Contact Us' },

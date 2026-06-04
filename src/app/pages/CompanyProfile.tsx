@@ -6,10 +6,13 @@ import { FlagshipProjectSection } from '../pages/admin/FlagshipProjectSection';
 
 export function CompanyProfile() {
    const { clients } = useContent();
+  const getClientPortfolioLink = (clientId: string) =>
+    `/portfolio?client=${encodeURIComponent(clientId)}`;
+
   const services = [
     {
       category: 'Engineering Consultancy & Infrastructure Design',
-      href: '/consulting-service',
+      href: '/consulting',
       items: [
         'Detailed Engineering Design & Drawings',
         'Feasibility Studies & Master Planning',
@@ -22,7 +25,7 @@ export function CompanyProfile() {
     },
     {
       category: 'Procurement & Bid Support',
-      href: '/consulting-service',
+      href: '/consulting',
       items: [
         'Preparation of Bid Documents',
         'Bid Evaluation & Procurement Support',
@@ -170,11 +173,9 @@ export function CompanyProfile() {
 
            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-center">
               {clients.map((client) => (
-                <a
+                <Link
                   key={client.id}
-                  href={client.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  to={getClientPortfolioLink(client.id)}
                   className="flex items-center justify-center p-6 bg-white rounded-lg hover:shadow-lg transition-shadow duration-200"
                 >
                   <img
@@ -182,7 +183,7 @@ export function CompanyProfile() {
                     alt={client.name}
                     className="max-h-16 max-w-full object-contain"
                   />
-                </a>
+                </Link>
               ))}
             </div>
         </div>
