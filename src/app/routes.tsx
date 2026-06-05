@@ -19,6 +19,7 @@ import { AdminLogin } from './components/AdminLogin';
 import { NotFound } from './pages/NotFound';
 import { Faq } from './pages/Faq'; //
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
       { path: 'portfolio', Component: Portfolio },
       { path: 'contact', Component: Contact },
       { path: 'faq', Component: Faq },
+      { path: 'privacy-policy', Component: PrivacyPolicy },
       { path: '*', Component: NotFound },
     ],
   },

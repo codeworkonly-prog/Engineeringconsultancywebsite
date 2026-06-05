@@ -10,7 +10,9 @@ import {
   collection,
   addDoc,
   getDocs,
+  getDoc,
   updateDoc,
+  setDoc,
   deleteDoc,
   doc,
 } from "firebase/firestore";
@@ -103,6 +105,14 @@ export interface HomeFaq {
   updatedAt?: string;
 }
 
+export interface PrivacyPolicy {
+  content: string;
+  isPublished: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
+}
+
 interface ContentContextType {
   teamMembers: TeamMember[];
   projects: Project[];
@@ -112,6 +122,7 @@ interface ContentContextType {
   sectors: Sector[];
   portfolio: PortfolioItem[];
   homeFaqs: HomeFaq[];
+  privacyPolicy: PrivacyPolicy | null;
 
   addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
   updateTeamMember: (
@@ -163,6 +174,8 @@ interface ContentContextType {
   addHomeFaq: (faq: Omit<HomeFaq, "id">) => Promise<void>;
   updateHomeFaq: (id: string, faq: Omit<HomeFaq, "id">) => Promise<void>;
   deleteHomeFaq: (id: string) => Promise<void>;
+
+  savePrivacyPolicy: (policy: PrivacyPolicy) => Promise<void>;
 }
 
 /* =========================
@@ -190,6 +203,7 @@ export function ContentProvider({
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [homeFaqs, setHomeFaqs] = useState<HomeFaq[]>([]);
+  const [privacyPolicy, setPrivacyPolicy] = useState<PrivacyPolicy | null>(null);
 
   /* =========================
      Fetch Data
@@ -204,6 +218,7 @@ export function ContentProvider({
     fetchSectors();
     fetchPortfolio();
     fetchHomeFaqs();
+    fetchPrivacyPolicy();
   }, []);
 
   /* =========================
@@ -899,6 +914,40 @@ export function ContentProvider({
   };
 
   /* =========================
+     PRIVACY POLICY
+  ========================= */
+
+  const fetchPrivacyPolicy = async () => {
+    try {
+      const snapshot = await getDoc(doc(db, "siteContent", "privacyPolicy"));
+
+      if (!snapshot.exists()) {
+        setPrivacyPolicy(null);
+        return;
+      }
+
+      setPrivacyPolicy(snapshot.data() as PrivacyPolicy);
+    } catch (error) {
+      console.error("Error fetching privacy policy:", error);
+    }
+  };
+
+const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
+  try {
+    // Strip undefined fields — Firestore rejects them with setDoc
+    const payload = Object.fromEntries(
+      Object.entries(policy).filter(([, v]) => v !== undefined)
+    ) as PrivacyPolicy;
+ 
+    await setDoc(doc(db, "siteContent", "privacyPolicy"), payload);
+    setPrivacyPolicy(payload);
+  } catch (error) {
+    console.error("Error saving privacy policy:", error);
+    throw error;
+  }
+};
+
+  /* =========================
      Provider Return
   ========================= */
 
@@ -912,6 +961,7 @@ export function ContentProvider({
         clients,
         portfolio,
         homeFaqs,
+        privacyPolicy,
 
         addTeamMember,
         updateTeamMember,
@@ -944,6 +994,8 @@ export function ContentProvider({
         addHomeFaq,
         updateHomeFaq,
         deleteHomeFaq,
+
+        savePrivacyPolicy,
       }}
     >
       {children}

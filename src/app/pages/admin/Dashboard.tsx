@@ -10,6 +10,7 @@ import {
   LogOut,
   Home,
   CircleHelp,
+  ShieldCheck,
 } from 'lucide-react';
 import { Section } from './types';
 import { DashboardHome } from './DashboardHome';
@@ -18,7 +19,7 @@ import { PortfolioSection } from './PortfolioSection';
 import { ClientsManagement } from './Clients';
 import { SectorsManagement } from './Sectors';
 import { FaqsSection } from './FaqsSection';
-
+import { PrivacyPolicySection } from './PrivacyPolicySection'; // ← new
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
@@ -27,6 +28,7 @@ const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: 'clients', label: 'Clients', icon: <Briefcase className="h-5 w-5" /> },
   { id: 'sectors', label: 'Sectors', icon: <Briefcase className="h-5 w-5" /> },
   { id: 'faqs', label: 'FAQs', icon: <CircleHelp className="h-5 w-5" /> },
+  { id: 'privacy-policy', label: 'Privacy Policy', icon: <ShieldCheck className="h-5 w-5" /> }, // ← new
 ];
 
 const SECTION_LABELS: Record<Section, string> = {
@@ -36,6 +38,7 @@ const SECTION_LABELS: Record<Section, string> = {
   clients: 'Clients',
   sectors: 'Sectors',
   faqs: 'FAQs',
+  'privacy-policy': 'Privacy Policy', // ← new
 };
 
 export function Dashboard() {
@@ -57,7 +60,7 @@ export function Dashboard() {
           <h1 className="text-xl font-bold text-brand-600">Admin Panel</h1>
         </div>
 
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           {NAV_ITEMS.map(({ id, label, icon }) => (
             <button
               key={id}
@@ -95,12 +98,13 @@ export function Dashboard() {
         </header>
 
         <div className="p-8">
-          {activeSection === 'dashboard' && <DashboardHome />}
-          {activeSection === 'portfolio' && <PortfolioSection />}
-          {activeSection === 'team' && <TeamSection />}
-          {activeSection === 'clients' && <ClientsManagement />}
-          {activeSection === 'sectors' && <SectorsManagement />}
-          {activeSection === 'faqs' && <FaqsSection />}
+          {activeSection === 'dashboard'      && <DashboardHome />}
+          {activeSection === 'portfolio'      && <PortfolioSection />}
+          {activeSection === 'team'           && <TeamSection />}
+          {activeSection === 'clients'        && <ClientsManagement />}
+          {activeSection === 'sectors'        && <SectorsManagement />}
+          {activeSection === 'faqs'           && <FaqsSection />}
+          {activeSection === 'privacy-policy' && <PrivacyPolicySection />}  {/* ← new */}
         </div>
       </main>
     </div>

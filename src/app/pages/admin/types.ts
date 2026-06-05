@@ -1,4 +1,11 @@
-export type Section = 'dashboard' | 'portfolio' | 'team' | 'clients' | 'sectors' | 'faqs';
+export type Section =
+  | 'dashboard'
+  | 'portfolio'
+  | 'team'
+  | 'clients'
+  | 'sectors'
+  | 'faqs'
+  | 'privacy-policy';
 
 
 export type TeamForm = {
