@@ -17,6 +17,7 @@ import { PortfolioItemDetail } from './pages/PortfolioItemDetail';
 import { Dashboard } from './pages/admin/Dashboard';
 import { AdminLogin } from './components/AdminLogin';
 import { NotFound } from './pages/NotFound';
+import { Faq } from './pages/Faq'; //
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
       { path: 'projects/:slug', Component: ProjectDetail },
       { path: 'portfolio', Component: Portfolio },
       { path: 'contact', Component: Contact },
+      { path: 'faq', Component: Faq },
       { path: '*', Component: NotFound },
     ],
   },
