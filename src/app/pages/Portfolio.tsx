@@ -4,36 +4,24 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   CalendarClock,
-  Download,
   GraduationCap,
-  Search,
   Users,
   ArrowDown,
   ArrowUp,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../components/ui/select';
 import { useContent } from '../contexts/ContentContext';
 import {
-  PortfolioFilterType,
   PortfolioFilters,
   PortfolioItem,
   PortfolioType,
 } from '../../types/portfolio.types';
 import {
   filterPortfolioItems,
-  formatContractAmount,
   getUniqueFilterValues,
-  sortPortfolioItems,
 } from '../../services/portfolio.service';
 import { slugify } from '../../utils/slug';
+import { PortfolioFilters as PortfolioFiltersComponent } from '../components/PortfolioFilters';
 
 const PAGE_SIZE = 10;
 const COMPANY_START_BS_YEAR = 2072;
@@ -83,15 +71,7 @@ function escapeCsvValue(value?: string | number | boolean) {
 }
 
 function getPortfolioCsv(items: PortfolioItem[], clients: { id: string; name: string }[]) {
-  const headers = [
-    'S.N',
-    'Work',
-    'Type',
-    'Fiscal Year',
-    'Client',
-    'Sector',
-    'Partner Firms',
-  ];
+  const headers = ['S.N', 'Work', 'Type', 'Fiscal Year', 'Client', 'Sector', 'Partner Firms'];
 
   const rows = items.map((item, index) => [
     index + 1,
@@ -190,26 +170,10 @@ export function Portfolio() {
     const trainingPrograms = portfolio.filter((item) => item.type === 'training').length;
 
     return [
-      {
-        label: 'Projects',
-        value: `${projects}+`,
-        icon: BriefcaseBusiness,
-      },
-      {
-        label: 'Consulting Services',
-        value: `${consultingServices}+`,
-        icon: Users,
-      },
-      {
-        label: 'Training Programs',
-        value: `${trainingPrograms}+`,
-        icon: GraduationCap,
-      },
-      {
-        label: 'Years of Experience',
-        value: `${yearsOfExperience}+`,
-        icon: CalendarClock,
-      },
+      { label: 'Projects', value: `${projects}+`, icon: BriefcaseBusiness },
+      { label: 'Consulting Services', value: `${consultingServices}+`, icon: Users },
+      { label: 'Training Programs', value: `${trainingPrograms}+`, icon: GraduationCap },
+      { label: 'Years of Experience', value: `${yearsOfExperience}+`, icon: CalendarClock },
     ];
   }, [portfolio]);
 
@@ -284,7 +248,9 @@ export function Portfolio() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-const isEmpty = filteredItems.length === 0;
+
+  const isEmpty = filteredItems.length === 0;
+
   return (
     <div className="bg-slate-50">
       <section className="relative overflow-hidden bg-slate-950 text-white">
@@ -322,117 +288,23 @@ const isEmpty = filteredItems.length === 0;
           ))}
         </section>
 
-        <section className="mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.25fr_repeat(5,minmax(0,1fr))_auto_auto]">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input
-                value={filters.search || ''}
-                onChange={(event) => updateFilters({ search: event.target.value })}
-                placeholder="Search keyword"
-                className="pl-10"
-              />
-            </div>
-
-            <Select
-              value={filters.type || 'all'}
-              onValueChange={(value) =>
-                updateFilters({ type: value as PortfolioFilterType })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="project">Project</SelectItem>
-                <SelectItem value="consulting">Consulting</SelectItem>
-                <SelectItem value="training">Training</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={filters.sector || 'all'}
-              onValueChange={(value) =>
-                updateFilters({ sector: value === 'all' ? undefined : value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sector" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Sectors</SelectItem>
-                {filterValues.sectors.map((sector) => (
-                  <SelectItem key={sector} value={sector}>
-                    {sector}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={filters.fiscalYear || 'all'}
-              onValueChange={(value) =>
-                updateFilters({ fiscalYear: value === 'all' ? undefined : value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Fiscal Year" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Years</SelectItem>
-                {filterValues.fiscalYears.map((year) => (
-                  <SelectItem key={year} value={year}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={filters.client || 'all'}
-              onValueChange={(value) =>
-                updateFilters({ client: value === 'all' ? undefined : value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Client" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Clients</SelectItem>
-                {clients.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
-              Clear
-            </Button>
-
-            <Button
-              onClick={handleDownloadCsv}
-              disabled={isEmpty}
-              className={isEmpty ? "cursor-not-allowed" : "cursor-pointer"}
-              title={
-                isEmpty
-                  ? "No portfolio items match the selected filters"
-                  : "Download the currently displayed portfolio table data as CSV"
-              }
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
-            </Button>
-          </div>
-
-          <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-4 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
-            <span>
-              Showing {visibleItems.length} of {filteredItems.length} assignments
-            </span>
-            <span>Page {page} of {totalPages}</span>
-          </div>
-        </section>
+        <PortfolioFiltersComponent
+          filters={filters}
+          filterValues={filterValues}
+          clients={clients}
+          pagination={{
+            visibleCount: visibleItems.length,
+            filteredCount: filteredItems.length,
+            page,
+            totalPages,
+            itemLabel: 'assignments',
+          }}
+          hasActiveFilters={hasActiveFilters}
+          isEmpty={isEmpty}
+          onUpdateFilters={updateFilters}
+          onClearFilters={clearFilters}
+          onDownloadCsv={handleDownloadCsv}
+        />
 
         <section className="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="hidden overflow-x-auto md:block">
@@ -442,21 +314,14 @@ const isEmpty = filteredItems.length === 0;
                   <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                     S.N
                   </th>
-
                   <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                     Work
                   </th>
-
                   <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                     Type
                   </th>
-
                   <th
-                    onClick={() =>
-                      setFySortOrder(prev =>
-                        prev === 'desc' ? 'asc' : 'desc'
-                      )
-                    }
+                    onClick={() => setFySortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
                     className="cursor-pointer px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"
                   >
                     <div className="flex items-center gap-2">
@@ -468,15 +333,12 @@ const isEmpty = filteredItems.length === 0;
                       )}
                     </div>
                   </th>
-
                   <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                     Client
                   </th>
-
                   <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                     Sector
                   </th>
-
                   <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                     Partner Firms
                   </th>
@@ -499,13 +361,9 @@ const isEmpty = filteredItems.length === 0;
                       <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-500">
                         {(page - 1) * PAGE_SIZE + index + 1}
                       </td>
-
                       <td className="px-5 py-4">
-                        <div className="font-semibold text-slate-950">
-                          {item.title}
-                        </div>
+                        <div className="font-semibold text-slate-950">{item.title}</div>
                       </td>
-
                       <td className="px-5 py-4">
                         <span
                           className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${categoryStyles[item.type]}`}
@@ -513,19 +371,13 @@ const isEmpty = filteredItems.length === 0;
                           {categoryLabels[item.type]}
                         </span>
                       </td>
-
                       <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">
                         {item.fiscalYear || '-'}
                       </td>
-
                       <td className="px-5 py-4 text-sm text-slate-700">
                         {clients.find((c) => c.id === item.clientId)?.name || '-'}
                       </td>
-
-                      <td className="px-5 py-4 text-sm text-slate-700">
-                        {item.sector || '-'}
-                      </td>
-
+                      <td className="px-5 py-4 text-sm text-slate-700">{item.sector || '-'}</td>
                       <td className="px-5 py-4 text-sm text-slate-700">
                         {item.partnerFirms || '-'}
                       </td>
@@ -569,20 +421,17 @@ const isEmpty = filteredItems.length === 0;
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">Client</p>
-                      <p className="font-medium text-slate-900">{clients.find((c) => c.id === item.clientId)?.name || '-'}</p>
+                      <p className="font-medium text-slate-900">
+                        {clients.find((c) => c.id === item.clientId)?.name || '-'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">Sector</p>
-                      <p className="font-medium text-slate-900">
-                        {item.sector || '-'}
-                      </p>
+                      <p className="font-medium text-slate-900">{item.sector || '-'}</p>
                     </div>
-
                     <div>
                       <p className="text-xs text-slate-500">Partner Firms</p>
-                      <p className="font-medium text-slate-900">
-                        {item.partnerFirms || '-'}
-                      </p>
+                      <p className="font-medium text-slate-900">{item.partnerFirms || '-'}</p>
                     </div>
                   </div>
                 </button>

@@ -2,19 +2,26 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
 import { Search, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { PortfolioFilters as PortfolioFiltersComponent } from '../components/PortfolioFilters';
+import { PortfolioFilters, PortfolioFilterType } from '../../types/portfolio.types';
 
 type ProjectStatus = 'upcoming' | 'ongoing' | 'completed';
 
 export function Projects() {
-  const { projects, galleryImages, portfolio } = useContent();
+  const { projects, galleryImages, portfolio, clients } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [locationFilter, setLocationFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState<'all' | ProjectStatus>('all');
+  const [filters, setFilters] = useState<PortfolioFilters>({
+    type: 'all',
+    sector: undefined,
+    fiscalYear: undefined,
+    client: undefined,
+    search: '',
+  });
   const [visibleCount, setVisibleCount] = useState(6);
 
   const projectItems = [
@@ -28,6 +35,9 @@ export function Projects() {
       slug: project.slug,
       location: project.location,
       completionDate: project.completionDate,
+      sector: undefined as string | undefined,
+      fiscalYear: undefined as string | undefined,
+      clientId: undefined as string | undefined,
     })),
     ...portfolio
       .filter((item) => item.type === 'project')
@@ -37,23 +47,39 @@ export function Projects() {
         description: item.shortDescription,
         projectType: item.projectType || 'Project',
         imageUrl: item.featuredImage,
-        status: item.status || 'ongoing',
+        status: (item.status || 'ongoing') as ProjectStatus,
         slug: item.slug,
         location: item.location,
         completionDate: item.endDate,
+        sector: item.sector,
+        fiscalYear: item.fiscalYear,
+        clientId: item.clientId,
       })),
   ];
 
-  const locations = ['all', ...new Set(projectItems.map((p) => p.location).filter(Boolean))];
-  const projectTypes = ['all', ...new Set(projectItems.map((p) => p.projectType).filter(Boolean))];
+  const filterValues = {
+    sectors: [...new Set(projectItems.map((p) => p.sector).filter(Boolean))] as string[],
+    fiscalYears: [...new Set(projectItems.map((p) => p.fiscalYear).filter(Boolean))] as string[],
+  };
 
   const resetVisibleCount = () => setVisibleCount(6);
+
+  const updateFilters = (updates: Partial<PortfolioFilters>) => {
+    setFilters((current) => ({ ...current, ...updates }));
+    resetVisibleCount();
+  };
 
   const clearFilters = () => {
     setSearchQuery('');
     setTypeFilter('all');
-    setLocationFilter('all');
     setStatusFilter('all');
+    setFilters({
+      type: 'all',
+      sector: undefined,
+      fiscalYear: undefined,
+      client: undefined,
+      search: '',
+    });
     resetVisibleCount();
   };
 
@@ -65,14 +91,35 @@ export function Projects() {
       project.description.toLowerCase().includes(search) ||
       (project.location || '').toLowerCase().includes(search);
     const matchesType = typeFilter === 'all' || project.projectType === typeFilter;
-    const matchesLocation = locationFilter === 'all' || project.location === locationFilter;
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+    const matchesFilterType =
+      filters.type === 'all' || project.projectType === filters.type;
+    const matchesSector = !filters.sector || project.sector === filters.sector;
+    const matchesFiscalYear = !filters.fiscalYear || project.fiscalYear === filters.fiscalYear;
+    const matchesClient = !filters.client || project.clientId === filters.client;
 
-    return matchesSearch && matchesType && matchesLocation && matchesStatus;
+    return (
+      matchesSearch &&
+      matchesType &&
+      matchesStatus &&
+      matchesFilterType &&
+      matchesSector &&
+      matchesFiscalYear &&
+      matchesClient
+    );
   });
 
   const visibleProjects = filteredProjects.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProjects.length;
+
+  const hasActiveFilters =
+    filters.type !== 'all' ||
+    Boolean(filters.sector) ||
+    Boolean(filters.fiscalYear) ||
+    Boolean(filters.client) ||
+    Boolean(filters.search);
+
+  const isEmpty = filteredProjects.length === 0;
 
   const statusLabel = (status: ProjectStatus) => {
     if (status === 'upcoming') return 'Upcoming';
@@ -94,10 +141,7 @@ export function Projects() {
             <h1 className="text-5xl font-bold mb-4">Our Projects</h1>
             <div className="flex items-center gap-2 mb-8">
               <button
-                onClick={() => {
-                  setTypeFilter('Design and Build');
-                  resetVisibleCount();
-                }}
+                onClick={() => { setTypeFilter('Design and Build'); resetVisibleCount(); }}
                 className={`text-xl transition-all ${
                   typeFilter === 'Design and Build'
                     ? 'text-white font-semibold underline underline-offset-4'
@@ -108,10 +152,7 @@ export function Projects() {
               </button>
               <span className="text-xl text-brand-50">|</span>
               <button
-                onClick={() => {
-                  setTypeFilter('Contract');
-                  resetVisibleCount();
-                }}
+                onClick={() => { setTypeFilter('Contract'); resetVisibleCount(); }}
                 className={`text-xl transition-all ${
                   typeFilter === 'Contract'
                     ? 'text-white font-semibold underline underline-offset-4'
@@ -124,10 +165,7 @@ export function Projects() {
                 <>
                   <span className="text-xl text-brand-50">|</span>
                   <button
-                    onClick={() => {
-                      setTypeFilter('all');
-                      resetVisibleCount();
-                    }}
+                    onClick={() => { setTypeFilter('all'); resetVisibleCount(); }}
                     className="text-lg text-brand-100 hover:text-white transition-colors"
                   >
                     View All
@@ -153,78 +191,25 @@ export function Projects() {
         </div>
       </section>
 
-      <section className="bg-white border-b sticky top-16 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-            <div className="flex flex-wrap gap-3 items-center">
-              <span className="text-sm font-medium text-gray-700">Filter by:</span>
-
-              <Select
-                value={typeFilter}
-                onValueChange={(value) => {
-                  setTypeFilter(value);
-                  resetVisibleCount();
-                }}
-              >
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projectTypes.map((projectType) => (
-                    <SelectItem key={projectType} value={projectType}>
-                      {projectType === 'all' ? 'All Types' : projectType}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={locationFilter}
-                onValueChange={(value) => {
-                  setLocationFilter(value);
-                  resetVisibleCount();
-                }}
-              >
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  {locations
-                    .filter((location) => location !== 'all')
-                    .map((location) => (
-                      <SelectItem key={location} value={location as string}>
-                        {location}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={statusFilter}
-                onValueChange={(value) => {
-                  setStatusFilter(value as 'all' | ProjectStatus);
-                  resetVisibleCount();
-                }}
-              >
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="upcoming">Upcoming</SelectItem>
-                  <SelectItem value="ongoing">Ongoing</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="text-sm text-gray-600">
-              Showing {visibleProjects.length} of {filteredProjects.length} projects
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PortfolioFiltersComponent
+          filters={filters}
+          filterValues={filterValues}
+          clients={clients}
+          pagination={{
+            visibleCount: visibleProjects.length,
+            filteredCount: filteredProjects.length,
+            page: 1,
+            totalPages: 1,
+            itemLabel: 'projects',
+          }}
+          hasActiveFilters={hasActiveFilters}
+          isEmpty={isEmpty}
+          onUpdateFilters={updateFilters}
+          onClearFilters={clearFilters}
+          onDownloadCsv={() => {}}
+        />
+      </div>
 
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
