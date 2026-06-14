@@ -12,7 +12,7 @@ import {
 import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
 import {
-  PortfolioFilters,
+  PortfolioFiltersState,
   PortfolioItem,
   PortfolioType,
 } from '../../types/portfolio.types';
@@ -21,7 +21,7 @@ import {
   getUniqueFilterValues,
 } from '../../services/portfolio.service';
 import { slugify } from '../../utils/slug';
-import { PortfolioFilters as PortfolioFiltersComponent } from '../components/PortfolioFilters';
+import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
 
 const PAGE_SIZE = 10;
 const COMPANY_START_BS_YEAR = 2072;
@@ -96,7 +96,7 @@ export function Portfolio() {
   const { portfolio, clients, sectors } = useContent();
   const [page, setPage] = useState(1);
   const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
-  const [filters, setFilters] = useState<PortfolioFilters>({
+  const [filters, setFilters] = useState<PortfolioFiltersState>({
     type: 'all',
     sector: undefined,
     fiscalYear: undefined,
@@ -177,7 +177,7 @@ export function Portfolio() {
     ];
   }, [portfolio]);
 
-  const updateFilters = (updates: Partial<PortfolioFilters>) => {
+  const updateFilters = (updates: Partial<PortfolioFiltersState>) => {
     if (Object.prototype.hasOwnProperty.call(updates, 'client')) {
       const nextParams = new URLSearchParams(searchParams);
 

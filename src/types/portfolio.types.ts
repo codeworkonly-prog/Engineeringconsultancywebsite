@@ -17,7 +17,7 @@ export type PortfolioSortKey =
   | 'createdAt';
 export type PortfolioSortOrder = 'asc' | 'desc';
 
-export interface PortfolioFilters {
+export interface PortfolioFiltersState {
   type?: PortfolioFilterType;
   sector?: string;
   client?: string;
@@ -25,47 +25,33 @@ export interface PortfolioFilters {
   search?: string;
 }
 
+/** @deprecated Use PortfolioFiltersState instead */
+export type PortfolioFilters = PortfolioFiltersState;
+
 export interface PortfolioItem {
   id: string;
-
   type: PortfolioType;
-
   title: string;
   slug: string;
-
   shortDescription: string;
   overview?: string;
   fullDescription?: string;
-
   featuredImage: string;
-
   sector?: string;
   clientId?: string;
   partnerFirms?: string;
   fiscalYear?: string;
-
   status?: PortfolioStatus;
-
   location?: string;
   startDate?: string;
   endDate?: string;
-
   isFlagship?: boolean;
-
-  // Project Fields
   projectType?: string;
   contractAmount?: string;
-
-  // Consulting Fields
   serviceType?: string;
-
-  // Training Fields
   trainingType?: string;
   mode?: 'online' | 'physical' | 'hybrid';
-
-  // Home Screen Display
   displayOnHome?: boolean;
-
   createdAt?: string;
   updatedAt?: string;
 }
@@ -73,30 +59,21 @@ export interface PortfolioItem {
 export const defaultPortfolioFormData: PortfolioItem = {
   id: '',
   type: 'project',
-
   title: '',
   slug: '',
-
   shortDescription: '',
   overview: '',
-
   featuredImage: '',
-
   sector: '',
   clientId: '',
   fiscalYear: '',
-
   location: '',
   startDate: '',
   endDate: '',
-
   isFlagship: false,
-
   projectType: '',
   contractAmount: '',
-
   serviceType: '',
-
   trainingType: '',
   mode: 'physical',
   displayOnHome: false,

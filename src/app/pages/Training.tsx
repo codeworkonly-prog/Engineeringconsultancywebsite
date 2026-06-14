@@ -1,11 +1,23 @@
+import { useState } from 'react';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { ArrowRight, BookOpen, Users, Clock, Award, CheckCircle, Calendar, GraduationCap, MapPin } from 'lucide-react';
+import { ArrowRight, BookOpen, Users, Award, CheckCircle, Calendar, GraduationCap, MapPin, LayoutGrid, Table2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
+import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
+import { PortfolioFiltersState } from '../../types/portfolio.types';
 
 export function Training() {
   const { events, portfolio, clients } = useContent();
+  const [view, setView] = useState<'grid' | 'table'>('grid');
+  const [filters, setFilters] = useState<PortfolioFiltersState>({
+    type: 'all',
+    sector: undefined,
+    fiscalYear: undefined,
+    client: undefined,
+    search: '',
+  });
+
   const trainingItems = [
     ...events.map((event) => ({
       id: `event-${event.id}`,
@@ -19,6 +31,9 @@ export function Training() {
       topics: event.topics,
       imageUrl: '',
       location: '',
+      sector: undefined as string | undefined,
+      fiscalYear: undefined as string | undefined,
+      clientId: undefined as string | undefined,
     })),
     ...portfolio
       .filter((item) => item.type === 'training')
@@ -35,23 +50,70 @@ export function Training() {
           .filter(Boolean) as string[],
         imageUrl: item.featuredImage,
         location: item.location || clients.find((c) => c.id === item.clientId)?.name || '',
+        sector: item.sector,
+        fiscalYear: item.fiscalYear,
+        clientId: item.clientId,
       })),
   ];
 
+  const filterValues = {
+    sectors: [...new Set(trainingItems.map((t) => t.sector).filter(Boolean))] as string[],
+    fiscalYears: [...new Set(trainingItems.map((t) => t.fiscalYear).filter(Boolean))] as string[],
+  };
+
+  const updateFilters = (updates: Partial<PortfolioFiltersState>) => {
+    setFilters((current) => ({ ...current, ...updates }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      type: 'all',
+      sector: undefined,
+      fiscalYear: undefined,
+      client: undefined,
+      search: '',
+    });
+  };
+
+  const hasActiveFilters =
+    Boolean(filters.sector) ||
+    Boolean(filters.fiscalYear) ||
+    Boolean(filters.client) ||
+    Boolean(filters.search);
+
+  const filteredItems = trainingItems.filter((item) => {
+    const search = (filters.search || '').toLowerCase();
+    const matchesSearch =
+      !search ||
+      item.title.toLowerCase().includes(search) ||
+      item.description.toLowerCase().includes(search);
+    const matchesSector = !filters.sector || item.sector === filters.sector;
+    const matchesFiscalYear = !filters.fiscalYear || item.fiscalYear === filters.fiscalYear;
+    const matchesClient = !filters.client || item.clientId === filters.client;
+
+    return matchesSearch && matchesSector && matchesFiscalYear && matchesClient;
+  });
+
+  const isEmpty = filteredItems.length === 0;
+
   return (
     <div>
-      {/* Header Section */}
+      {/* Hero */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Training</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
             Professional development programs, workshops, and training sessions organized by DCP
           </p>
+          <div className="mt-8">
+            <p className="text-3xl font-bold">{trainingItems.length}+</p>
+            <p className="mt-1 text-sm text-brand-100">Training Programs Conducted</p>
+          </div>
         </div>
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 mt-4 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Why Train With Us</h2>
@@ -89,6 +151,7 @@ export function Training() {
                 </div>
               </CardContent>
             </Card>
+
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
@@ -124,62 +187,93 @@ export function Training() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Available Programs</h2>
-            <p className="text-gray-600">
-              Choose from our range of specialized training courses
-            </p>
+            <h2 className="text-3xl font-bold mb-4">Training & Capacity Building Programs</h2>
+            <p className="text-gray-600">Explore the training programs, workshops, and professional development courses organized and delivered by DCP across various sectors</p>
+          </div>
+          {/* Filters */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <PortfolioFiltersComponent
+              filters={filters}
+              filterValues={filterValues}
+              clients={clients}
+              pagination={{
+                visibleCount: filteredItems.length,
+                filteredCount: trainingItems.length,
+                page: 1,
+                totalPages: 1,
+                itemLabel: 'programs',
+              }}
+              hasActiveFilters={hasActiveFilters}
+              isEmpty={isEmpty}
+              showTypeFilter={false}
+              extraControls={
+                <div className="flex items-center rounded-md border border-slate-200 overflow-hidden">
+                  <button
+                    onClick={() => setView('grid')}
+                    className={`p-2 transition-colors ${view === 'grid' ? 'bg-slate-900 text-white' : 'bg-white text-slate-500 hover:bg-slate-50'}`}
+                    title="Grid view"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setView('table')}
+                    className={`p-2 transition-colors ${view === 'table' ? 'bg-slate-900 text-white' : 'bg-white text-slate-500 hover:bg-slate-50'}`}
+                    title="Table view"
+                  >
+                    <Table2 className="h-4 w-4" />
+                  </button>
+                </div>
+              }
+              onUpdateFilters={updateFilters}
+              onClearFilters={clearFilters}
+              onDownloadCsv={() => { }}
+            />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {trainingItems.length > 0 ? (
-              trainingItems.map((event) => (
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-12 ">
+              {hasActiveFilters ? (
+                <>
+                  <p className="text-gray-500">No training programs match the selected filters.</p>
+                  <Button variant="outline" onClick={clearFilters} className="mt-4">Clear Filters</Button>
+                </>
+              ) : (
+                <p className="text-gray-500">No training programs available at the moment. Check back soon!</p>
+              )}
+            </div>
+
+          ) : view === 'grid' ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+              {filteredItems.map((event) => (
                 <Link key={event.id} to={`/training/${event.slug}`}>
                   <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full group">
                     <div className="relative overflow-hidden">
                       {event.imageUrl ? (
-                        <img
-                          src={event.imageUrl}
-                          alt={event.title}
-                          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
+                        <img src={event.imageUrl} alt={event.title} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300" />
                       ) : (
                         <div className="h-64 bg-gradient-to-br from-brand-600 via-brand-500 to-slate-800" />
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
                       <div className="absolute top-4 right-4">
-                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-800 text-white">
-                          {event.type}
-                        </span>
+                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-800 text-white">{event.type}</span>
                       </div>
                     </div>
-
                     <CardContent className="pt-6">
                       <div className="mb-3">
-                        <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full font-medium">
-                          {event.duration}
-                        </span>
+                        <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full font-medium">{event.duration}</span>
                       </div>
-
-                      <h3 className="font-semibold text-xl mb-2 group-hover:text-brand-600 transition-colors">
-                        {event.title}
-                      </h3>
-
+                      <h3 className="font-semibold text-xl mb-2 group-hover:text-brand-600 transition-colors">{event.title}</h3>
                       {event.location && (
                         <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                           <MapPin className="h-4 w-4" />
                           <span>{event.location}</span>
                         </div>
                       )}
-
-                      <p className="text-sm text-gray-600 line-clamp-3 mb-4">
-                        {event.description}
-                      </p>
-
+                      <p className="text-sm text-gray-600 line-clamp-3 mb-4">{event.description}</p>
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                         <Calendar className="h-4 w-4" />
                         <span>{event.startDate} - {event.endDate}</span>
                       </div>
-
                       {event.topics.length > 0 && (
                         <ul className="space-y-2 mb-6">
                           {event.topics.slice(0, 3).map((topic, index) => (
@@ -190,7 +284,6 @@ export function Training() {
                           ))}
                         </ul>
                       )}
-
                       <div className="flex items-center text-brand-600 text-sm font-medium group-hover:gap-2 transition-all">
                         <span>View Training</span>
                         <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -198,13 +291,47 @@ export function Training() {
                     </CardContent>
                   </Card>
                 </Link>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12">
-                <p className="text-gray-500">No training programs available at the moment. Check back soon!</p>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm mt-12">
+              <table className="w-full">
+                <thead className="bg-slate-900 text-white">
+                  <tr>
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">S.N</th>
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Program</th>
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Type</th>
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Duration</th>
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Location</th>
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Date</th>
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredItems.map((event, index) => (
+                    <tr key={event.id} className="hover:bg-cyan-50/60 transition-colors">
+                      <td className="px-5 py-4 text-sm text-slate-500">{index + 1}</td>
+                      <td className="px-5 py-4">
+                        <div className="font-semibold text-slate-900">{event.title}</div>
+                        <div className="text-xs text-slate-500 mt-0.5 line-clamp-1">{event.description}</div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold bg-violet-50 text-violet-700 ring-1 ring-violet-100">{event.type}</span>
+                      </td>
+                      <td className="px-5 py-4 text-sm text-slate-700">{event.duration || '-'}</td>
+                      <td className="px-5 py-4 text-sm text-slate-700">{event.location || '-'}</td>
+                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">{event.startDate || '-'}</td>
+                      <td className="px-5 py-4">
+                        <Link to={`/training/${event.slug}`} className="flex items-center gap-1 text-sm font-medium text-brand-600 hover:gap-2 transition-all">
+                          View <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </section>
 

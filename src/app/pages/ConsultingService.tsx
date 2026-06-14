@@ -135,22 +135,8 @@ export function ConsultingService() {
         </div>
       </section>
 
-      {/* Introduction Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Comprehensive Consulting Solutions</h2>
-            <p className="text-gray-600">
-              Diksha Consulting & Training Pvt. Ltd. provides multidisciplinary engineering and management
-              consulting services to support clients throughout the project lifecycle—from feasibility studies
-              and design to procurement, supervision, and training.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Consulting Services Section */}
-      <section className="py-16 bg-gray-50">
+      {/* <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Our Consulting Services</h2>
@@ -184,13 +170,13 @@ export function ConsultingService() {
             })}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {consultingAssignments.length > 0 && (
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Consulting Assignments</h2>
+              <h2 className="text-3xl font-bold mb-4">Our Consulting Assignments</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 Selected consulting work delivered for institutional and infrastructure clients.
               </p>

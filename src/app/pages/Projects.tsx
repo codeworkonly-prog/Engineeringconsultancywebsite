@@ -1,21 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { Card, CardContent } from '../components/ui/card';
-import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
-import { Search, MapPin, Calendar, ArrowRight } from 'lucide-react';
-import { PortfolioFilters as PortfolioFiltersComponent } from '../components/PortfolioFilters';
-import { PortfolioFilters, PortfolioFilterType } from '../../types/portfolio.types';
+import { MapPin, Calendar, ArrowRight,LayoutGrid, Table2 } from 'lucide-react';
+import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
+import { PortfolioFiltersState } from '../../types/portfolio.types';
 
 type ProjectStatus = 'upcoming' | 'ongoing' | 'completed';
 
 export function Projects() {
   const { projects, galleryImages, portfolio, clients } = useContent();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | ProjectStatus>('all');
-  const [filters, setFilters] = useState<PortfolioFilters>({
+    const [view, setView] = useState<'grid' | 'table'>('grid');
+  const [filters, setFilters] = useState<PortfolioFiltersState>({
     type: 'all',
     sector: undefined,
     fiscalYear: undefined,
@@ -64,15 +61,12 @@ export function Projects() {
 
   const resetVisibleCount = () => setVisibleCount(6);
 
-  const updateFilters = (updates: Partial<PortfolioFilters>) => {
+  const updateFilters = (updates: Partial<PortfolioFiltersState>) => {
     setFilters((current) => ({ ...current, ...updates }));
     resetVisibleCount();
   };
 
   const clearFilters = () => {
-    setSearchQuery('');
-    setTypeFilter('all');
-    setStatusFilter('all');
     setFilters({
       type: 'all',
       sector: undefined,
@@ -84,36 +78,23 @@ export function Projects() {
   };
 
   const filteredProjects = projectItems.filter((project) => {
-    const search = searchQuery.toLowerCase();
+    const search = (filters.search || '').toLowerCase();
     const matchesSearch =
       !search ||
       project.title.toLowerCase().includes(search) ||
       project.description.toLowerCase().includes(search) ||
       (project.location || '').toLowerCase().includes(search);
-    const matchesType = typeFilter === 'all' || project.projectType === typeFilter;
-    const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
-    const matchesFilterType =
-      filters.type === 'all' || project.projectType === filters.type;
     const matchesSector = !filters.sector || project.sector === filters.sector;
     const matchesFiscalYear = !filters.fiscalYear || project.fiscalYear === filters.fiscalYear;
     const matchesClient = !filters.client || project.clientId === filters.client;
 
-    return (
-      matchesSearch &&
-      matchesType &&
-      matchesStatus &&
-      matchesFilterType &&
-      matchesSector &&
-      matchesFiscalYear &&
-      matchesClient
-    );
+    return matchesSearch && matchesSector && matchesFiscalYear && matchesClient;
   });
 
   const visibleProjects = filteredProjects.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProjects.length;
 
   const hasActiveFilters =
-    filters.type !== 'all' ||
     Boolean(filters.sector) ||
     Boolean(filters.fiscalYear) ||
     Boolean(filters.client) ||
@@ -135,63 +116,22 @@ export function Projects() {
 
   return (
     <div>
-      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-20">
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="text-5xl font-bold mb-4">Our Projects</h1>
-            <div className="flex items-center gap-2 mb-8">
-              <button
-                onClick={() => { setTypeFilter('Design and Build'); resetVisibleCount(); }}
-                className={`text-xl transition-all ${
-                  typeFilter === 'Design and Build'
-                    ? 'text-white font-semibold underline underline-offset-4'
-                    : 'text-brand-100 hover:text-white'
-                }`}
-              >
-                Design & Build
-              </button>
-              <span className="text-xl text-brand-50">|</span>
-              <button
-                onClick={() => { setTypeFilter('Contract'); resetVisibleCount(); }}
-                className={`text-xl transition-all ${
-                  typeFilter === 'Contract'
-                    ? 'text-white font-semibold underline underline-offset-4'
-                    : 'text-brand-100 hover:text-white'
-                }`}
-              >
-                Contract Projects
-              </button>
-              {typeFilter !== 'all' && (
-                <>
-                  <span className="text-xl text-brand-50">|</span>
-                  <button
-                    onClick={() => { setTypeFilter('all'); resetVisibleCount(); }}
-                    className="text-lg text-brand-100 hover:text-white transition-colors"
-                  >
-                    View All
-                  </button>
-                </>
-              )}
-            </div>
-
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search projects by name, description, or location..."
-                value={searchQuery}
-                onChange={(event) => {
-                  setSearchQuery(event.target.value);
-                  resetVisibleCount();
-                }}
-                className="pl-12 h-14 text-lg bg-white text-gray-900"
-              />
-            </div>
+          <h1 className="text-4xl font-bold mb-4">Our Projects</h1>
+          <p className="text-xl text-brand-50 max-w-3xl">
+            Explore our growing portfolio of infrastructure, design-build, and contract projects delivered across Nepal.
+          </p>
+          <div className="mt-8">
+            <p className="text-3xl font-bold">{projectItems.length}+</p>
+            <p className="mt-1 text-sm text-brand-100">Projects Delivered Across Nepal</p>
           </div>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── Filters ──────────────────────────────────────────────────────── */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <PortfolioFiltersComponent
           filters={filters}
           filterValues={filterValues}
@@ -205,15 +145,35 @@ export function Projects() {
           }}
           hasActiveFilters={hasActiveFilters}
           isEmpty={isEmpty}
+          showTypeFilter={false}
+          extraControls={
+            <div className="flex items-center rounded-md border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => setView('grid')}
+                className={`p-2 transition-colors ${view === 'grid' ? 'bg-slate-900 text-white' : 'bg-white text-slate-500 hover:bg-slate-50'}`}
+                title="Grid view"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setView('table')}
+                className={`p-2 transition-colors ${view === 'table' ? 'bg-slate-900 text-white' : 'bg-white text-slate-500 hover:bg-slate-50'}`}
+                title="Table view"
+              >
+                <Table2 className="h-4 w-4" />
+              </button>
+            </div>
+          }
           onUpdateFilters={updateFilters}
           onClearFilters={clearFilters}
           onDownloadCsv={() => {}}
         />
       </div>
 
+      {/* ── Project Grid ─────────────────────────────────────────────────── */}
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredProjects.length === 0 ? (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {isEmpty ? (
             <div className="text-center py-20">
               <p className="text-gray-500 text-lg">No projects found matching your criteria.</p>
               <Button variant="outline" onClick={clearFilters} className="mt-4">
@@ -244,29 +204,24 @@ export function Projects() {
                             {project.projectType}
                           </span>
                         </div>
-
                         <h3 className="font-semibold text-xl mb-2 group-hover:text-brand-600 transition-colors">
                           {project.title}
                         </h3>
-
                         {project.location && (
                           <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                             <MapPin className="h-4 w-4" />
                             <span>{project.location}</span>
                           </div>
                         )}
-
                         <p className="text-sm text-gray-600 line-clamp-3 mb-4">
                           {project.description}
                         </p>
-
                         {project.completionDate && (
                           <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                             <Calendar className="h-4 w-4" />
                             <span>Completed: {new Date(project.completionDate).toLocaleDateString()}</span>
                           </div>
                         )}
-
                         <div className="flex items-center text-brand-600 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View Project</span>
                           <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -289,14 +244,14 @@ export function Projects() {
         </div>
       </section>
 
+      {/* ── Gallery ──────────────────────────────────────────────────────── */}
       {galleryImages.length > 0 && (
         <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-4">Project Gallery</h2>
               <p className="text-gray-600">A glimpse into our work and achievements</p>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {galleryImages.slice(0, 6).map((image) => (
                 <div key={image.id} className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow group">
@@ -318,8 +273,9 @@ export function Projects() {
         </section>
       )}
 
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section className="py-16 bg-brand-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">Have a Project in Mind?</h2>
           <p className="text-xl mb-8 text-brand-50">
             Let's collaborate to turn your vision into reality
