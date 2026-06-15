@@ -146,7 +146,7 @@ export function Projects() {
   return (
     <div>
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {/*  Hero  */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white min-h-[580px] flex items-center">
 
         {/* Blueprint grid */}
@@ -165,26 +165,26 @@ export function Projects() {
         <div className="absolute -left-20 top-0 bottom-0 w-[360px] bg-cyan-500/10 blur-[100px] pointer-events-none" />
 
         {/* ── 6-image mosaic ── */}
-<div className="absolute right-0 top-1/2 -translate-y-1/2 h-[70%] w-[58%] hidden lg:grid grid-cols-3 gap-2 p-2">
-  {heroImages.slice(0, 6).map((src, i) => (
-    <div
-      key={i}
-      className="group relative overflow-hidden rounded-2xl shadow-lg"
-    >
-      <img
-        src={src}
-        alt={`Project ${i + 1}`}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-      />
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 h-[70%] w-[58%] hidden lg:grid grid-cols-3 gap-2 p-2">
+          {heroImages.slice(0, 6).map((src, i) => (
+            <div
+              key={i}
+              className="group relative overflow-hidden rounded-2xl shadow-lg"
+            >
+              <img
+                src={src}
+                alt={`Project ${i + 1}`}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              />
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-brand-900/20 transition-all duration-500 group-hover:bg-brand-900/10" />
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-brand-900/20 transition-all duration-500 group-hover:bg-brand-900/10" />
 
-      {/* Optional subtle gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-    </div>
-  ))}
-</div>
+              {/* Optional subtle gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            </div>
+          ))}
+        </div>
 
         {/* Gradient bridge — text bleeds into mosaic */}
         <div className="absolute inset-0 hidden lg:block bg-gradient-to-r from-brand-900/20 via-brand-900/50 to-transparent pointer-events-none" />
@@ -418,7 +418,7 @@ export function Projects() {
         </div>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      {/* CTA  */}
       <section className="py-16 bg-brand-600 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">Have a Project in Mind?</h2>
