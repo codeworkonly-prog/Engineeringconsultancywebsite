@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
-import { MapPin, Calendar, ArrowRight, LayoutGrid, Table2, Layers, MapPinned, ShieldCheck, Handshake, Clock, Leaf } from 'lucide-react';
+import { MapPin, Calendar, ArrowRight, LayoutGrid, Table2, Layers, MapPinned, ShieldCheck, Handshake, Clock, Leaf, ArrowUp, ArrowDown } from 'lucide-react';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
 import { PortfolioFiltersState } from '../../types/portfolio.types';
 import project1 from '../../imports/project1.jpg';
@@ -18,6 +18,7 @@ type ProjectStatus = 'upcoming' | 'ongoing' | 'completed';
 export function Projects() {
   const { projects, galleryImages, portfolio, clients } = useContent();
   const [view, setView] = useState<'grid' | 'table'>('grid');
+  const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
   const [filters, setFilters] = useState<PortfolioFiltersState>({
     type: 'all',
     sector: undefined,
@@ -88,6 +89,12 @@ export function Projects() {
     const matchesFiscalYear = !filters.fiscalYear || project.fiscalYear === filters.fiscalYear;
     const matchesClient = !filters.client || project.clientId === filters.client;
     return matchesSearch && matchesSector && matchesFiscalYear && matchesClient;
+  }).sort((a, b) => {
+    const yearA = a.fiscalYear || '0000';
+    const yearB = b.fiscalYear || '0000';
+    return fySortOrder === 'desc'
+      ? yearB.localeCompare(yearA)
+      : yearA.localeCompare(yearB);
   });
 
   const visibleProjects = filteredProjects.slice(0, visibleCount);
@@ -145,11 +152,8 @@ export function Projects() {
 
   return (
     <div>
-
-      {/*  Hero  */}
+      {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white min-h-[580px] flex items-center">
-
-        {/* Blueprint grid */}
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -157,52 +161,29 @@ export function Projects() {
               linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
               linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)
             `,
-            backgroundSize: "60px 60px",
+            backgroundSize: '60px 60px',
           }}
         />
-
-        {/* Left glow */}
         <div className="absolute -left-20 top-0 bottom-0 w-[360px] bg-cyan-500/10 blur-[100px] pointer-events-none" />
-
-        {/* ── 6-image mosaic ── */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 h-[70%] w-[58%] hidden lg:grid grid-cols-3 gap-2 p-2">
           {heroImages.slice(0, 6).map((src, i) => (
-            <div
-              key={i}
-              className="group relative overflow-hidden rounded-2xl shadow-lg"
-            >
-              <img
-                src={src}
-                alt={`Project ${i + 1}`}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-              />
-
-              {/* Dark overlay */}
+            <div key={i} className="group relative overflow-hidden rounded-2xl shadow-lg">
+              <img src={src} alt={`Project ${i + 1}`} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
               <div className="absolute inset-0 bg-brand-900/20 transition-all duration-500 group-hover:bg-brand-900/10" />
-
-              {/* Optional subtle gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </div>
           ))}
         </div>
-
-        {/* Gradient bridge — text bleeds into mosaic */}
         <div className="absolute inset-0 hidden lg:block bg-gradient-to-r from-brand-900/20 via-brand-900/50 to-transparent pointer-events-none" />
-
-        {/* ── Text content ── */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 w-full">
           <div className="max-w-lg">
-
             <h1 className="text-5xl lg:text-[3.75rem] font-bold leading-[1.05] tracking-tight mb-6">
               Projects Built<br />
               <span className="text-brand-200">Across Nepal</span>
             </h1>
-
             <p className="text-brand-200/70 text-base leading-relaxed max-w-sm">
-              Infrastructure, design-build, and contract projects delivered on time
-              and at scale across Nepal.
+              Infrastructure, design-build, and contract projects delivered on time and at scale across Nepal.
             </p>
-
             <div className="mt-10 flex items-stretch gap-10">
               <div className="flex items-start gap-4">
                 <div className="w-px self-stretch bg-cyan-400 mt-1" />
@@ -219,163 +200,159 @@ export function Projects() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </section>
 
- {/* Programs Section */}
+      {/* Projects Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-4">Our Projects Portfolio</h2>
-            <p className="text-gray-600">Explore the diverse projects successfully implemented by DCP across various sectors, delivering innovative solutions and sustainable impact.</p>
+            <p className="text-gray-600 max-w-2xl mx-auto">Explore the diverse projects successfully implemented by DCP across various sectors, delivering innovative solutions and sustainable impact.</p>
           </div>
-      {/* ── Filters ──────────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <PortfolioFiltersComponent
-          filters={filters}
-          filterValues={filterValues}
-          clients={clients}
-          pagination={{
-            visibleCount: view === 'grid' ? visibleProjects.length : filteredProjects.length,
-            filteredCount: filteredProjects.length,
-            page: 1,
-            totalPages: 1,
-            itemLabel: 'projects',
-          }}
-          hasActiveFilters={hasActiveFilters}
-          isEmpty={isEmpty}
-          showTypeFilter={false}
-          extraControls={viewToggle}
-          onUpdateFilters={updateFilters}
-          onClearFilters={clearFilters}
-          onDownloadCsv={() => { }}
-        />
-      </div>
 
-      {/* ── Project Grid / Table ─────────────────────────────────────────── */}
-      <section className="py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {isEmpty ? (
-            <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">No projects found matching your criteria.</p>
-              <Button variant="outline" onClick={clearFilters} className="mt-4">Clear Filters</Button>
-            </div>
-          ) : view === 'grid' ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {visibleProjects.map((project) => (
-                  <Link key={project.id} to={`/projects/${project.slug}`}>
-                    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full group">
-                      <div className="relative overflow-hidden">
-                        {project.imageUrl ? (
-                          <img
-                            src={project.imageUrl}
-                            alt={project.title}
-                            className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="h-64 bg-gradient-to-br from-brand-600 via-brand-500 to-slate-800" />
-                        )}
-                        <div className="absolute top-4 right-4">
-                          <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusClass(project.status)}`}>
-                            {statusLabel(project.status)}
-                          </span>
+          {/* Filters */}
+          <PortfolioFiltersComponent
+            filters={filters}
+            filterValues={filterValues}
+            clients={clients}
+            pagination={{
+              visibleCount: view === 'grid' ? visibleProjects.length : filteredProjects.length,
+              filteredCount: filteredProjects.length,
+              page: 1,
+              totalPages: 1,
+              itemLabel: 'projects',
+            }}
+            hasActiveFilters={hasActiveFilters}
+            isEmpty={isEmpty}
+            showTypeFilter={false}
+            extraControls={viewToggle}
+            onUpdateFilters={updateFilters}
+            onClearFilters={clearFilters}
+            onDownloadCsv={() => {}}
+          />
+
+          {/* Content */}
+          <div className="mt-8">
+            {isEmpty ? (
+              <div className="text-center py-20">
+                <p className="text-gray-500 text-lg">No projects found matching your criteria.</p>
+                <Button variant="outline" onClick={clearFilters} className="mt-4">Clear Filters</Button>
+              </div>
+            ) : view === 'grid' ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {visibleProjects.map((project) => (
+                    <Link key={project.id} to={`/projects/${project.slug}`}>
+                      <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full group">
+                        <div className="relative overflow-hidden">
+                          {project.imageUrl ? (
+                            <img src={project.imageUrl} alt={project.title} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300" />
+                          ) : (
+                            <div className="h-64 bg-gradient-to-br from-brand-600 via-brand-500 to-slate-800" />
+                          )}
+                          <div className="absolute top-4 right-4">
+                            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusClass(project.status)}`}>
+                              {statusLabel(project.status)}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      <CardContent className="pt-6">
-                        <div className="mb-3">
-                          <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full font-medium">
+                        <CardContent className="pt-6">
+                          <div className="mb-3">
+                            <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full font-medium">{project.projectType}</span>
+                          </div>
+                          <h3 className="font-semibold text-xl mb-2 group-hover:text-brand-600 transition-colors">{project.title}</h3>
+                          {project.location && (
+                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                              <MapPin className="h-4 w-4" />
+                              <span>{project.location}</span>
+                            </div>
+                          )}
+                          <p className="text-sm text-gray-600 line-clamp-3 mb-4">{project.description}</p>
+                          {project.completionDate && (
+                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                              <Calendar className="h-4 w-4" />
+                              <span>Completed: {new Date(project.completionDate).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center text-brand-600 text-sm font-medium group-hover:gap-2 transition-all">
+                            <span>View Project</span>
+                            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+                {hasMore && (
+                  <div className="text-center mt-12">
+                    <Button size="lg" variant="outline" onClick={() => setVisibleCount((prev) => prev + 6)}>
+                      Load More Projects
+                    </Button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+                <table className="w-full">
+                  <thead className="bg-slate-900 text-white">
+                    <tr>
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">S.N</th>
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Project</th>
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Type</th>
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Sector</th>
+                      <th
+                        onClick={() => setFySortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
+                        className="cursor-pointer px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"
+                      >
+                        <div className="flex items-center gap-2">
+                          Fiscal Year
+                          {fySortOrder === 'desc' ? (
+                            <ArrowDown className="h-3 w-3" />
+                          ) : (
+                            <ArrowUp className="h-3 w-3" />
+                          )}
+                        </div>
+                      </th>
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredProjects.map((project, index) => (
+                      <tr key={project.id} className="hover:bg-cyan-50/60 transition-colors">
+                        <td className="px-5 py-4 text-sm text-slate-500">{index + 1}</td>
+                        <td className="px-5 py-4">
+                          <div className="font-semibold text-slate-900">{project.title}</div>
+                          <div className="text-xs text-slate-500 mt-0.5 line-clamp-1">{project.description}</div>
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-100">
                             {project.projectType}
                           </span>
-                        </div>
-                        <h3 className="font-semibold text-xl mb-2 group-hover:text-brand-600 transition-colors">
-                          {project.title}
-                        </h3>
-                        {project.location && (
-                          <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                            <MapPin className="h-4 w-4" />
-                            <span>{project.location}</span>
-                          </div>
-                        )}
-                        <p className="text-sm text-gray-600 line-clamp-3 mb-4">{project.description}</p>
-                        {project.completionDate && (
-                          <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                            <Calendar className="h-4 w-4" />
-                            <span>Completed: {new Date(project.completionDate).toLocaleDateString()}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center text-brand-600 text-sm font-medium group-hover:gap-2 transition-all">
-                          <span>View Project</span>
-                          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
+                        </td>
+                        <td className="px-5 py-4 text-sm text-slate-700">
+                          {clients.find((c) => c.id === project.clientId)?.name || '-'}
+                        </td>
+                        <td className="px-5 py-4 text-sm text-slate-700">{project.sector || '-'}</td>
+                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">{project.fiscalYear || '-'}</td>
+                        <td className="px-5 py-4">
+                          <Link to={`/projects/${project.slug}`} className="flex items-center gap-1 text-sm font-medium text-brand-600 hover:gap-2 transition-all">
+                            View <ArrowRight className="h-3.5 w-3.5" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              {hasMore && (
-                <div className="text-center mt-12">
-                  <Button size="lg" variant="outline" onClick={() => setVisibleCount((prev) => prev + 6)}>
-                    Load More Projects
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-              <table className="w-full">
-                <thead className="bg-slate-900 text-white">
-                  <tr>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">S.N</th>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Project</th>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Type</th>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Location</th>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Completed</th>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {filteredProjects.map((project, index) => (
-                    <tr key={project.id} className="hover:bg-cyan-50/60 transition-colors">
-                      <td className="px-5 py-4 text-sm text-slate-500">{index + 1}</td>
-                      <td className="px-5 py-4">
-                        <div className="font-semibold text-slate-900">{project.title}</div>
-                        <div className="text-xs text-slate-500 mt-0.5 line-clamp-1">{project.description}</div>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-100">
-                          {project.projectType}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(project.status)}`}>
-                          {statusLabel(project.status)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 text-sm text-slate-700">{project.location || '-'}</td>
-                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">
-                        {project.completionDate ? new Date(project.completionDate).toLocaleDateString() : '-'}
-                      </td>
-                      <td className="px-5 py-4">
-                        <Link to={`/projects/${project.slug}`} className="flex items-center gap-1 text-sm font-medium text-brand-600 hover:gap-2 transition-all">
-                          View <ArrowRight className="h-3.5 w-3.5" />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </section>
-</div>
-      </section>
 
-      {/* ── Gallery ──────────────────────────────────────────────────────── */}
+      {/* Gallery */}
       {galleryImages.length > 0 && (
         <section className="py-16 bg-gray-50">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -386,11 +363,7 @@ export function Projects() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {galleryImages.slice(0, 6).map((image) => (
                 <div key={image.id} className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow group">
-                  <img
-                    src={image.imageUrl}
-                    alt={image.title}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  <img src={image.imageUrl} alt={image.title} className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
                     <div className="p-4 text-white">
                       <h3 className="font-semibold">{image.title}</h3>
@@ -404,7 +377,7 @@ export function Projects() {
         </section>
       )}
 
-      {/* ── Why DCP ──────────────────────────────────────────────────────── */}
+      {/* Why DCP */}
       <section className="py-16 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -427,7 +400,7 @@ export function Projects() {
         </div>
       </section>
 
-      {/* CTA  */}
+      {/* CTA */}
       <section className="py-16 bg-brand-600 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">Have a Project in Mind?</h2>
@@ -437,7 +410,6 @@ export function Projects() {
           </Link>
         </div>
       </section>
-
     </div>
   );
 }
