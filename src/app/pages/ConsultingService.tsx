@@ -206,8 +206,7 @@ export function ConsultingService() {
                   <thead className="bg-slate-900 text-white">
                     <tr>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">S.N</th>
-                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Assignment</th>
-                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Service Type</th>
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Assignment Title</th>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Sector</th>
                       <th
@@ -232,12 +231,6 @@ export function ConsultingService() {
                         <td className="px-5 py-4 text-sm text-slate-500">{index + 1}</td>
                         <td className="px-5 py-4">
                           <div className="font-semibold text-slate-900">{assignment.title}</div>
-                          <div className="text-xs text-slate-500 mt-0.5 line-clamp-1">{assignment.shortDescription}</div>
-                        </td>
-                        <td className="px-5 py-4">
-                          <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
-                            {assignment.serviceType || 'Consulting'}
-                          </span>
                         </td>
                         <td className="px-5 py-4 text-sm text-slate-700">
                           {clients.find((c) => c.id === assignment.clientId)?.name || '-'}

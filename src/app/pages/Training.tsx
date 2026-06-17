@@ -237,8 +237,7 @@ export function Training() {
                 <thead className="bg-slate-900 text-white">
                   <tr>
                     <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">S.N</th>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Training Name</th>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Type</th>
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Training Title</th>
                     <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Sector</th>
                     <th
                       onClick={() => setFySortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
@@ -262,10 +261,6 @@ export function Training() {
                       <td className="px-5 py-4 text-sm text-slate-500">{index + 1}</td>
                       <td className="px-5 py-4">
                         <div className="font-semibold text-slate-900">{event.title}</div>
-                        <div className="text-xs text-slate-500 mt-0.5 line-clamp-1">{event.description}</div>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold bg-violet-50 text-violet-700 ring-1 ring-violet-100">{event.type}</span>
                       </td>
                       <td className="px-5 py-4 text-sm text-slate-700">{event.sector || '-'}</td>
                       <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-700">{event.fiscalYear || '-'}</td>

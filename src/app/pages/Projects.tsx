@@ -299,8 +299,7 @@ export function Projects() {
                   <thead className="bg-slate-900 text-white">
                     <tr>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">S.N</th>
-                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Project</th>
-                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Type</th>
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Project Title</th>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Sector</th>
                       <th
@@ -326,11 +325,6 @@ export function Projects() {
                         <td className="px-5 py-4">
                           <div className="font-semibold text-slate-900">{project.title}</div>
                           <div className="text-xs text-slate-500 mt-0.5 line-clamp-1">{project.description}</div>
-                        </td>
-                        <td className="px-5 py-4">
-                          <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-100">
-                            {project.projectType}
-                          </span>
                         </td>
                         <td className="px-5 py-4 text-sm text-slate-700">
                           {clients.find((c) => c.id === project.clientId)?.name || '-'}
