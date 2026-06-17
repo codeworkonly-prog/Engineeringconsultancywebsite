@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Card, CardContent } from '../components/ui/card';
-import { ArrowRight, Calendar, CheckCircle, MapPin, Users, Target, BarChart, LayoutGrid, Table2 } from 'lucide-react';
+import { ArrowRight, Calendar, CheckCircle, MapPin, Users, Target, BarChart, LayoutGrid, Table2, ArrowUp, ArrowDown } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
@@ -10,6 +10,7 @@ import { PortfolioFiltersState } from '../../types/portfolio.types';
 export function ConsultingService() {
   const { portfolio, clients } = useContent();
   const [view, setView] = useState<'grid' | 'table'>('grid');
+  const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
   const [filters, setFilters] = useState<PortfolioFiltersState>({
     type: 'all',
     sector: undefined,
@@ -49,6 +50,12 @@ export function ConsultingService() {
     const matchesFiscalYear = !filters.fiscalYear || item.fiscalYear === filters.fiscalYear;
     const matchesClient = !filters.client || item.clientId === filters.client;
     return matchesSearch && matchesSector && matchesFiscalYear && matchesClient;
+  }).sort((a, b) => {
+    const yearA = a.fiscalYear || '0000';
+    const yearB = b.fiscalYear || '0000';
+    return fySortOrder === 'desc'
+      ? yearB.localeCompare(yearA)
+      : yearA.localeCompare(yearB);
   });
 
   const isEmpty = filteredAssignments.length === 0;
@@ -203,7 +210,19 @@ export function ConsultingService() {
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Service Type</th>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Sector</th>
-                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">Fiscal Year</th>
+                      <th
+                        onClick={() => setFySortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
+                        className="cursor-pointer px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"
+                      >
+                        <div className="flex items-center gap-2">
+                          Fiscal Year
+                          {fySortOrder === 'desc' ? (
+                            <ArrowDown className="h-3 w-3" />
+                          ) : (
+                            <ArrowUp className="h-3 w-3" />
+                          )}
+                        </div>
+                      </th>
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider"></th>
                     </tr>
                   </thead>
