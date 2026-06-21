@@ -1,21 +1,31 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
-import { Card, CardContent } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Button } from '../components/ui/button';
-import { useContent } from '../contexts/ContentContext';
-import { Search, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { useState } from "react";
+import { Link } from "react-router";
+import { Card, CardContent } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import { Button } from "../components/ui/button";
+import { useContent } from "../contexts/ContentContext";
+import { Search, MapPin, Calendar, ArrowRight } from "lucide-react";
 
-type ProjectStatus = 'upcoming' | 'ongoing' | 'completed';
+type ProjectStatus = "upcoming" | "ongoing" | "completed";
 
 export function Projects() {
   const { projects, galleryImages, portfolio } = useContent();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [locationFilter, setLocationFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | ProjectStatus>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | ProjectStatus>(
+    "all",
+  );
   const [visibleCount, setVisibleCount] = useState(6);
+
+  console.log("Projects:", projects);
 
   const projectItems = [
     ...projects.map((project) => ({
@@ -30,30 +40,36 @@ export function Projects() {
       completionDate: project.completionDate,
     })),
     ...portfolio
-      .filter((item) => item.type === 'project')
+      .filter((item) => item.type === "project")
       .map((item) => ({
         id: `portfolio-${item.id}`,
         title: item.title,
         description: item.shortDescription,
-        projectType: item.projectType || 'Project',
+        projectType: item.projectType || "Project",
         imageUrl: item.featuredImage,
-        status: item.status || 'ongoing',
+        status: item.status || "ongoing",
         slug: item.slug,
         location: item.location,
         completionDate: item.endDate,
       })),
   ];
 
-  const locations = ['all', ...new Set(projectItems.map((p) => p.location).filter(Boolean))];
-  const projectTypes = ['all', ...new Set(projectItems.map((p) => p.projectType).filter(Boolean))];
+  const locations = [
+    "all",
+    ...new Set(projectItems.map((p) => p.location).filter(Boolean)),
+  ];
+  const projectTypes = [
+    "all",
+    ...new Set(projectItems.map((p) => p.projectType).filter(Boolean)),
+  ];
 
   const resetVisibleCount = () => setVisibleCount(6);
 
   const clearFilters = () => {
-    setSearchQuery('');
-    setTypeFilter('all');
-    setLocationFilter('all');
-    setStatusFilter('all');
+    setSearchQuery("");
+    setTypeFilter("all");
+    setLocationFilter("all");
+    setStatusFilter("all");
     resetVisibleCount();
   };
 
@@ -63,10 +79,13 @@ export function Projects() {
       !search ||
       project.title.toLowerCase().includes(search) ||
       project.description.toLowerCase().includes(search) ||
-      (project.location || '').toLowerCase().includes(search);
-    const matchesType = typeFilter === 'all' || project.projectType === typeFilter;
-    const matchesLocation = locationFilter === 'all' || project.location === locationFilter;
-    const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+      (project.location || "").toLowerCase().includes(search);
+    const matchesType =
+      typeFilter === "all" || project.projectType === typeFilter;
+    const matchesLocation =
+      locationFilter === "all" || project.location === locationFilter;
+    const matchesStatus =
+      statusFilter === "all" || project.status === statusFilter;
 
     return matchesSearch && matchesType && matchesLocation && matchesStatus;
   });
@@ -75,15 +94,15 @@ export function Projects() {
   const hasMore = visibleCount < filteredProjects.length;
 
   const statusLabel = (status: ProjectStatus) => {
-    if (status === 'upcoming') return 'Upcoming';
-    if (status === 'ongoing') return 'Ongoing';
-    return 'Completed';
+    if (status === "upcoming") return "Upcoming";
+    if (status === "ongoing") return "Ongoing";
+    return "Completed";
   };
 
   const statusClass = (status: ProjectStatus) => {
-    if (status === 'upcoming') return 'bg-blue-500 text-white';
-    if (status === 'ongoing') return 'bg-green-500 text-white';
-    return 'bg-gray-800 text-white';
+    if (status === "upcoming") return "bg-blue-500 text-white";
+    if (status === "ongoing") return "bg-green-500 text-white";
+    return "bg-gray-800 text-white";
   };
 
   return (
@@ -95,13 +114,13 @@ export function Projects() {
             <div className="flex items-center gap-2 mb-8">
               <button
                 onClick={() => {
-                  setTypeFilter('Design and Build');
+                  setTypeFilter("Design and Build");
                   resetVisibleCount();
                 }}
                 className={`text-xl transition-all ${
-                  typeFilter === 'Design and Build'
-                    ? 'text-white font-semibold underline underline-offset-4'
-                    : 'text-brand-100 hover:text-white'
+                  typeFilter === "Design and Build"
+                    ? "text-white font-semibold underline underline-offset-4"
+                    : "text-brand-100 hover:text-white"
                 }`}
               >
                 Design & Build
@@ -109,23 +128,23 @@ export function Projects() {
               <span className="text-xl text-brand-50">|</span>
               <button
                 onClick={() => {
-                  setTypeFilter('Contract');
+                  setTypeFilter("Contract");
                   resetVisibleCount();
                 }}
                 className={`text-xl transition-all ${
-                  typeFilter === 'Contract'
-                    ? 'text-white font-semibold underline underline-offset-4'
-                    : 'text-brand-100 hover:text-white'
+                  typeFilter === "Contract"
+                    ? "text-white font-semibold underline underline-offset-4"
+                    : "text-brand-100 hover:text-white"
                 }`}
               >
                 Contract Projects
               </button>
-              {typeFilter !== 'all' && (
+              {typeFilter !== "all" && (
                 <>
                   <span className="text-xl text-brand-50">|</span>
                   <button
                     onClick={() => {
-                      setTypeFilter('all');
+                      setTypeFilter("all");
                       resetVisibleCount();
                     }}
                     className="text-lg text-brand-100 hover:text-white transition-colors"
@@ -157,7 +176,9 @@ export function Projects() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             <div className="flex flex-wrap gap-3 items-center">
-              <span className="text-sm font-medium text-gray-700">Filter by:</span>
+              <span className="text-sm font-medium text-gray-700">
+                Filter by:
+              </span>
 
               <Select
                 value={typeFilter}
@@ -172,7 +193,7 @@ export function Projects() {
                 <SelectContent>
                   {projectTypes.map((projectType) => (
                     <SelectItem key={projectType} value={projectType}>
-                      {projectType === 'all' ? 'All Types' : projectType}
+                      {projectType === "all" ? "All Types" : projectType}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -191,7 +212,7 @@ export function Projects() {
                 <SelectContent>
                   <SelectItem value="all">All Locations</SelectItem>
                   {locations
-                    .filter((location) => location !== 'all')
+                    .filter((location) => location !== "all")
                     .map((location) => (
                       <SelectItem key={location} value={location as string}>
                         {location}
@@ -203,7 +224,7 @@ export function Projects() {
               <Select
                 value={statusFilter}
                 onValueChange={(value) => {
-                  setStatusFilter(value as 'all' | ProjectStatus);
+                  setStatusFilter(value as "all" | ProjectStatus);
                   resetVisibleCount();
                 }}
               >
@@ -220,7 +241,8 @@ export function Projects() {
             </div>
 
             <div className="text-sm text-gray-600">
-              Showing {visibleProjects.length} of {filteredProjects.length} projects
+              Showing {visibleProjects.length} of {filteredProjects.length}{" "}
+              projects
             </div>
           </div>
         </div>
@@ -230,7 +252,9 @@ export function Projects() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {filteredProjects.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">No projects found matching your criteria.</p>
+              <p className="text-gray-500 text-lg">
+                No projects found matching your criteria.
+              </p>
               <Button variant="outline" onClick={clearFilters} className="mt-4">
                 Clear Filters
               </Button>
@@ -248,7 +272,9 @@ export function Projects() {
                           className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                         />
                         <div className="absolute top-4 right-4">
-                          <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusClass(project.status)}`}>
+                          <span
+                            className={`px-3 py-1 text-xs font-semibold rounded-full ${statusClass(project.status)}`}
+                          >
                             {statusLabel(project.status)}
                           </span>
                         </div>
@@ -278,7 +304,12 @@ export function Projects() {
                         {project.completionDate && (
                           <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                             <Calendar className="h-4 w-4" />
-                            <span>Completed: {new Date(project.completionDate).toLocaleDateString()}</span>
+                            <span>
+                              Completed:{" "}
+                              {new Date(
+                                project.completionDate,
+                              ).toLocaleDateString()}
+                            </span>
                           </div>
                         )}
 
@@ -294,7 +325,11 @@ export function Projects() {
 
               {hasMore && (
                 <div className="text-center mt-12">
-                  <Button size="lg" variant="outline" onClick={() => setVisibleCount((prev) => prev + 6)}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => setVisibleCount((prev) => prev + 6)}
+                  >
                     Load More Projects
                   </Button>
                 </div>
@@ -309,12 +344,17 @@ export function Projects() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-4">Project Gallery</h2>
-              <p className="text-gray-600">A glimpse into our work and achievements</p>
+              <p className="text-gray-600">
+                A glimpse into our work and achievements
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {galleryImages.slice(0, 6).map((image) => (
-                <div key={image.id} className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow group">
+                <div
+                  key={image.id}
+                  className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow group"
+                >
                   <img
                     src={image.imageUrl}
                     alt={image.title}
