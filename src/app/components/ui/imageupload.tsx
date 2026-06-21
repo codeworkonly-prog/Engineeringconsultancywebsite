@@ -94,25 +94,17 @@ export function ImageUpload({
         )}
       </label>
 
-      {fileName && (
-        <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2">
-          <span className="truncate text-sm">{fileName}</span>
-
-          {value && (
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              disabled={disabled || uploading}
-              onClick={() => {
-                onChange("");
-                setFileName("");
-              }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+      {value && (
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          disabled={disabled || uploading}
+          onClick={() => onChange("")}
+        >
+          <X className="mr-2 h-4 w-4" />
+          Remove Image
+        </Button>
       )}
     </div>
   );
