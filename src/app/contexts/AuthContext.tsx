@@ -1,103 +1,121 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  updatePassword,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+} from "firebase/auth";
+
+import { auth } from "../../firebase";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
-  logout: () => void;
-  changePassword: (oldPassword: string, newPassword: string) => boolean;
-  resetPassword: (resetToken: string, newPassword: string) => boolean;
-  generateResetToken: (username: string) => string | null;
+  authLoading: boolean;
+
+  login: (email: string, password: string) => Promise<boolean>;
+
+  logout: () => Promise<void>;
+
+  changePassword: (
+    currentPassword: string,
+    newPassword: string,
+  ) => Promise<boolean>;
+
+  resetPassword: (email: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Default admin credentials - change these after first login
-const DEFAULT_USERNAME = 'admin';
-const DEFAULT_PASSWORD = 'admin123';
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const authStatus = localStorage.getItem('dcpAdminAuth');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
-    }
+  const [authLoading, setAuthLoading] = useState(true);
 
-    // Initialize credentials if not set
-    if (!localStorage.getItem('dcpAdminUsername')) {
-      localStorage.setItem('dcpAdminUsername', DEFAULT_USERNAME);
-      localStorage.setItem('dcpAdminPassword', btoa(DEFAULT_PASSWORD)); // Base64 encode for basic obfuscation
-    }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setAuthLoading(false);
+    });
+
+    return unsubscribe;
   }, []);
 
-  const login = (username: string, password: string): boolean => {
-    const storedUsername = localStorage.getItem('dcpAdminUsername');
-    const storedPassword = localStorage.getItem('dcpAdminPassword');
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
 
-    if (username === storedUsername && btoa(password) === storedPassword) {
-      setIsAuthenticated(true);
-      localStorage.setItem('dcpAdminAuth', 'true');
       return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
     }
-    return false;
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('dcpAdminAuth');
+  const logout = async (): Promise<void> => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
-  const changePassword = (oldPassword: string, newPassword: string): boolean => {
-    const storedPassword = localStorage.getItem('dcpAdminPassword');
-    
-    if (btoa(oldPassword) === storedPassword) {
-      localStorage.setItem('dcpAdminPassword', btoa(newPassword));
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<boolean> => {
+    try {
+      const user = auth.currentUser;
+
+      if (!user || !user.email) {
+        return false;
+      }
+
+      const credential = EmailAuthProvider.credential(
+        user.email,
+        currentPassword,
+      );
+
+      await reauthenticateWithCredential(user, credential);
+
+      await updatePassword(user, newPassword);
+
       return true;
+    } catch (error) {
+      console.error("Password change failed:", error);
+      return false;
     }
-    return false;
   };
 
-  const generateResetToken = (username: string): string | null => {
-    const storedUsername = localStorage.getItem('dcpAdminUsername');
-    
-    if (username === storedUsername) {
-      // Generate a time-limited reset token
-      const token = btoa(`${username}-${Date.now()}`);
-      localStorage.setItem('dcpResetToken', token);
-      localStorage.setItem('dcpResetTokenExpiry', String(Date.now() + 3600000)); // 1 hour expiry
-      return token;
-    }
-    return null;
-  };
+  const resetPassword = async (email: string): Promise<boolean> => {
+    try {
+      await sendPasswordResetEmail(auth, email);
 
-  const resetPassword = (resetToken: string, newPassword: string): boolean => {
-    const storedToken = localStorage.getItem('dcpResetToken');
-    const tokenExpiry = localStorage.getItem('dcpResetTokenExpiry');
-
-    if (
-      resetToken === storedToken &&
-      tokenExpiry &&
-      Date.now() < parseInt(tokenExpiry)
-    ) {
-      localStorage.setItem('dcpAdminPassword', btoa(newPassword));
-      localStorage.removeItem('dcpResetToken');
-      localStorage.removeItem('dcpResetTokenExpiry');
       return true;
+    } catch (error) {
+      console.error("Password reset failed:", error);
+      return false;
     }
-    return false;
   };
 
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated,
+        authLoading,
         login,
         logout,
         changePassword,
         resetPassword,
-        generateResetToken,
       }}
     >
       {children}
@@ -107,8 +125,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 }

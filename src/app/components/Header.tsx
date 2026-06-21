@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
-import logoImage from '../../imports/DCP_logo-1.png';
+import logoImage from '../../imports/DCP_logo-1.webp';
 
 export function Header() {
   const location = useLocation();
@@ -19,9 +19,10 @@ export function Header() {
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About Us' },
     { path: '/company-profile', label: 'Company Profile' },
-    { path: '/consulting-service', label: 'Consulting Service' },
+    { path: '/portfolio', label: 'Portfolio' },
+    { path: '/consulting', label: 'Consulting' },
     { path: '/projects', label: 'Projects' },
-    { path: '/events', label: 'Events' },
+    { path: '/training', label: 'Training' },
     { path: '/contact', label: 'Contact Us' },
   ];
 

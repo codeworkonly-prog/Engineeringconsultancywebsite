@@ -2,12 +2,14 @@ import { Card, CardContent } from '../components/ui/card';
 import { Target, Eye, Award, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
-import aboutUs from "../../imports/About_us.png";
+import aboutUs from "../../imports/About_us.webp";
+import aboutUsHeader from "../../imports/aboutUsHeader.webp";
 
 export function About() {
   const { teamMembers } = useContent();
-  const managingDirector = teamMembers[0];
-  const otherMembers = teamMembers.slice(1);
+  const leadershipMember = teamMembers.find(member => member.isLeadership);
+  const otherMembers = teamMembers.filter(member => !member.isLeadership);
+
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -19,12 +21,31 @@ export function About() {
   return (
     <div>
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-4">About Us</h1>
-          <p className="text-xl text-brand-50 max-w-3xl mb-8">
-            A multidisciplinary engineering and management consulting firm dedicated to excellence
-          </p>
+      <section
+        className="relative h-[420px] flex items-center text-white overflow-hidden"
+        style={{
+          backgroundImage: `url(${aboutUsHeader})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          backgroundRepeat: "no-repeat",
+        }}
+        aria-label="About Diksha Consulting engineering team in Nepal"
+      >
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/55"></div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">
+              About Us
+            </h1>
+
+            <p className="text-lg md:text-2xl text-gray-200 leading-relaxed mb-6">
+              A multidisciplinary engineering and management consulting firm
+              dedicated to excellence.
+            </p>
+          </div>
 
           {/* Subsection Navigation */}
           <div className="flex flex-wrap gap-4">
@@ -47,11 +68,11 @@ export function About() {
       {/* Who We Are Section */}
       <section
         id="who-we-are"
-        className="relative py-24 bg-gradient-to-b from-white to-blue-50 overflow-hidden"
+        className="relative py-24 bg-gradient-to-b from-white to-brand-50 overflow-hidden"
       >
         {/* Background Blur */}
-        <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-40 -z-10" />
-        <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-40 -z-10" />
+        <div className="absolute top-0 left-0 w-72 h-72 bg-brand-100 rounded-full blur-3xl opacity-40 -z-10" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-brand-100 rounded-full blur-3xl opacity-40 -z-10" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -59,9 +80,9 @@ export function About() {
             {/* LEFT CONTENT */}
             <div>
               {/* Heading */}
-              <h2 className="text-4xl md:text-5xl font-extrabold leading-tight text-gray-900 mb-6">
+              <h2 className="text-4xl md:text-5xl font-extrabold leading-tight text-gray-800 mb-6">
                 Building Nepal’s Future Through
-                <span className="text-blue-700"> Engineering Excellence</span>
+                <span className="text-brand-600"> Engineering Excellence</span>
               </h2>
 
               {/* Description */}
@@ -107,14 +128,14 @@ export function About() {
               <div className="flex gap-4">
                 <a
                   href="/services"
-                  className="bg-blue-700 hover:bg-blue-800 transition text-white px-6 py-3 rounded-xl font-semibold shadow-lg"
+                  className="bg-brand-600 hover:bg-brand-700 transition text-white px-6 py-3 rounded-xl font-semibold shadow-lg"
                 >
                   Explore Services
                 </a>
 
                 <a
                   href="/contact"
-                  className="border border-gray-300 hover:border-blue-700 hover:text-blue-700 transition px-6 py-3 rounded-xl font-semibold text-gray-700"
+                  className="border border-gray-300 hover:border-brand-600 hover:text-brand-600 transition px-6 py-3 rounded-xl font-semibold text-gray-700"
                 >
                   Contact Us
                 </a>
@@ -153,7 +174,7 @@ export function About() {
               </div>
 
               {/* Floating Badge */}
-              <div className="absolute -bottom-6 -right-6 bg-blue-500 text-white px-6 py-4 rounded-2xl shadow-2xl">
+              <div className="absolute -bottom-6 -right-6 bg-brand-600 text-white px-6 py-4 rounded-2xl shadow-2xl">
                 <CheckCircle className="h-8 w-8 text-white" />
                 <p className="text-3xl font-extrabold">10+</p>
                 <p className="text-sm font-medium">Technical Services</p>
@@ -263,24 +284,24 @@ export function About() {
             </div>
           ) : (
             <>
-              {/* Managing Director - Center Highlight */}
-              {managingDirector && (
+                {/* Leadership Member - Center Highlight */}
+              {leadershipMember && (
                 <div className="max-w-2xl mx-auto mb-16">
-                  <Link to={`/team/${managingDirector.slug}`}>
+                  <Link to={`/team/${leadershipMember.slug}`}>
                     <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-200 cursor-pointer">
                       <div className="grid md:grid-cols-2 gap-6">
                         <img
-                          src={managingDirector.imageUrl}
-                          alt={managingDirector.name}
+                          src={leadershipMember.imageUrl}
+                          alt={leadershipMember.name}
                           className="w-full h-full object-cover"
                         />
                         <CardContent className="pt-6 flex flex-col justify-center">
                           <div className="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full mb-3 w-fit">
                             Leadership
                           </div>
-                          <h3 className="font-semibold text-2xl mb-2">{managingDirector.name}</h3>
-                          <p className="text-brand-600 mb-4">{managingDirector.position}</p>
-                          <p className="text-gray-600">{managingDirector.bio}</p>
+                          <h3 className="font-semibold text-2xl mb-2">{leadershipMember.name}</h3>
+                          <p className="text-brand-600 mb-4">{leadershipMember.position}</p>
+                          <p className="text-gray-600">{leadershipMember.bio}</p>
                         </CardContent>
                       </div>
                     </Card>

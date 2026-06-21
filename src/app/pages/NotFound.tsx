@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { Home, Briefcase, Calendar, FileText } from 'lucide-react';
+import { Home, Briefcase, Calendar, FileText, Building2 } from 'lucide-react';
 
 // Construction Crane Animation Component
 function ConstructionCrane() {
@@ -99,24 +99,35 @@ function ConstructionCrane() {
 export function NotFound() {
   const suggestions = [
     {
-      title: 'Consulting Services',
-      description: 'Explore our professional engineering and management consulting services',
+      title: 'Explore Portfolio',
+      description:
+        'Browse our complete portfolio of projects, consulting assignments, training programs, and events',
+      icon: Briefcase,
+      path: '/portfolio',
+      color: 'from-brand-500 to-brand-600',
+    },
+    {
+      title: 'Consulting',
+      description:
+        'Explore our professional engineering and management consulting services',
       icon: FileText,
-      path: '/consulting-service',
+      path: '/consulting',
       color: 'from-blue-500 to-blue-600',
     },
     {
-      title: 'Our Projects',
-      description: 'View our portfolio of successful engineering projects',
-      icon: Briefcase,
+      title: 'Projects',
+      description:
+        'View our engineering, infrastructure, and development projects',
+      icon: Building2,
       path: '/projects',
       color: 'from-green-500 to-green-600',
     },
     {
-      title: 'Events',
-      description: 'Check out our upcoming workshops, training sessions, and seminars',
+      title: 'Training',
+      description:
+        'Check out our workshops, training programs, seminars, and events',
       icon: Calendar,
-      path: '/events',
+      path: '/training',
       color: 'from-purple-500 to-purple-600',
     },
   ];
@@ -152,12 +163,14 @@ export function NotFound() {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-gray-50 px-4 text-sm text-gray-500">or explore these pages</span>
+            <span className="bg-gray-50 px-4 text-sm text-gray-500">
+              Discover our work, services, and expertise
+            </span>
           </div>
         </div>
 
         {/* Suggestions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {suggestions.map((suggestion, index) => {
             const Icon = suggestion.icon;
             return (
@@ -177,13 +190,31 @@ export function NotFound() {
         </div>
 
         {/* Additional Help */}
-        <div className="text-center mt-12">
-          <p className="text-gray-600 mb-4">
-            Still can't find what you're looking for?
-          </p>
-          <Link to="/contact">
-            <Button variant="outline">Contact Us</Button>
-          </Link>
+        <div className="mt-16">
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-[#1e3a5f] text-white">
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(88,136,196,0.40),transparent_30%),linear-gradient(45deg,rgba(120,160,220,0.18),transparent_50%),radial-gradient(circle_at_top_right,rgba(88,136,196,0.25),transparent_45%)]" />
+
+            <div className="relative px-8 py-12 text-center">
+              <h3 className="text-2xl font-bold mb-3">
+                Still can't find what you're looking for?
+              </h3>
+
+              <p className="mx-auto max-w-2xl text-slate-300 mb-6">
+                Our team is here to help. Contact us and we'll point you in the
+                right direction.
+              </p>
+
+              <Link to="/contact">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="font-medium"
+                >
+                  Contact Us
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
