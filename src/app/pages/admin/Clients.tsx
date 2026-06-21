@@ -19,6 +19,7 @@ import { useContent } from "../../contexts/ContentContext";
 import { toast } from "sonner";
 import { Edit, Trash2, Plus } from "lucide-react";
 import { getUniqueSlug, slugPattern, slugify } from "../../../utils/slug";
+import { ImageUpload } from "../../components/ui/imageupload";
 
 export function ClientsManagement() {
   const { clients, addClient, updateClient, deleteClient } = useContent();
@@ -147,14 +148,12 @@ export function ClientsManagement() {
               />
             </div>
 
-            <div>
-              <Label>Logo URL</Label>
-              <Input
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                placeholder="https://..."
-              />
-            </div>
+            <ImageUpload
+              label="Client Logo"
+              folder="clients"
+              value={logoUrl}
+              onChange={setLogoUrl}
+            />
 
             <div>
               <Label>Website</Label>
