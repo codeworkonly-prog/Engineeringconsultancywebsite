@@ -154,6 +154,13 @@ export function ClientsManagement() {
               value={logoUrl}
               onChange={setLogoUrl}
             />
+            {logoUrl && (
+              <img
+                src={logoUrl}
+                alt="Preview"
+                className="mt-3 h-24 w-24 object-cover border"
+              />
+            )}
 
             <div>
               <Label>Website</Label>
