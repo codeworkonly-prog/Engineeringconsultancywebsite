@@ -1,28 +1,40 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
-import { Checkbox } from '../../components/ui/checkbox';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Textarea } from "../../components/ui/textarea";
+import { Checkbox } from "../../components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
-} from '../../components/ui/dialog';
-import { useContent } from '../../contexts/ContentContext';
-import { toast } from 'sonner';
-import { Edit, Trash2, X, UserCheck } from 'lucide-react';
-import { TeamForm, defaultTeamForm } from './types';
+} from "../../components/ui/dialog";
+import { useContent } from "../../contexts/ContentContext";
+import { toast } from "sonner";
+import { Edit, Trash2, X, UserCheck } from "lucide-react";
+import { TeamForm, defaultTeamForm } from "./types";
+import { uploadImage } from "../../../cloudinary";
+import { ImageUpload } from "../../components/ui/imageupload";
 
 export function TeamSection() {
   const { teamMembers, addTeamMember, updateTeamMember, deleteTeamMember } =
     useContent();
+  const [uploading, setUploading] = useState(false);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<TeamForm>(defaultTeamForm);
+  {
+    /* Image URL */
+  }
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
@@ -30,8 +42,8 @@ export function TeamSection() {
   const generateSlug = (name: string, existingId?: string) => {
     let baseSlug = name
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
 
     const slugExists = (slug: string) =>
       teamMembers.some((t) => t.slug === slug && t.id !== existingId);
@@ -58,14 +70,14 @@ export function TeamSection() {
   };
 
   const currentLeadershipMember = teamMembers.find(
-    (member) => member.isLeadership && member.id !== editingId
+    (member) => member.isLeadership && member.id !== editingId,
   );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.name || !form.position || !form.bio || !form.imageUrl) {
-      toast.error('Please fill all fields');
+      toast.error("Please fill all fields");
       return;
     }
 
@@ -83,17 +95,17 @@ export function TeamSection() {
 
     if (editingId) {
       updateTeamMember(editingId, form);
-      toast.success('Team member updated successfully');
+      toast.success("Team member updated successfully");
       setEditingId(null);
     } else {
       addTeamMember(form);
-      toast.success('Team member added successfully');
+      toast.success("Team member added successfully");
     }
 
     setForm(defaultTeamForm);
   };
 
-  const handleEdit = (member: typeof teamMembers[0]) => {
+  const handleEdit = (member: (typeof teamMembers)[0]) => {
     setForm({
       name: member.name,
       position: member.position,
@@ -116,12 +128,12 @@ export function TeamSection() {
 
     try {
       await deleteTeamMember(deleteTargetId);
-      toast.success('Team member deleted');
+      toast.success("Team member deleted");
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     } catch (error) {
       console.error(error);
-      toast.error('Delete failed');
+      toast.error("Delete failed");
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     }
@@ -138,7 +150,7 @@ export function TeamSection() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {editingId ? 'Edit Team Member' : 'Add New Team Member'}
+            {editingId ? "Edit Team Member" : "Add New Team Member"}
           </CardTitle>
         </CardHeader>
 
@@ -192,20 +204,27 @@ export function TeamSection() {
             </div>
 
             {/* Image URL */}
+            {/* Profile Image */}
             <div>
-              <Label htmlFor="team-image">Image URL</Label>
-
-              <Input
-                id="team-image"
+              <ImageUpload
+                label="Profile Image"
+                folder="team"
                 value={form.imageUrl}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    imageUrl: e.target.value,
-                  })
+                onChange={(url) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    imageUrl: url,
+                  }))
                 }
-                placeholder="https://example.com/image.jpg"
               />
+
+              {form.imageUrl && (
+                <img
+                  src={form.imageUrl}
+                  alt="Preview"
+                  className="mt-3 h-24 w-24 rounded-full object-cover border"
+                />
+              )}
             </div>
 
             {/* Slug */}
@@ -221,7 +240,7 @@ export function TeamSection() {
               />
 
               <p className="text-xs text-gray-500 mt-1">
-                URL: /team/{form.slug || 'member-name'}
+                URL: /team/{form.slug || "member-name"}
               </p>
             </div>
 
@@ -252,8 +271,8 @@ export function TeamSection() {
               {currentLeadershipMember && (
                 <div className="mt-3 text-xs text-brand-700 bg-white border border-brand-200 rounded-md p-3">
                   <p className="font-medium">
-                    Current Leadership Member is {currentLeadershipMember.name} (
-                    {currentLeadershipMember.position})
+                    Current Leadership Member is {currentLeadershipMember.name}{" "}
+                    ({currentLeadershipMember.position})
                   </p>
 
                   <p className="mt-1">
@@ -270,12 +289,13 @@ export function TeamSection() {
 
             {/* Buttons */}
             <div className="flex gap-2">
-              <Button type="submit" className="flex-1">
-                {editingId ? 'Update Member' : 'Add Member'}
+              <Button disabled={uploading} type="submit" className="flex-1">
+                {editingId ? "Update Member" : "Add Member"}
               </Button>
 
               {editingId && (
                 <Button
+                  disabled={uploading}
                   type="button"
                   variant="outline"
                   onClick={cancelEdit}
@@ -291,9 +311,7 @@ export function TeamSection() {
       {/* Team List */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            All Team Members ({teamMembers.length})
-          </CardTitle>
+          <CardTitle>All Team Members ({teamMembers.length})</CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -301,10 +319,9 @@ export function TeamSection() {
             {teamMembers.map((member) => (
               <div
                 key={member.id}
-                className={`border rounded-lg p-4 transition-all duration-200 hover:bg-gray-50 ${member.isLeadership
-                    ? 'border-brand-300 bg-brand-50'
-                    : ''
-                  }`}
+                className={`border rounded-lg p-4 transition-all duration-200 hover:bg-gray-50 ${
+                  member.isLeadership ? "border-brand-300 bg-brand-50" : ""
+                }`}
               >
                 <div className="flex gap-4">
                   <img
@@ -315,9 +332,7 @@ export function TeamSection() {
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">
-                        {member.name}
-                      </h3>
+                      <h3 className="font-semibold">{member.name}</h3>
 
                       {member.isLeadership && (
                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-brand-100 text-brand-700">
@@ -327,13 +342,9 @@ export function TeamSection() {
                       )}
                     </div>
 
-                    <p className="text-sm text-brand-600">
-                      {member.position}
-                    </p>
+                    <p className="text-sm text-brand-600">{member.position}</p>
 
-                    <p className="text-sm text-gray-600 mt-1">
-                      {member.bio}
-                    </p>
+                    <p className="text-sm text-gray-600 mt-1">{member.bio}</p>
 
                     <p className="text-xs text-gray-400 mt-2">
                       /team/{member.slug}
@@ -372,11 +383,15 @@ export function TeamSection() {
           </DialogHeader>
 
           <p className="text-sm text-gray-600">
-            Are you sure you want to delete this team member? This action cannot be undone.
+            Are you sure you want to delete this team member? This action cannot
+            be undone.
           </p>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDelete}>

@@ -1,17 +1,23 @@
-import { useMemo, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
-import { Checkbox } from '../../components/ui/checkbox';
+import { useMemo, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Textarea } from "../../components/ui/textarea";
+import { Checkbox } from "../../components/ui/checkbox";
+import { ImageUpload } from "../../components/ui/imageupload";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../components/ui/select';
+} from "../../components/ui/select";
 import {
   Dialog,
   DialogTrigger,
@@ -19,19 +25,28 @@ import {
   DialogHeader,
   DialogFooter,
   DialogTitle,
-} from '../../components/ui/dialog';
-import { useContent } from '../../contexts/ContentContext';
-import { toast } from 'sonner';
-import { Award, Edit, Search, Trash2, X, Plus,Check, ChevronsUpDown } from 'lucide-react';
+} from "../../components/ui/dialog";
+import { useContent } from "../../contexts/ContentContext";
+import { toast } from "sonner";
+import {
+  Award,
+  Edit,
+  Search,
+  Trash2,
+  X,
+  Plus,
+  Check,
+  ChevronsUpDown,
+} from "lucide-react";
 import {
   PortfolioItem,
   PortfolioStatus,
   PortfolioType,
   defaultPortfolioFormData,
-} from '../../../types/portfolio.types';
+} from "../../../types/portfolio.types";
 
-type TypeFilter = PortfolioType | 'all';
-type StatusFilter = PortfolioStatus | 'all';
+type TypeFilter = PortfolioType | "all";
+type StatusFilter = PortfolioStatus | "all";
 type PortfolioFormErrors = Partial<Record<keyof PortfolioItem, string>>;
 
 const createEmptyForm = (): PortfolioItem => ({ ...defaultPortfolioFormData });
@@ -39,9 +54,9 @@ const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const formatType = (type: PortfolioType) => {
   const labels: Record<PortfolioType, string> = {
-    project: 'Project',
-    consulting: 'Consulting',
-    training: 'Training & Event',
+    project: "Project",
+    consulting: "Consulting",
+    training: "Training & Event",
   };
 
   return labels[type];
@@ -62,7 +77,10 @@ const isValidImagePath = (value: string) =>
   /^(https?:\/\/|data:image\/|\/|\.\/|\.\.\/).+/.test(value) ||
   /^[\w./-]+\.(?:avif|gif|jpe?g|png|svg|webp)(?:\?.*)?$/.test(value);
 
-const getFieldError = (errors: PortfolioFormErrors, field: keyof PortfolioItem) =>
+const getFieldError = (
+  errors: PortfolioFormErrors,
+  field: keyof PortfolioItem,
+) =>
   errors[field] ? (
     <p className="mt-1 text-sm text-red-600">{errors[field]}</p>
   ) : null;
@@ -80,9 +98,9 @@ export function PortfolioSection() {
   } = useContent();
 
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [form, setForm] = useState<PortfolioItem>(createEmptyForm);
   const [errors, setErrors] = useState<PortfolioFormErrors>({});
   const selectedTypeLabel = formatType(form.type).toLowerCase();
@@ -91,27 +109,31 @@ export function PortfolioSection() {
 
   // Client modal state for adding a new client directly from portfolio form
   const [clientModalOpen, setClientModalOpen] = useState(false);
-  const [newClientName, setNewClientName] = useState('');
-  const [newClientLogo, setNewClientLogo] = useState('');
-  const [newClientWebsite, setNewClientWebsite] = useState('');
+  const [newClientName, setNewClientName] = useState("");
+  const [newClientLogo, setNewClientLogo] = useState("");
+  const [newClientWebsite, setNewClientWebsite] = useState("");
   const [customFiscalYears, setCustomFiscalYears] = useState<string[]>([]);
-  const [newSectorName, setNewSectorName] = useState('');
+  const [newSectorName, setNewSectorName] = useState("");
   const [sectorModalOpen, setSectorModalOpen] = useState(false);
 
   const handleAddClientFromModal = async () => {
     const name = newClientName.trim();
-    if (!name) return toast.error('Client name is required');
+    if (!name) return toast.error("Client name is required");
 
     try {
-      const id = await addClient({ name, logoUrl: newClientLogo.trim(), website: newClientWebsite.trim() });
-      updateForm('clientId', id);
+      const id = await addClient({
+        name,
+        logoUrl: newClientLogo.trim(),
+        website: newClientWebsite.trim(),
+      });
+      updateForm("clientId", id);
       setClientModalOpen(false);
-      setNewClientName('');
-      setNewClientLogo('');
-      setNewClientWebsite('');
-      toast.success('Client added');
+      setNewClientName("");
+      setNewClientLogo("");
+      setNewClientWebsite("");
+      toast.success("Client added");
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to add client');
+      toast.error(err?.message || "Failed to add client");
     }
   };
 
@@ -120,7 +142,7 @@ export function PortfolioSection() {
 
     // Default fiscal years
     for (let year = 2070; year <= 2085; year++) {
-      years.add(`${year}/${String((year + 1) % 100).padStart(2, '0')}`);
+      years.add(`${year}/${String((year + 1) % 100).padStart(2, "0")}`);
     }
 
     // Existing data
@@ -134,26 +156,31 @@ export function PortfolioSection() {
     customFiscalYears.forEach((year) => years.add(year));
 
     return Array.from(years).sort((a, b) =>
-      a.localeCompare(b, undefined, { numeric: true })
+      a.localeCompare(b, undefined, { numeric: true }),
     );
   }, [portfolio, customFiscalYears]);
 
   const sectorOptions = useMemo(() => {
-    const options = sectors
-      .map((s) => s.name.trim())
-      .filter(Boolean);
+    const options = sectors.map((s) => s.name.trim()).filter(Boolean);
 
     const currentValue = form.sector?.trim();
-    if (currentValue && !options.some((option) => option.toLowerCase() === currentValue.toLowerCase())) {
+    if (
+      currentValue &&
+      !options.some(
+        (option) => option.toLowerCase() === currentValue.toLowerCase(),
+      )
+    ) {
       options.push(currentValue);
     }
 
-    return Array.from(new Set(options)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    return Array.from(new Set(options)).sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: true }),
+    );
   }, [sectors, form.sector]);
 
   const findSectorByName = (name: string) =>
     sectors.find(
-      (s) => s.name.trim().toLowerCase() === name.trim().toLowerCase()
+      (s) => s.name.trim().toLowerCase() === name.trim().toLowerCase(),
     );
 
   const ensureSectorRecord = async (name?: string) => {
@@ -167,27 +194,27 @@ export function PortfolioSection() {
 
   const handleAddSector = async () => {
     const name = newSectorName.trim();
-    if (!name) return toast.error('Sector name is required');
+    if (!name) return toast.error("Sector name is required");
 
     try {
       await addSector({ name });
-      updateForm('sector', name);
-      setNewSectorName('');
+      updateForm("sector", name);
+      setNewSectorName("");
       setSectorModalOpen(false);
       toast.success(`Sector "${name}" added`);
     } catch (err: any) {
-      toast.error(err?.message || 'Failed to add sector');
+      toast.error(err?.message || "Failed to add sector");
     }
   };
 
   const currentFlagshipItem = useMemo(
     () => portfolio.find((item) => item.isFlagship && item.type === form.type),
-    [portfolio, form.type]
+    [portfolio, form.type],
   );
 
   const updateForm = <K extends keyof PortfolioItem>(
     key: K,
-    value: PortfolioItem[K]
+    value: PortfolioItem[K],
   ) => {
     setForm((current) => ({ ...current, [key]: value }));
     setErrors((current) => {
@@ -201,16 +228,17 @@ export function PortfolioSection() {
 
   const handleAddFiscalYear = () => {
     const latestYear = fiscalYearOptions
-      .map((fy) => Number(fy.split('/')[0]))
+      .map((fy) => Number(fy.split("/")[0]))
       .sort((a, b) => b - a)[0];
 
     const nextYear = latestYear + 1;
-    const nextFiscalYear = `${nextYear}/${String(
-      (nextYear + 1) % 100
-    ).padStart(2, '0')}`;
+    const nextFiscalYear = `${nextYear}/${String((nextYear + 1) % 100).padStart(
+      2,
+      "0",
+    )}`;
 
     setCustomFiscalYears((prev) => [...prev, nextFiscalYear]);
-    updateForm('fiscalYear', nextFiscalYear);
+    updateForm("fiscalYear", nextFiscalYear);
 
     toast.success(`Fiscal year ${nextFiscalYear} added`);
   };
@@ -219,10 +247,10 @@ export function PortfolioSection() {
     const baseSlug = title
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
 
-    if (!baseSlug) return '';
+    if (!baseSlug) return "";
 
     const slugExists = (slug: string) =>
       portfolio.some((item) => item.slug === slug && item.id !== existingId);
@@ -298,26 +326,26 @@ export function PortfolioSection() {
     const fiscalYear = form.fiscalYear?.trim();
     const featuredImage = form.featuredImage.trim();
 
-    if (!title) nextErrors.title = 'Title is required';
-    if (!fiscalYear) nextErrors.fiscalYear = 'Fiscal year is required';
-    if (!form.sector?.trim()) nextErrors.sector = 'Sector is required';
+    if (!title) nextErrors.title = "Title is required";
+    if (!fiscalYear) nextErrors.fiscalYear = "Fiscal year is required";
+    if (!form.sector?.trim()) nextErrors.sector = "Sector is required";
     if (slug && !slugPattern.test(slug)) {
-      nextErrors.slug = 'Use lowercase letters, numbers, and hyphens only';
+      nextErrors.slug = "Use lowercase letters, numbers, and hyphens only";
     }
     if (
       slug &&
       portfolio.some((item) => item.slug === slug && item.id !== editingId)
     ) {
-      nextErrors.slug = 'This slug is already used by another portfolio item';
+      nextErrors.slug = "This slug is already used by another portfolio item";
     }
     if (featuredImage && !isValidImagePath(featuredImage)) {
-      nextErrors.featuredImage = 'Enter a valid image URL or relative path';
+      nextErrors.featuredImage = "Enter a valid image URL or relative path";
     }
     if (fiscalYear && !isValidFiscalYear(fiscalYear)) {
-      nextErrors.fiscalYear = 'Use YYYY/YY with the next year, e.g. 2080/81';
+      nextErrors.fiscalYear = "Use YYYY/YY with the next year, e.g. 2080/81";
     }
     if (form.startDate && form.endDate && form.endDate < form.startDate) {
-      nextErrors.endDate = 'End date cannot be before start date';
+      nextErrors.endDate = "End date cannot be before start date";
     }
 
     return nextErrors;
@@ -325,7 +353,7 @@ export function PortfolioSection() {
 
   const clearOtherFlagshipItems = async (
     currentSlug: string,
-    currentType: PortfolioType
+    currentType: PortfolioType,
   ) => {
     const updates = portfolio
       .filter(
@@ -333,7 +361,7 @@ export function PortfolioSection() {
           item.isFlagship &&
           item.type === currentType &&
           item.id !== editingId &&
-          item.slug !== currentSlug
+          item.slug !== currentSlug,
       )
       .map((item) => {
         const { id, ...payload } = item;
@@ -355,7 +383,7 @@ export function PortfolioSection() {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
-      toast.error('Please fix the highlighted fields');
+      toast.error("Please fix the highlighted fields");
       return;
     }
 
@@ -365,10 +393,10 @@ export function PortfolioSection() {
 
       if (editingId) {
         await updatePortfolioItem(editingId, payload);
-        toast.success('Portfolio item updated');
+        toast.success("Portfolio item updated");
       } else {
         await addPortfolioItem(payload);
-        toast.success('Portfolio item added');
+        toast.success("Portfolio item added");
       }
 
       if (payload.isFlagship) {
@@ -378,7 +406,7 @@ export function PortfolioSection() {
       resetForm();
     } catch (error) {
       console.error(error);
-      toast.error('Something went wrong while saving');
+      toast.error("Something went wrong while saving");
     }
   };
 
@@ -393,12 +421,12 @@ export function PortfolioSection() {
     try {
       await deletePortfolioItem(deleteTargetId);
       if (editingId === deleteTargetId) resetForm();
-      toast.success('Portfolio item deleted');
+      toast.success("Portfolio item deleted");
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     } catch (error) {
       console.error(error);
-      toast.error('Delete failed');
+      toast.error("Delete failed");
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     }
@@ -413,9 +441,9 @@ export function PortfolioSection() {
     const search = searchQuery.trim().toLowerCase();
 
     return portfolio.filter((item) => {
-      const matchesType = typeFilter === 'all' || item.type === typeFilter;
+      const matchesType = typeFilter === "all" || item.type === typeFilter;
       const matchesStatus =
-        statusFilter === 'all' || item.status === statusFilter;
+        statusFilter === "all" || item.status === statusFilter;
       const clientName = clients.find((c) => c.id === item.clientId)?.name;
       const matchesSearch =
         !search ||
@@ -439,7 +467,7 @@ export function PortfolioSection() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {editingId ? 'Edit Portfolio Item' : 'Add Portfolio Item'}
+            {editingId ? "Edit Portfolio Item" : "Add Portfolio Item"}
           </CardTitle>
         </CardHeader>
 
@@ -450,14 +478,18 @@ export function PortfolioSection() {
                 <Label>Type</Label>
                 <Select
                   value={form.type}
-                  onValueChange={(value) => updateForm('type', value as PortfolioType)}
+                  onValueChange={(value) =>
+                    updateForm("type", value as PortfolioType)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="project">Project</SelectItem>
-                    <SelectItem value="consulting">Consulting Services</SelectItem>
+                    <SelectItem value="consulting">
+                      Consulting Services
+                    </SelectItem>
                     <SelectItem value="training">Training</SelectItem>
                   </SelectContent>
                 </Select>
@@ -467,7 +499,9 @@ export function PortfolioSection() {
                 <Label>Status</Label>
                 <Select
                   value={form.status}
-                  onValueChange={(value) => updateForm('status', value as PortfolioStatus)}
+                  onValueChange={(value) =>
+                    updateForm("status", value as PortfolioStatus)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -485,8 +519,8 @@ export function PortfolioSection() {
 
                 <div className="flex gap-2">
                   <Select
-                    value={form.fiscalYear || ''}
-                    onValueChange={(value) => updateForm('fiscalYear', value)}
+                    value={form.fiscalYear || ""}
+                    onValueChange={(value) => updateForm("fiscalYear", value)}
                   >
                     <SelectTrigger className="flex-1">
                       <SelectValue placeholder="Select Fiscal Year" />
@@ -511,7 +545,7 @@ export function PortfolioSection() {
                   </Button>
                 </div>
 
-                {getFieldError(errors, 'fiscalYear')}
+                {getFieldError(errors, "fiscalYear")}
               </div>
             </div>
 
@@ -524,18 +558,18 @@ export function PortfolioSection() {
                   required
                   aria-invalid={Boolean(errors.title)}
                 />
-                {getFieldError(errors, 'title')}
+                {getFieldError(errors, "title")}
               </div>
 
               <div>
                 <Label>Slug</Label>
                 <Input
                   value={form.slug}
-                  onChange={(event) => updateForm('slug', event.target.value)}
+                  onChange={(event) => updateForm("slug", event.target.value)}
                   placeholder="auto-generated-from-title"
                   aria-invalid={Boolean(errors.slug)}
                 />
-                {getFieldError(errors, 'slug')}
+                {getFieldError(errors, "slug")}
               </div>
             </div>
 
@@ -543,17 +577,19 @@ export function PortfolioSection() {
               <Label>Short Description</Label>
               <Textarea
                 value={form.shortDescription}
-                onChange={(event) => updateForm('shortDescription', event.target.value)}
+                onChange={(event) =>
+                  updateForm("shortDescription", event.target.value)
+                }
                 aria-invalid={Boolean(errors.shortDescription)}
               />
-              {getFieldError(errors, 'shortDescription')}
+              {getFieldError(errors, "shortDescription")}
             </div>
 
             <div>
               <Label>Overview</Label>
               <Textarea
-                value={form.overview || ''}
-                onChange={(event) => updateForm('overview', event.target.value)}
+                value={form.overview || ""}
+                onChange={(event) => updateForm("overview", event.target.value)}
                 rows={5}
               />
             </div>
@@ -565,7 +601,10 @@ export function PortfolioSection() {
                   <Select
                     value={form.clientId || undefined}
                     onValueChange={(value) =>
-                      updateForm('clientId', value === 'none' ? undefined : value)
+                      updateForm(
+                        "clientId",
+                        value === "none" ? undefined : value,
+                      )
                     }
                   >
                     <SelectTrigger>
@@ -574,12 +613,17 @@ export function PortfolioSection() {
                     <SelectContent>
                       <SelectItem value="none">None</SelectItem>
                       {clients.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
-                  <Dialog open={clientModalOpen} onOpenChange={setClientModalOpen}>
+                  <Dialog
+                    open={clientModalOpen}
+                    onOpenChange={setClientModalOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
                         <Plus className="h-4 w-4 mr-2" /> Add Client
@@ -593,23 +637,46 @@ export function PortfolioSection() {
                       <div className="space-y-3">
                         <div>
                           <Label>Name *</Label>
-                          <Input value={newClientName} onChange={(e) => setNewClientName(e.target.value)} />
+                          <Input
+                            value={newClientName}
+                            onChange={(e) => setNewClientName(e.target.value)}
+                          />
                         </div>
 
                         <div>
                           <Label>Logo URL</Label>
-                          <Input value={newClientLogo} onChange={(e) => setNewClientLogo(e.target.value)} placeholder="https://..." />
+                          <Input
+                            value={newClientLogo}
+                            onChange={(e) => setNewClientLogo(e.target.value)}
+                            placeholder="https://..."
+                          />
                         </div>
 
                         <div>
                           <Label>Website</Label>
-                          <Input value={newClientWebsite} onChange={(e) => setNewClientWebsite(e.target.value)} placeholder="https://..." />
+                          <Input
+                            value={newClientWebsite}
+                            onChange={(e) =>
+                              setNewClientWebsite(e.target.value)
+                            }
+                            placeholder="https://..."
+                          />
                         </div>
                       </div>
 
                       <DialogFooter>
-                        <Button type="button" onClick={handleAddClientFromModal}>Add Client</Button>
-                        <Button variant="outline" onClick={() => setClientModalOpen(false)}>Cancel</Button>
+                        <Button
+                          type="button"
+                          onClick={handleAddClientFromModal}
+                        >
+                          Add Client
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setClientModalOpen(false)}
+                        >
+                          Cancel
+                        </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
@@ -619,8 +686,10 @@ export function PortfolioSection() {
               <div>
                 <Label>Partner Firms</Label>
                 <Input
-                  value={form.partnerFirms || ''}
-                  onChange={(event) => updateForm('partnerFirms', event.target.value)}
+                  value={form.partnerFirms || ""}
+                  onChange={(event) =>
+                    updateForm("partnerFirms", event.target.value)
+                  }
                 />
               </div>
             </div>
@@ -630,8 +699,8 @@ export function PortfolioSection() {
                 <Label>Sector *</Label>
                 <div className="flex gap-2">
                   <Select
-                    value={form.sector || ''}
-                    onValueChange={(value) => updateForm('sector', value)}
+                    value={form.sector || ""}
+                    onValueChange={(value) => updateForm("sector", value)}
                   >
                     <SelectTrigger className="flex-1">
                       <SelectValue placeholder="Select sector" />
@@ -639,12 +708,17 @@ export function PortfolioSection() {
 
                     <SelectContent>
                       {sectorOptions.map((s) => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                        <SelectItem key={s} value={s}>
+                          {s}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
-                  <Dialog open={sectorModalOpen} onOpenChange={setSectorModalOpen}>
+                  <Dialog
+                    open={sectorModalOpen}
+                    onOpenChange={setSectorModalOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
                         <Plus className="h-4 w-4 mr-2" /> Add Sector
@@ -659,7 +733,11 @@ export function PortfolioSection() {
                       <div className="space-y-4">
                         <div>
                           <Label>Name *</Label>
-                          <Input value={newSectorName} onChange={(e) => setNewSectorName(e.target.value)} placeholder="Sector name" />
+                          <Input
+                            value={newSectorName}
+                            onChange={(e) => setNewSectorName(e.target.value)}
+                            placeholder="Sector name"
+                          />
                         </div>
                       </div>
 
@@ -667,19 +745,26 @@ export function PortfolioSection() {
                         <Button type="button" onClick={handleAddSector}>
                           <Plus className="h-4 w-4 mr-1" /> Add Sector
                         </Button>
-                        <Button variant="outline" onClick={() => setSectorModalOpen(false)}>Cancel</Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setSectorModalOpen(false)}
+                        >
+                          Cancel
+                        </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>
-                {getFieldError(errors, 'sector')}
+                {getFieldError(errors, "sector")}
               </div>
 
               <div>
                 <Label>Location</Label>
                 <Input
-                  value={form.location || ''}
-                  onChange={(event) => updateForm('location', event.target.value)}
+                  value={form.location || ""}
+                  onChange={(event) =>
+                    updateForm("location", event.target.value)
+                  }
                 />
               </div>
             </div>
@@ -689,8 +774,10 @@ export function PortfolioSection() {
                 <Label>Start Date</Label>
                 <Input
                   type="date"
-                  value={form.startDate || ''}
-                  onChange={(event) => updateForm('startDate', event.target.value)}
+                  value={form.startDate || ""}
+                  onChange={(event) =>
+                    updateForm("startDate", event.target.value)
+                  }
                 />
               </div>
 
@@ -698,101 +785,116 @@ export function PortfolioSection() {
                 <Label>End Date</Label>
                 <Input
                   type="date"
-                  value={form.endDate || ''}
-                  onChange={(event) => updateForm('endDate', event.target.value)}
+                  value={form.endDate || ""}
+                  onChange={(event) =>
+                    updateForm("endDate", event.target.value)
+                  }
                   aria-invalid={Boolean(errors.endDate)}
                 />
-                {getFieldError(errors, 'endDate')}
+                {getFieldError(errors, "endDate")}
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <Label>Featured Image</Label>
-                <Input
+                <ImageUpload
+                  label="Featured Image"
+                  folder="portfolio"
                   value={form.featuredImage}
-                  onChange={(event) => updateForm('featuredImage', event.target.value)}
-                  placeholder="https://..."
-                  aria-invalid={Boolean(errors.featuredImage)}
+                  onChange={(url) => updateForm("featuredImage", url)}
                 />
-                {getFieldError(errors, 'featuredImage')}
+
+                {getFieldError(errors, "featuredImage")}
               </div>
-
-
             </div>
 
             {form.featuredImage && (
               <img
                 src={form.featuredImage}
-                alt={form.title || 'Portfolio preview'}
+                alt={form.title || "Portfolio preview"}
                 className="h-44 w-full rounded-lg border object-cover"
               />
             )}
 
-            {form.type === 'project' && (
+            {form.type === "project" && (
               <div className="space-y-3 rounded-lg border p-4">
                 <h3 className="font-semibold">Project Details</h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Input
                     placeholder="Project Type"
-                    value={form.projectType || ''}
-                    onChange={(event) => updateForm('projectType', event.target.value)}
+                    value={form.projectType || ""}
+                    onChange={(event) =>
+                      updateForm("projectType", event.target.value)
+                    }
                     aria-invalid={Boolean(errors.projectType)}
                   />
                   <Input
                     placeholder="Contract Amount"
-                    value={form.contractAmount || ''}
-                    onChange={(event) => updateForm('contractAmount', event.target.value)}
+                    value={form.contractAmount || ""}
+                    onChange={(event) =>
+                      updateForm("contractAmount", event.target.value)
+                    }
                     aria-invalid={Boolean(errors.contractAmount)}
                   />
                 </div>
-                {getFieldError(errors, 'projectType')}
-                {getFieldError(errors, 'contractAmount')}
+                {getFieldError(errors, "projectType")}
+                {getFieldError(errors, "contractAmount")}
               </div>
             )}
 
-            {form.type === 'consulting' && (
+            {form.type === "consulting" && (
               <div className="space-y-3 rounded-lg border p-4">
                 <h3 className="font-semibold">Consulting Details</h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Input
                     placeholder="Service Type"
-                    value={form.serviceType || ''}
-                    onChange={(event) => updateForm('serviceType', event.target.value)}
+                    value={form.serviceType || ""}
+                    onChange={(event) =>
+                      updateForm("serviceType", event.target.value)
+                    }
                     aria-invalid={Boolean(errors.serviceType)}
                   />
                   <Input
                     placeholder="Contract Amount (NRs.)"
-                    value={form.contractAmount || ''}
-                    onChange={(event) => updateForm('contractAmount', event.target.value)}
+                    value={form.contractAmount || ""}
+                    onChange={(event) =>
+                      updateForm("contractAmount", event.target.value)
+                    }
                     aria-invalid={Boolean(errors.contractAmount)}
                   />
                 </div>
-                {getFieldError(errors, 'serviceType')}
-                {getFieldError(errors, 'contractAmount')}
+                {getFieldError(errors, "serviceType")}
+                {getFieldError(errors, "contractAmount")}
               </div>
             )}
 
-            {form.type === 'training' && (
+            {form.type === "training" && (
               <div className="space-y-3 rounded-lg border p-4">
                 <h3 className="font-semibold">Training & Event Details</h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Input
                     placeholder="Training Type"
-                    value={form.trainingType || ''}
-                    onChange={(event) => updateForm('trainingType', event.target.value)}
+                    value={form.trainingType || ""}
+                    onChange={(event) =>
+                      updateForm("trainingType", event.target.value)
+                    }
                     aria-invalid={Boolean(errors.trainingType)}
                   />
                   <Input
                     placeholder="Contract Amount (NRs.)"
-                    value={form.contractAmount || ''}
-                    onChange={(event) => updateForm('contractAmount', event.target.value)}
+                    value={form.contractAmount || ""}
+                    onChange={(event) =>
+                      updateForm("contractAmount", event.target.value)
+                    }
                     aria-invalid={Boolean(errors.contractAmount)}
                   />
                   <Select
-                    value={form.mode || 'physical'}
+                    value={form.mode || "physical"}
                     onValueChange={(value) =>
-                      updateForm('mode', value as 'online' | 'physical' | 'hybrid')
+                      updateForm(
+                        "mode",
+                        value as "online" | "physical" | "hybrid",
+                      )
                     }
                   >
                     <SelectTrigger>
@@ -805,9 +907,9 @@ export function PortfolioSection() {
                     </SelectContent>
                   </Select>
                 </div>
-                {getFieldError(errors, 'trainingType')}
-                {getFieldError(errors, 'contractAmount')}
-                {getFieldError(errors, 'mode')}
+                {getFieldError(errors, "trainingType")}
+                {getFieldError(errors, "contractAmount")}
+                {getFieldError(errors, "mode")}
               </div>
             )}
 
@@ -815,32 +917,40 @@ export function PortfolioSection() {
               <label className="flex items-center gap-2 text-sm font-medium">
                 <Checkbox
                   checked={Boolean(form.displayOnHome)}
-                  onCheckedChange={(checked) => updateForm('displayOnHome', checked === true)}
+                  onCheckedChange={(checked) =>
+                    updateForm("displayOnHome", checked === true)
+                  }
                 />
                 Display on Home Screen
               </label>
               <p className="text-sm text-gray-500">
-                Marking this item will make it eligible for the home screen featured section (up to 4 items per type).
+                Marking this item will make it eligible for the home screen
+                featured section (up to 4 items per type).
               </p>
             </div>
 
             <label className="flex items-center gap-2 text-sm font-medium">
               <Checkbox
                 checked={Boolean(form.isFlagship)}
-                onCheckedChange={(checked) => updateForm('isFlagship', checked === true)}
+                onCheckedChange={(checked) =>
+                  updateForm("isFlagship", checked === true)
+                }
               />
               Flagship {selectedTypeLabel}
             </label>
 
-            {currentFlagshipItem && currentFlagshipItem.id !== editingId && form.isFlagship && (
-              <p className="text-sm text-amber-700">
-                Saving this will replace the current flagship {selectedTypeLabel}: {currentFlagshipItem.title}.
-              </p>
-            )}
+            {currentFlagshipItem &&
+              currentFlagshipItem.id !== editingId &&
+              form.isFlagship && (
+                <p className="text-sm text-amber-700">
+                  Saving this will replace the current flagship{" "}
+                  {selectedTypeLabel}: {currentFlagshipItem.title}.
+                </p>
+              )}
 
             <div className="flex gap-2 border-t pt-4">
               <Button type="submit" className="flex-1">
-                {editingId ? 'Update Portfolio Item' : 'Add Portfolio Item'}
+                {editingId ? "Update Portfolio Item" : "Add Portfolio Item"}
               </Button>
 
               {editingId && (
@@ -879,14 +989,18 @@ export function PortfolioSection() {
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="project">Projects</SelectItem>
-                  <SelectItem value="consulting">Consulting Services</SelectItem>
+                  <SelectItem value="consulting">
+                    Consulting Services
+                  </SelectItem>
                   <SelectItem value="training">Training</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select
                 value={statusFilter}
-                onValueChange={(value) => setStatusFilter(value as StatusFilter)}
+                onValueChange={(value) =>
+                  setStatusFilter(value as StatusFilter)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -946,7 +1060,7 @@ export function PortfolioSection() {
                         item.fiscalYear,
                       ]
                         .filter(Boolean)
-                        .join(' • ') || item.slug}
+                        .join(" • ") || item.slug}
                     </p>
                   </div>
 
@@ -983,11 +1097,15 @@ export function PortfolioSection() {
           </DialogHeader>
 
           <p className="text-sm text-gray-600">
-            Are you sure you want to delete this portfolio item? This action cannot be undone.
+            Are you sure you want to delete this portfolio item? This action
+            cannot be undone.
           </p>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDelete}>
