@@ -65,11 +65,10 @@ export function Dashboard() {
             <button
               key={id}
               onClick={() => setActiveSection(id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 ${
-                activeSection === id
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 cursor-pointer ${activeSection === id
                   ? 'bg-brand-50 text-brand-600'
                   : 'text-gray-700 hover:bg-gray-50'
-              }`}
+                }`}
             >
               {icon}
               <span>{label}</span>
@@ -98,12 +97,14 @@ export function Dashboard() {
         </header>
 
         <div className="p-8">
-          {activeSection === 'dashboard'      && <DashboardHome />}
-          {activeSection === 'portfolio'      && <PortfolioSection />}
-          {activeSection === 'team'           && <TeamSection />}
-          {activeSection === 'clients'        && <ClientsManagement />}
-          {activeSection === 'sectors'        && <SectorsManagement />}
-          {activeSection === 'faqs'           && <FaqsSection />}
+          {activeSection === 'dashboard' && (
+            <DashboardHome onNavigate={setActiveSection} />
+          )}
+          {activeSection === 'portfolio' && <PortfolioSection />}
+          {activeSection === 'team' && <TeamSection />}
+          {activeSection === 'clients' && <ClientsManagement />}
+          {activeSection === 'sectors' && <SectorsManagement />}
+          {activeSection === 'faqs' && <FaqsSection />}
           {activeSection === 'privacy-policy' && <PrivacyPolicySection />}  {/* ← new */}
         </div>
       </main>
