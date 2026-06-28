@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { useContent } from '../../contexts/ContentContext';
 import {
   Briefcase,
-  ClipboardList,
+  Building2,
   GraduationCap,
   Users,
   Landmark,
@@ -38,7 +38,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
     {
       label: 'Projects',
       value: projectCount,
-      icon: ClipboardList,
+      icon: Building2,
       section: 'portfolio',
     },
     {
