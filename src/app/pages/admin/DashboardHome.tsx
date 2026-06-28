@@ -5,8 +5,8 @@ import {
   ClipboardList,
   GraduationCap,
   Users,
-  Building2,
-  Layers3,
+  Landmark,
+  Factory,
 } from 'lucide-react';
 import { Section } from './types';
 
@@ -62,13 +62,13 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
     {
       label: 'Clients',
       value: clients.length,
-      icon: Building2,
+      icon: Landmark,
       section: 'clients',
     },
     {
       label: 'Sectors',
       value: sectors.length,
-      icon: Layers3,
+      icon: Factory,
       section: 'sectors',
     },
   ];

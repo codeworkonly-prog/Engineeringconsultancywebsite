@@ -11,6 +11,9 @@ import {
   Home,
   CircleHelp,
   ShieldCheck,
+  Landmark,
+  Factory,
+  ClipboardList
 } from 'lucide-react';
 import { Section } from './types';
 import { DashboardHome } from './DashboardHome';
@@ -23,10 +26,10 @@ import { PrivacyPolicySection } from './PrivacyPolicySection'; // ← new
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
-  { id: 'portfolio', label: 'Portfolio', icon: <Briefcase className="h-5 w-5" /> },
+  { id: 'portfolio', label: 'Portfolio', icon: <ClipboardList className="h-5 w-5" /> },
   { id: 'team', label: 'Team', icon: <Users className="h-5 w-5" /> },
-  { id: 'clients', label: 'Clients', icon: <Briefcase className="h-5 w-5" /> },
-  { id: 'sectors', label: 'Sectors', icon: <Briefcase className="h-5 w-5" /> },
+  { id: 'clients', label: 'Clients', icon: <Landmark className="h-5 w-5" /> },
+  { id: 'sectors', label: 'Sectors', icon: <Factory className="h-5 w-5" /> },
   { id: 'faqs', label: 'FAQs', icon: <CircleHelp className="h-5 w-5" /> },
   { id: 'privacy-policy', label: 'Privacy Policy', icon: <ShieldCheck className="h-5 w-5" /> }, // ← new
 ];
