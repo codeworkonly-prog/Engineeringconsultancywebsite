@@ -68,7 +68,7 @@ export const router = createBrowserRouter([
       { index: true, Component: DashboardHome },
       { path: 'portfolio', Component: PortfolioSection },
       { path: 'portfolio/add', Component: PortfolioForm },
-      { path: 'portfolio/edit/:id', Component: PortfolioForm },
+      { path: 'portfolio/edit/:slug', Component: PortfolioForm },
       { path: 'team', Component: TeamSection },
       { path: 'clients', Component: ClientsManagement },
       { path: 'sectors', Component: SectorsManagement },
