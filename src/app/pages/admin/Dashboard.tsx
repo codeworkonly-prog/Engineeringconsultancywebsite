@@ -1,11 +1,9 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { Button } from '../../components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
 import {
   LayoutDashboard,
-  Briefcase,
   Users,
   LogOut,
   Home,
@@ -13,25 +11,18 @@ import {
   ShieldCheck,
   Landmark,
   Factory,
-  ClipboardList
+  ClipboardList,
 } from 'lucide-react';
 import { Section } from './types';
-import { DashboardHome } from './DashboardHome';
-import { TeamSection } from './TeamSection';
-import { PortfolioSection } from './PortfolioSection';
-import { ClientsManagement } from './Clients';
-import { SectorsManagement } from './Sectors';
-import { FaqsSection } from './FaqsSection';
-import { PrivacyPolicySection } from './PrivacyPolicySection'; // ← new
 
-const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
-  { id: 'portfolio', label: 'Portfolio', icon: <ClipboardList className="h-5 w-5" /> },
-  { id: 'team', label: 'Team', icon: <Users className="h-5 w-5" /> },
-  { id: 'clients', label: 'Clients', icon: <Landmark className="h-5 w-5" /> },
-  { id: 'sectors', label: 'Sectors', icon: <Factory className="h-5 w-5" /> },
-  { id: 'faqs', label: 'FAQs', icon: <CircleHelp className="h-5 w-5" /> },
-  { id: 'privacy-policy', label: 'Privacy Policy', icon: <ShieldCheck className="h-5 w-5" /> }, // ← new
+const NAV_ITEMS: { id: Section; label: string; to: string; icon: React.ReactNode }[] = [
+  { id: 'dashboard', label: 'Dashboard', to: '/admin', icon: <LayoutDashboard className="h-5 w-5" /> },
+  { id: 'portfolio', label: 'Portfolio', to: '/admin/portfolio', icon: <ClipboardList className="h-5 w-5" /> },
+  { id: 'team', label: 'Team', to: '/admin/team', icon: <Users className="h-5 w-5" /> },
+  { id: 'clients', label: 'Clients', to: '/admin/clients', icon: <Landmark className="h-5 w-5" /> },
+  { id: 'sectors', label: 'Sectors', to: '/admin/sectors', icon: <Factory className="h-5 w-5" /> },
+  { id: 'faqs', label: 'FAQs', to: '/admin/faqs', icon: <CircleHelp className="h-5 w-5" /> },
+  { id: 'privacy-policy', label: 'Privacy Policy', to: '/admin/privacy-policy', icon: <ShieldCheck className="h-5 w-5" /> },
 ];
 
 const SECTION_LABELS: Record<Section, string> = {
@@ -41,13 +32,20 @@ const SECTION_LABELS: Record<Section, string> = {
   clients: 'Clients',
   sectors: 'Sectors',
   faqs: 'FAQs',
-  'privacy-policy': 'Privacy Policy', // ← new
+  'privacy-policy': 'Privacy Policy',
 };
 
-export function Dashboard() {
+// Determines the header title even on nested routes like /admin/portfolio/add
+const getActiveSectionLabel = (pathname: string) => {
+  const segments = pathname.replace(/^\/admin\/?/, '').split('/').filter(Boolean);
+  const sectionId = (segments[0] as Section) || 'dashboard';
+  return SECTION_LABELS[sectionId] ?? 'Dashboard';
+};
+
+export function AdminLayout() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { logout } = useAuth();
-  const [activeSection, setActiveSection] = useState<Section>('dashboard');
 
   const handleLogout = () => {
     logout();
@@ -64,18 +62,20 @@ export function Dashboard() {
         </div>
 
         <nav className="flex-1 p-4 overflow-y-auto">
-          {NAV_ITEMS.map(({ id, label, icon }) => (
-            <button
+          {NAV_ITEMS.map(({ id, label, to, icon }) => (
+            <NavLink
               key={id}
-              onClick={() => setActiveSection(id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 cursor-pointer ${activeSection === id
-                  ? 'bg-brand-50 text-brand-600'
-                  : 'text-gray-700 hover:bg-gray-50'
-                }`}
+              to={to}
+              end={id === 'dashboard'}
+              className={({ isActive }) =>
+                `w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 cursor-pointer ${
+                  isActive ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
+                }`
+              }
             >
               {icon}
               <span>{label}</span>
-            </button>
+            </NavLink>
           ))}
         </nav>
 
@@ -96,19 +96,11 @@ export function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         <header className="bg-white border-b px-8 py-6">
-          <h2 className="text-2xl font-bold text-gray-900">{SECTION_LABELS[activeSection]}</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{getActiveSectionLabel(pathname)}</h2>
         </header>
 
         <div className="p-8">
-          {activeSection === 'dashboard' && (
-            <DashboardHome onNavigate={setActiveSection} />
-          )}
-          {activeSection === 'portfolio' && <PortfolioSection />}
-          {activeSection === 'team' && <TeamSection />}
-          {activeSection === 'clients' && <ClientsManagement />}
-          {activeSection === 'sectors' && <SectorsManagement />}
-          {activeSection === 'faqs' && <FaqsSection />}
-          {activeSection === 'privacy-policy' && <PrivacyPolicySection />}  {/* ← new */}
+          <Outlet />
         </div>
       </main>
     </div>

@@ -14,7 +14,15 @@ import { CompanyProfile } from './pages/CompanyProfile';
 import { CompanySector } from './pages/CompanySector';
 import { ConsultingService } from './pages/ConsultingService';
 import { PortfolioItemDetail } from './pages/PortfolioItemDetail';
-import { Dashboard } from './pages/admin/Dashboard';
+import { AdminLayout } from './pages/admin/Dashboard';
+import { DashboardHome } from './pages/admin/DashboardHome';
+import { PortfolioSection } from './pages/admin/PortfolioSection';
+import { PortfolioForm } from './pages/admin/PortfolioForm';
+import { TeamSection } from './pages/admin/TeamSection';
+import { ClientsManagement } from './pages/admin/Clients';
+import { SectorsManagement } from './pages/admin/Sectors';
+import { FaqsSection } from './pages/admin/FaqsSection';
+import { PrivacyPolicySection } from './pages/admin/PrivacyPolicySection';
 import { AdminLogin } from './components/AdminLogin';
 import { NotFound } from './pages/NotFound';
 import { Faq } from './pages/Faq'; //
@@ -53,8 +61,20 @@ export const router = createBrowserRouter([
     path: '/admin',
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <AdminLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, Component: DashboardHome },
+      { path: 'portfolio', Component: PortfolioSection },
+      { path: 'portfolio/add', Component: PortfolioForm },
+      { path: 'portfolio/edit/:id', Component: PortfolioForm },
+      { path: 'team', Component: TeamSection },
+      { path: 'clients', Component: ClientsManagement },
+      { path: 'sectors', Component: SectorsManagement },
+      { path: 'faqs', Component: FaqsSection },
+      { path: 'privacy-policy', Component: PrivacyPolicySection },
+      { path: '*', Component: NotFound },
+    ],
   },
 ]);
