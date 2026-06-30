@@ -1009,15 +1009,23 @@ export function PortfolioForm() {
                 )}
             </div>
 
-            <div className="flex gap-2 border-t pt-4">
-              <Button type="submit" className="flex-1">
-                {isEditing ? "Update Portfolio Item" : "Add Portfolio Item"}
-              </Button>
+            <div className="flex justify-end gap-3 border-t pt-5">
+  <Button
+    type="button"
+    variant="outline"
+    onClick={goBackToList}
+    className="h-11 px-6 rounded-lg cursor-pointer border-gray-300 hover:bg-gray-100"
+  >
+    Cancel
+  </Button>
 
-              <Button type="button" variant="outline" onClick={goBackToList}>
-                Cancel
-              </Button>
-            </div>
+  <Button
+    type="submit"
+    className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer"
+  >
+    {isEditing ? "Update Portfolio Item" : "Add Portfolio Item"}
+  </Button>
+</div>
           </form>
         </CardContent>
       </Card>
