@@ -98,20 +98,38 @@ export function PortfolioSection() {
 
   return (
     <div className="space-y-6">
+      <Button
+        type="button"
+        size="sm"
+        onClick={() => navigate("/admin/portfolio/add")}
+        className="
+    rounded-xl
+    px-5
+    font-semibold
+    shadow-lg
+    transition-all
+    duration-200
+    cursor-pointer
+
+    bg-brand-600
+    text-white
+
+    hover:bg-brand-700
+    hover:text-white
+    hover:shadow-xl
+    hover:scale-[1.02]
+
+    active:scale-[0.98]
+  "
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add Portfolio Item
+      </Button>
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center justify-between gap-4">
               <CardTitle>Portfolio ({filteredPortfolio.length})</CardTitle>
-
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => navigate("/admin/portfolio/add")}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Portfolio Item
-              </Button>
             </div>
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_160px_160px]">

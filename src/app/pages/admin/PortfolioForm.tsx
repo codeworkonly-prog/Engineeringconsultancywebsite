@@ -425,8 +425,33 @@ export function PortfolioForm() {
           <p className="text-gray-600">
             This portfolio item could not be found. It may have been deleted.
           </p>
-          <Button type="button" onClick={goBackToList}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+          <Button
+            type="button"
+            onClick={goBackToList}
+            variant="outline"
+            className="
+  rounded-xl
+  px-5
+  font-semibold
+  shadow-md
+  transition-all
+  duration-200
+  cursor-pointer
+
+  border-2
+  border-brand-600
+  bg-white
+  text-brand-600
+
+  hover:bg-brand-600
+  hover:text-white
+  hover:shadow-lg
+  hover:scale-[1.02]
+
+  active:scale-[0.98]
+"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Portfolio
           </Button>
         </CardContent>
@@ -436,8 +461,33 @@ export function PortfolioForm() {
 
   return (
     <div className="space-y-6">
-      <Button type="button" variant="ghost" onClick={goBackToList} className="-ml-2">
-        <ArrowLeft className="h-4 w-4 mr-2" />
+      <Button
+        type="button"
+        onClick={goBackToList}
+        variant="outline"
+        className="
+  rounded-xl
+  px-5
+  font-semibold
+  shadow-md
+  transition-all
+  duration-200
+  cursor-pointer
+
+  border-2
+  border-brand-600
+  bg-white
+  text-brand-600
+
+  hover:bg-brand-600
+  hover:text-white
+  hover:shadow-lg
+  hover:scale-[1.02]
+
+  active:scale-[0.98]
+"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Portfolio
       </Button>
 
