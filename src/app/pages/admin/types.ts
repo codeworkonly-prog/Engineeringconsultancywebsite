@@ -5,7 +5,8 @@ export type Section =
   | 'clients'
   | 'sectors'
   | 'faqs'
-  | 'privacy-policy';
+  | 'privacy-policy'
+  | 'website-settings';
 
 
 export type TeamForm = {

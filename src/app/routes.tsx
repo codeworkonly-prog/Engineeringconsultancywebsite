@@ -23,6 +23,7 @@ import { ClientsManagement } from './pages/admin/Clients';
 import { SectorsManagement } from './pages/admin/Sectors';
 import { FaqsSection } from './pages/admin/FaqsSection';
 import { PrivacyPolicySection } from './pages/admin/PrivacyPolicySection';
+import { WebsiteSettingsSection } from './pages/admin/WebsiteSettingsSection';
 import { AdminLogin } from './components/AdminLogin';
 import { NotFound } from './pages/NotFound';
 import { Faq } from './pages/Faq'; //
@@ -74,6 +75,7 @@ export const router = createBrowserRouter([
       { path: 'sectors', Component: SectorsManagement },
       { path: 'faqs', Component: FaqsSection },
       { path: 'privacy-policy', Component: PrivacyPolicySection },
+      { path: 'website-settings', Component: WebsiteSettingsSection },
       { path: '*', Component: NotFound },
     ],
   },

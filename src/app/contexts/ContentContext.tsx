@@ -113,6 +113,35 @@ export interface PrivacyPolicy {
   publishedAt?: string;
 }
 
+export interface WebsiteSettings {
+  // General
+  companyName?: string;
+  companyTagline?: string;
+
+  // Branding
+  companyLogo?: string;
+  favicon?: string;
+
+  // Contact
+  primaryEmail?: string;
+  primaryPhone?: string;
+  secondaryPhone?: string;
+  whatsappNumber?: string;
+  officeAddress?: string;
+  businessHours?: string;
+  panVatNumber?: string;
+  googleMapsEmbedUrl?: string;
+
+  // Social Media
+  facebookUrl?: string;
+  instagramUrl?: string;
+  linkedinUrl?: string;
+  tiktokUrl?: string;
+
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface ContentContextType {
   teamMembers: TeamMember[];
   projects: Project[];
@@ -123,6 +152,7 @@ interface ContentContextType {
   portfolio: PortfolioItem[];
   homeFaqs: HomeFaq[];
   privacyPolicy: PrivacyPolicy | null;
+  websiteSettings: WebsiteSettings | null;
 
   addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
   updateTeamMember: (
@@ -176,6 +206,7 @@ interface ContentContextType {
   deleteHomeFaq: (id: string) => Promise<void>;
 
   savePrivacyPolicy: (policy: PrivacyPolicy) => Promise<void>;
+  saveWebsiteSettings: (settings: WebsiteSettings) => Promise<void>;
 }
 
 /* =========================
@@ -204,6 +235,7 @@ export function ContentProvider({
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [homeFaqs, setHomeFaqs] = useState<HomeFaq[]>([]);
   const [privacyPolicy, setPrivacyPolicy] = useState<PrivacyPolicy | null>(null);
+  const [websiteSettings, setWebsiteSettings] = useState<WebsiteSettings | null>(null);
 
   /* =========================
      Fetch Data
@@ -219,6 +251,7 @@ export function ContentProvider({
     fetchPortfolio();
     fetchHomeFaqs();
     fetchPrivacyPolicy();
+    fetchWebsiteSettings();
   }, []);
 
   /* =========================
@@ -948,6 +981,40 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
 };
 
   /* =========================
+     WEBSITE SETTINGS
+  ========================= */
+
+  const fetchWebsiteSettings = async () => {
+    try {
+      const snapshot = await getDoc(doc(db, "siteContent", "websiteSettings"));
+
+      if (!snapshot.exists()) {
+        setWebsiteSettings(null);
+        return;
+      }
+
+      setWebsiteSettings(snapshot.data() as WebsiteSettings);
+    } catch (error) {
+      console.error("Error fetching website settings:", error);
+    }
+  };
+
+  const saveWebsiteSettings = async (settings: WebsiteSettings) => {
+    try {
+      // Strip undefined fields — Firestore rejects them with setDoc
+      const payload = Object.fromEntries(
+        Object.entries(settings).filter(([, v]) => v !== undefined)
+      ) as WebsiteSettings;
+
+      await setDoc(doc(db, "siteContent", "websiteSettings"), payload);
+      setWebsiteSettings(payload);
+    } catch (error) {
+      console.error("Error saving website settings:", error);
+      throw error;
+    }
+  };
+
+  /* =========================
      Provider Return
   ========================= */
 
@@ -962,6 +1029,7 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
         portfolio,
         homeFaqs,
         privacyPolicy,
+        websiteSettings,
 
         addTeamMember,
         updateTeamMember,
@@ -996,6 +1064,7 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
         deleteHomeFaq,
 
         savePrivacyPolicy,
+        saveWebsiteSettings,
       }}
     >
       {children}

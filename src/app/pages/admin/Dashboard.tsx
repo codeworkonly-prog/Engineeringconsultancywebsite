@@ -12,6 +12,7 @@ import {
   Landmark,
   Factory,
   ClipboardList,
+  Settings,
 } from 'lucide-react';
 import { Section } from './types';
 
@@ -23,6 +24,7 @@ const NAV_ITEMS: { id: Section; label: string; to: string; icon: React.ReactNode
   { id: 'sectors', label: 'Sectors', to: '/admin/sectors', icon: <Factory className="h-5 w-5" /> },
   { id: 'faqs', label: 'FAQs', to: '/admin/faqs', icon: <CircleHelp className="h-5 w-5" /> },
   { id: 'privacy-policy', label: 'Privacy Policy', to: '/admin/privacy-policy', icon: <ShieldCheck className="h-5 w-5" /> },
+  { id: 'website-settings', label: 'Website Settings', to: '/admin/website-settings', icon: <Settings className="h-5 w-5" /> },
 ];
 
 const SECTION_LABELS: Record<Section, string> = {
@@ -33,6 +35,7 @@ const SECTION_LABELS: Record<Section, string> = {
   sectors: 'Sectors',
   faqs: 'FAQs',
   'privacy-policy': 'Privacy Policy',
+  'website-settings': 'Website Settings',
 };
 
 // Determines the header title even on nested routes like /admin/portfolio/add
