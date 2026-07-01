@@ -28,7 +28,7 @@ import { Award, Edit, Search, Trash2, Plus } from "lucide-react";
 import { PortfolioItem, PortfolioStatus, PortfolioType } from "../../../types/portfolio.types";
 
 type TypeFilter = PortfolioType | "all";
-type StatusFilter = PortfolioStatus | "all";
+type FeaturedFilter = "all" | "featured" | "not-featured";
 
 const formatType = (type: PortfolioType) => {
   const labels: Record<PortfolioType, string> = {
@@ -46,7 +46,7 @@ export function PortfolioSection() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [featuredFilter, setFeaturedFilter] = useState<FeaturedFilter>("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
@@ -76,8 +76,9 @@ export function PortfolioSection() {
 
     return portfolio.filter((item: PortfolioItem) => {
       const matchesType = typeFilter === "all" || item.type === typeFilter;
-      const matchesStatus =
-        statusFilter === "all" || item.status === statusFilter;
+      const matchesFeatured =
+        featuredFilter === "all" ||
+        (featuredFilter === "featured" ? item.displayOnHome : !item.displayOnHome);
       const clientName = clients.find((c) => c.id === item.clientId)?.name;
       const matchesSearch =
         !search ||
@@ -92,9 +93,9 @@ export function PortfolioSection() {
           .filter(Boolean)
           .some((value) => value!.toLowerCase().includes(search));
 
-      return matchesType && matchesStatus && matchesSearch;
+      return matchesType && matchesFeatured && matchesSearch;
     });
-  }, [portfolio, typeFilter, statusFilter, searchQuery, clients]);
+  }, [portfolio, typeFilter, featuredFilter, searchQuery, clients]);
 
   return (
     <div className="space-y-6">
@@ -161,19 +162,18 @@ export function PortfolioSection() {
               </Select>
 
               <Select
-                value={statusFilter}
+                value={featuredFilter}
                 onValueChange={(value) =>
-                  setStatusFilter(value as StatusFilter)
+                  setFeaturedFilter(value as FeaturedFilter)
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="upcoming">Upcoming</SelectItem>
-                  <SelectItem value="ongoing">Ongoing</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="featured">Featured on Home</SelectItem>
+                  <SelectItem value="not-featured">Not Featured</SelectItem>
                 </SelectContent>
               </Select>
             </div>
