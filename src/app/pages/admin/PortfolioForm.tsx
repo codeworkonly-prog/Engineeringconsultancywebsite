@@ -443,8 +443,8 @@ export function PortfolioForm() {
   bg-white
   text-brand-600
 
-  hover:bg-brand-600
-  hover:text-white
+  hover:bg-white
+  hover:brand-600
   hover:shadow-lg
   hover:scale-[1.02]
 
@@ -452,7 +452,7 @@ export function PortfolioForm() {
 "
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Portfolio
+            Back to Portfolio List
           </Button>
         </CardContent>
       </Card>
@@ -479,16 +479,17 @@ export function PortfolioForm() {
   bg-white
   text-brand-600
 
-  hover:bg-brand-600
-  hover:text-white
+  hover:bg-white
+  hover:brand-600
   hover:shadow-lg
+  hover:text-brand-600
   hover:scale-[1.02]
 
   active:scale-[0.98]
 "
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Portfolio
+        Back to Portfolio List
       </Button>
 
       <Card>
@@ -569,6 +570,7 @@ export function PortfolioForm() {
                     <Button
                       type="button"
                       variant="outline"
+                      className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors"
                       onClick={handleAddFiscalYear}
                     >
                       <Plus className="h-4 w-4 mr-1" />
@@ -666,7 +668,7 @@ export function PortfolioForm() {
                       onOpenChange={setClientModalOpen}
                     >
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors">
                           <Plus className="h-4 w-4 mr-2" /> Add Client
                         </Button>
                       </DialogTrigger>
@@ -709,12 +711,14 @@ export function PortfolioForm() {
                           <Button
                             type="button"
                             onClick={handleAddClientFromModal}
+                            className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors"
                           >
                             Add Client
                           </Button>
                           <Button
                             variant="outline"
                             onClick={() => setClientModalOpen(false)}
+                            className="h-10 rounded-md px-5 font-semibold bg-white cursor-pointer text-brand-600 hover:text-brand-800 hover:bg-white transition-colors"
                           >
                             Cancel
                           </Button>
@@ -761,7 +765,7 @@ export function PortfolioForm() {
                       onOpenChange={setSectorModalOpen}
                     >
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors">
                           <Plus className="h-4 w-4 mr-2" /> Add Sector
                         </Button>
                       </DialogTrigger>
@@ -783,12 +787,13 @@ export function PortfolioForm() {
                         </div>
 
                         <DialogFooter>
-                          <Button type="button" onClick={handleAddSector}>
+                          <Button type="button" onClick={handleAddSector} className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors">
                             <Plus className="h-4 w-4 mr-1" /> Add Sector
                           </Button>
                           <Button
                             variant="outline"
                             onClick={() => setSectorModalOpen(false)}
+                            className="h-10 rounded-md px-5 font-semibold bg-white cursor-pointer text-brand-600 hover:text-brand-800 hover:bg-white transition-colors"
                           >
                             Cancel
                           </Button>
@@ -1010,22 +1015,22 @@ export function PortfolioForm() {
             </div>
 
             <div className="flex justify-end gap-3 border-t pt-5">
-  <Button
-    type="button"
-    variant="outline"
-    onClick={goBackToList}
-    className="h-11 px-6 rounded-lg cursor-pointer border-gray-300 hover:bg-gray-100"
-  >
-    Cancel
-  </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={goBackToList}
+                className="h-11 px-6 rounded-lg cursor-pointer border-gray-300 hover:bg-gray-100"
+              >
+                Cancel
+              </Button>
 
-  <Button
-    type="submit"
-    className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer"
-  >
-    {isEditing ? "Update Portfolio Item" : "Add Portfolio Item"}
-  </Button>
-</div>
+              <Button
+                type="submit"
+                className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer"
+              >
+                {isEditing ? "Update Portfolio Item" : "Add Portfolio Item"}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
