@@ -68,7 +68,7 @@ export function AdminLayout() {
               to={to}
               end={id === 'dashboard'}
               className={({ isActive }) =>
-                `w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 cursor-pointer ${
+                `w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 cursor-pointer font-semibold ${
                   isActive ? 'bg-brand-50 text-brand-600' : 'text-gray-700 hover:bg-gray-50'
                 }`
               }
