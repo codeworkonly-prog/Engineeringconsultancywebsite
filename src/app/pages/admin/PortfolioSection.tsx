@@ -25,7 +25,7 @@ import {
 import { useContent } from "../../contexts/ContentContext";
 import { toast } from "sonner";
 import { Award, Edit, Search, Trash2, Plus } from "lucide-react";
-import { PortfolioItem, PortfolioStatus, PortfolioType } from "../../../types/portfolio.types";
+import { PortfolioItem, PortfolioType } from "../../../types/portfolio.types";
 
 type TypeFilter = PortfolioType | "all";
 type FeaturedFilter = "all" | "featured" | "not-featured";
@@ -99,84 +99,64 @@ export function PortfolioSection() {
 
   return (
     <div className="space-y-6">
-      <Button
-        type="button"
-        size="sm"
-        onClick={() => navigate("/admin/portfolio/add")}
-        className="
-    rounded-xl
-    px-5
-    font-semibold
-    shadow-lg
-    transition-all
-    duration-200
-    cursor-pointer
-
-    bg-brand-600
-    text-white
-
-    hover:bg-brand-700
-    hover:text-white
-    hover:shadow-xl
-    hover:scale-[1.02]
-
-    active:scale-[0.98]
-  "
-      >
-        <Plus className="mr-2 h-4 w-4" />
-        Add Portfolio Item
-      </Button>
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center justify-between gap-4">
-              <CardTitle>Portfolio ({filteredPortfolio.length})</CardTitle>
+            <CardTitle>Portfolio List ({filteredPortfolio.length})</CardTitle>
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => navigate("/admin/portfolio/add")}
+                className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:bg-brand-700 transition-colors"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Portfolio Item
+              </Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(300px,1fr)_220px_220px]">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                className="pl-10 h-10"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
             </div>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_160px_160px]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  className="pl-10"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                />
-              </div>
+            <Select
+              value={typeFilter}
+              onValueChange={(value) => setTypeFilter(value as TypeFilter)}
+            >
+              <SelectTrigger className="h-10">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="project">Projects</SelectItem>
+                <SelectItem value="consulting">Consulting Services</SelectItem>
+                <SelectItem value="training">Training</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select
-                value={typeFilter}
-                onValueChange={(value) => setTypeFilter(value as TypeFilter)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="project">Projects</SelectItem>
-                  <SelectItem value="consulting">
-                    Consulting Services
-                  </SelectItem>
-                  <SelectItem value="training">Training</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={featuredFilter}
-                onValueChange={(value) =>
-                  setFeaturedFilter(value as FeaturedFilter)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="featured">Featured on Home</SelectItem>
-                  <SelectItem value="not-featured">Not Featured</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={featuredFilter}
+              onValueChange={(value) =>
+                setFeaturedFilter(value as FeaturedFilter)
+              }
+            >
+              <SelectTrigger className="h-10">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="featured">Featured on Home</SelectItem>
+                <SelectItem value="not-featured">Not Featured</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
 

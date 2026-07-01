@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { useContent } from '../../contexts/ContentContext';
 import {
@@ -10,11 +11,18 @@ import {
 } from 'lucide-react';
 import { Section } from './types';
 
-interface DashboardHomeProps {
-  onNavigate: (section: Section) => void;
-}
+const SECTION_ROUTES: Record<Section, string> = {
+  dashboard: '/admin',
+  portfolio: '/admin/portfolio',
+  team: '/admin/team',
+  clients: '/admin/clients',
+  sectors: '/admin/sectors',
+  faqs: '/admin/faqs',
+  'privacy-policy': '/admin/privacy-policy',
+};
 
-export function DashboardHome({ onNavigate }: DashboardHomeProps) {
+export function DashboardHome() {
+  const navigate = useNavigate();
   const { teamMembers, clients, portfolio, sectors } = useContent();
 
   const consultingCount = portfolio.filter(
@@ -81,7 +89,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
         return (
           <Card
             key={stat.label}
-            onClick={() => onNavigate(stat.section)}
+            onClick={() => navigate(SECTION_ROUTES[stat.section])}
             className="cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -19,6 +19,7 @@ import { DashboardHome } from './pages/admin/DashboardHome';
 import { PortfolioSection } from './pages/admin/PortfolioSection';
 import { PortfolioForm } from './pages/admin/PortfolioForm';
 import { TeamSection } from './pages/admin/TeamSection';
+import { TeamForm } from './pages/admin/TeamForm';
 import { ClientsManagement } from './pages/admin/Clients';
 import { SectorsManagement } from './pages/admin/Sectors';
 import { FaqsSection } from './pages/admin/FaqsSection';
@@ -70,6 +71,8 @@ export const router = createBrowserRouter([
       { path: 'portfolio/add', Component: PortfolioForm },
       { path: 'portfolio/edit/:slug', Component: PortfolioForm },
       { path: 'team', Component: TeamSection },
+      { path: 'team/add', Component: TeamForm },
+      { path: 'team/edit/:slug', Component: TeamForm },
       { path: 'clients', Component: ClientsManagement },
       { path: 'sectors', Component: SectorsManagement },
       { path: 'faqs', Component: FaqsSection },
