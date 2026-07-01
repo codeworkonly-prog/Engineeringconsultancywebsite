@@ -55,7 +55,7 @@ export function TeamSection() {
              <Button
                 type="button"
                 size="sm"
-                onClick={() => navigate("/admin/portfolio/add")}
+                onClick={() => navigate("/admin/team/add")}
                 className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:bg-brand-700 transition-colors"
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -112,6 +112,7 @@ export function TeamSection() {
                         variant="ghost"
                         size="sm"
                         type="button"
+                        className="cursor-pointer"
                         onClick={() => navigate(`/admin/team/edit/${member.slug}`)}
                       >
                         <Edit className="h-4 w-4" />
@@ -121,6 +122,7 @@ export function TeamSection() {
                         variant="ghost"
                         size="sm"
                         type="button"
+                        className="cursor-pointer"
                         onClick={() => openDeleteDialog(member.id)}
                       >
                         <Trash2 className="h-4 w-4 text-red-500" />

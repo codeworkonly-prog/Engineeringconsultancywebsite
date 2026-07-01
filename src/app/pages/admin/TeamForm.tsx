@@ -122,7 +122,28 @@ export function TeamForm() {
           <p className="text-gray-600">
             This team member could not be found. They may have been deleted.
           </p>
-          <Button type="button" onClick={goBackToList}>
+          <Button type="button" onClick={goBackToList} className="
+  rounded-xl
+  px-5
+  font-semibold
+  shadow-md
+  transition-all
+  duration-200
+  cursor-pointer
+
+  border-2
+  border-brand-600
+  bg-white
+  text-brand-600
+
+  hover:bg-white
+  hover:brand-600
+  hover:shadow-lg
+  hover:text-brand-600
+  hover:scale-[1.02]
+
+  active:scale-[0.98]
+">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Team
           </Button>
@@ -137,7 +158,28 @@ export function TeamForm() {
         type="button"
         variant="ghost"
         onClick={goBackToList}
-        className="-ml-2"
+        className="
+  rounded-xl
+  px-5
+  font-semibold
+  shadow-md
+  transition-all
+  duration-200
+  cursor-pointer
+
+  border-2
+  border-brand-600
+  bg-white
+  text-brand-600
+
+  hover:bg-white
+  hover:brand-600
+  hover:shadow-lg
+  hover:text-brand-600
+  hover:scale-[1.02]
+
+  active:scale-[0.98]
+"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to Team
@@ -273,14 +315,21 @@ export function TeamForm() {
                 </div>
               )}
             </div>
-
-            <div className="flex gap-2 border-t pt-4">
-              <Button type="submit" className="flex-1">
-                {slug ? "Update Member" : "Add Member"}
+             <div className="flex justify-end gap-3 border-t pt-5">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={goBackToList}
+                className="h-11 px-6 rounded-lg cursor-pointer border-gray-300 hover:bg-gray-100"
+              >
+                Cancel
               </Button>
 
-              <Button type="button" variant="outline" onClick={goBackToList}>
-                Cancel
+              <Button
+                type="submit"
+                className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer"
+              >
+                {slug ? "Update Member" : "Add Member"}
               </Button>
             </div>
           </form>
