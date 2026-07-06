@@ -1,194 +1,62 @@
-import React, { useState } from "react";
+import { useNavigate } from 'react-router';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { Button } from "../../components/ui/button";
+} from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
-} from "../../components/ui/dialog";
-import { useContent } from "../../contexts/ContentContext";
-import { toast } from "sonner";
-import { Edit, Trash2, Plus } from "lucide-react";
-import { getUniqueSlug, slugPattern, slugify } from "../../../utils/slug";
-import { ImageUpload } from "../../components/ui/imageupload";
+} from '../../components/ui/dialog';
+import { useState } from 'react';
+import { useContent } from '../../contexts/ContentContext';
+import { toast } from 'sonner';
+import { Edit, Trash2, Plus } from 'lucide-react';
+import { slugify } from '../../../utils/slug';
 
 export function ClientsManagement() {
-  const { clients, addClient, updateClient, deleteClient } = useContent();
+  const { clients, deleteClient } = useContent();
+  const navigate = useNavigate();
 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [logoUrl, setLogoUrl] = useState("");
-  const [website, setWebsite] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
-  const reset = () => {
-    setEditingId(null);
-    setName("");
-    setSlug("");
-    setLogoUrl("");
-    setWebsite("");
-  };
-
-  const generateSlug = (value: string, existingId?: string) =>
-    getUniqueSlug(
-      value,
-      clients
-        .filter((client) => client.id !== existingId)
-        .map((client) => client.slug || slugify(client.name)),
-    );
-
-  const handleNameChange = (value: string) => {
-    setName(value);
-    setSlug(generateSlug(value, editingId || undefined));
-  };
-
-  const handleEdit = (id: string) => {
-    const c = clients.find((x) => x.id === id);
-    if (!c) return;
-    setEditingId(id);
-    setName(c.name || "");
-    setSlug(c.slug || slugify(c.name || ""));
-    setLogoUrl(c.logoUrl || "");
-    setWebsite(c.website || "");
-  };
-
-  const handleSave = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-
-    const trimmed = name.trim();
-    const trimmedSlug = slug.trim();
-    if (!trimmed) return toast.error("Client name is required");
-    if (!trimmedSlug) return toast.error("Client slug is required");
-    if (!slugPattern.test(trimmedSlug)) {
-      return toast.error(
-        "Use lowercase letters, numbers, and hyphens only for the slug",
-      );
-    }
-
-    try {
-      if (editingId) {
-        await updateClient(editingId, {
-          name: trimmed,
-          slug: trimmedSlug,
-          logoUrl: logoUrl.trim(),
-          website: website.trim(),
-        });
-        toast.success("Client updated");
-      } else {
-        await addClient({
-          name: trimmed,
-          slug: trimmedSlug,
-          logoUrl: logoUrl.trim(),
-          website: website.trim(),
-        });
-        toast.success("Client added");
-      }
-
-      reset();
-    } catch (err: any) {
-      toast.error(err?.message || "Save failed");
-    }
-  };
-
   const handleDelete = async () => {
     if (!deleteTargetId) return;
-
     try {
       await deleteClient(deleteTargetId);
-      toast.success("Client deleted");
+      toast.success('Client deleted');
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     } catch (err: any) {
-      toast.error(err?.message || "Delete failed");
+      toast.error(err?.message || 'Delete failed');
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     }
-  };
-
-  const openDeleteDialog = (id: string) => {
-    setDeleteTargetId(id);
-    setDeleteDialogOpen(true);
   };
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>{editingId ? "Edit Client" : "Add Client"}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Clients ({clients.length})</CardTitle>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => navigate('/admin/clients/add')}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Client
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={(e) => handleSave(e)} className="space-y-4">
-            <div>
-              <Label>Name *</Label>
-              <Input
-                value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                required
-              />
-            </div>
 
-            <div>
-              <Label>Slug *</Label>
-              <Input
-                value={slug}
-                onChange={(e) => setSlug(slugify(e.target.value))}
-                placeholder="client-name"
-                required
-              />
-            </div>
-
-            <ImageUpload
-              label="Client Logo"
-              folder="clients"
-              value={logoUrl}
-              onChange={setLogoUrl}
-            />
-            {logoUrl && (
-              <img
-                src={logoUrl}
-                alt="Preview"
-                className="mt-3 h-24 w-24 object-cover border"
-              />
-            )}
-
-            <div>
-              <Label>Website</Label>
-              <Input
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                placeholder="https://..."
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button type="submit">
-                {editingId ? "Update Client" : "Add Client"}
-              </Button>
-              {editingId && (
-                <Button variant="outline" onClick={reset}>
-                  Cancel
-                </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Clients ({clients.length})</CardTitle>
-        </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {clients.length === 0 ? (
@@ -226,14 +94,17 @@ export function ClientsManagement() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleEdit(c.id)}
+                      onClick={() => navigate(`/admin/clients/edit/${c.id}`)}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => openDeleteDialog(c.id)}
+                      onClick={() => {
+                        setDeleteTargetId(c.id);
+                        setDeleteDialogOpen(true);
+                      }}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
@@ -250,17 +121,11 @@ export function ClientsManagement() {
           <DialogHeader>
             <DialogTitle>Delete Client</DialogTitle>
           </DialogHeader>
-
           <p className="text-sm text-gray-600">
-            Are you sure you want to delete this client? This action cannot be
-            undone.
+            Are you sure you want to delete this client? This action cannot be undone.
           </p>
-
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDelete}>
