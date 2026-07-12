@@ -46,7 +46,7 @@ const formatType = (type: PortfolioType) => {
   const labels: Record<PortfolioType, string> = {
     project: "Project",
     consulting: "Consulting",
-    training: "Training & Event",
+    training: "Training",
   };
 
   return labels[type];
@@ -928,7 +928,7 @@ export function PortfolioForm() {
 
               {form.type === "training" && (
                 <div className="space-y-3 rounded-lg border p-4">
-                  <h3 className="font-semibold">Training & Event Details</h3>
+                  <h3 className="font-semibold">Training Details</h3>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <Input
                       placeholder="Training Type"

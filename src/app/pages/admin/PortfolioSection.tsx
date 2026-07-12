@@ -34,7 +34,7 @@ const formatType = (type: PortfolioType) => {
   const labels: Record<PortfolioType, string> = {
     project: "Project",
     consulting: "Consulting",
-    training: "Training & Event",
+    training: "Training",
   };
 
   return labels[type];
@@ -179,18 +179,13 @@ export function PortfolioSection() {
                         <Award className="h-4 w-4 text-yellow-500" />
                       )}
                       {item.displayOnHome && (
-                        <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700">
+                        <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-brand-700">
                           Featured on Home
                         </span>
                       )}
-                      <span className="rounded bg-gray-100 px-2 py-1 text-xs">
+                      <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-brand-800">
                         {formatType(item.type)}
                       </span>
-                      {item.status && (
-                        <span className="rounded bg-gray-100 px-2 py-1 text-xs">
-                          {item.status}
-                        </span>
-                      )}
                     </div>
 
                     <p className="mt-1 line-clamp-2 text-sm text-gray-600">
