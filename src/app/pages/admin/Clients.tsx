@@ -96,8 +96,10 @@ export function ClientsManagement() {
                       variant="ghost"
                       size="sm"
                       onClick={() => navigate(`/admin/clients/edit/${c.slug || slugify(c.name)}`)}
+                      title="Update Client"
+                      className="cursor-pointer hover:bg-brand-100 hover:text-brand-900"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4 text-brand-900" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -106,6 +108,8 @@ export function ClientsManagement() {
                         setDeleteTargetId(c.id);
                         setDeleteDialogOpen(true);
                       }}
+                      title="Delete Client"
+                      className="cursor-pointer hover:bg-red-50 hover:text-red-600"
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>

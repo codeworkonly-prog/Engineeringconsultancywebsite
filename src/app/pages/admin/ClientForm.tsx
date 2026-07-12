@@ -167,7 +167,7 @@ export function ClientForm() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{slug ? 'Edit Client' : 'Add Client'}</CardTitle>
+          <CardTitle>{slug ? 'Update Client' : 'Add Client'}</CardTitle>
         </CardHeader>
 
         <CardContent>
