@@ -179,11 +179,11 @@ export function PortfolioSection() {
                         <Award className="h-4 w-4 text-yellow-500" />
                       )}
                       {item.displayOnHome && (
-                        <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-brand-700">
+                        <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-brand-800">
                           Featured on Home
                         </span>
                       )}
-                      <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-brand-800">
+                      <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-brand-700">
                         {formatType(item.type)}
                       </span>
                     </div>
