@@ -96,7 +96,7 @@ export function AdminLayout() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         <header className="bg-white border-b px-8 py-6">
-          <h2 className="text-2xl font-bold text-gray-900">{getActiveSectionLabel(pathname)}</h2>
+          <h2 className="text-2xl font-bold text-brand-800">{getActiveSectionLabel(pathname)}</h2>
         </header>
 
         <div className="p-8">
