@@ -188,7 +188,7 @@ export function TeamForm() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {slug ? "Edit Team Member" : "Add New Team Member"}
+            {slug ? "Update Team Member" : "Add New Team Member"}
           </CardTitle>
         </CardHeader>
 

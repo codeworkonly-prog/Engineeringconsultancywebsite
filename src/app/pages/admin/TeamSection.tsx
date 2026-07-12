@@ -112,17 +112,19 @@ export function TeamSection() {
                         variant="ghost"
                         size="sm"
                         type="button"
-                        className="cursor-pointer"
+                        title="Update Team Member"
+                        className="cursor-pointer hover:bg-brand-100 hover:text-brand-900"
                         onClick={() => navigate(`/admin/team/edit/${member.slug}`)}
                       >
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-4 w-4 text-brand-900" />
                       </Button>
 
                       <Button
                         variant="ghost"
                         size="sm"
                         type="button"
-                        className="cursor-pointer"
+                        title="Delete Team Member"
+                        className="cursor-pointer hover:bg-red-50 hover:text-red-600"
                         onClick={() => openDeleteDialog(member.id)}
                       >
                         <Trash2 className="h-4 w-4 text-red-500" />
