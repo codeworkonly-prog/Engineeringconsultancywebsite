@@ -152,7 +152,7 @@ export function SectorForm() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{slug ? 'Edit Sector' : 'Add Sector'}</CardTitle>
+          <CardTitle>{slug ? 'Update Sector' : 'Add Sector'}</CardTitle>
         </CardHeader>
 
         <CardContent>

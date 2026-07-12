@@ -76,8 +76,10 @@ export function SectorsManagement() {
                     <Button
                       variant="ghost"
                       onClick={() => navigate(`/admin/sectors/edit/${s.slug || slugify(s.name)}`)}
+                       title="Update Sector"
+                      className="cursor-pointer hover:bg-brand-100 hover:text-brand-900"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4 text-brand-900" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -86,6 +88,8 @@ export function SectorsManagement() {
                         setDeleteTargetId(s.id);
                         setDeleteDialogOpen(true);
                       }}
+                      title="Delete Sector"
+                      className="cursor-pointer hover:bg-red-100 hover:text-red-900"
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
