@@ -60,10 +60,10 @@ export function FaqForm() {
     try {
       if (editingId) {
         await updateHomeFaq(editingId, payload);
-        toast.success('FAQ updated');
+        toast.success('FAQ updated successfully');
       } else {
         await addHomeFaq(payload);
-        toast.success('FAQ added');
+        toast.success('FAQ added successfully');
       }
       goBackToList();
     } catch (err: any) {
@@ -138,7 +138,7 @@ export function FaqForm() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{editingId ? 'Edit FAQ' : 'Add FAQ'}</CardTitle>
+          <CardTitle>{editingId ? 'Update FAQ' : 'Add FAQ'}</CardTitle>
         </CardHeader>
 
         <CardContent>

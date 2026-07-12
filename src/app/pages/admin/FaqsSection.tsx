@@ -314,11 +314,11 @@ export function FaqsSection() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      title="Edit FAQ"
                       onClick={() => navigate(`/admin/faqs/edit/${faq.id}`)}
-                      className="cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+                      title="Update FAQ"
+                      className="cursor-pointer hover:bg-brand-100 hover:text-brand-900"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4 text-brand-900" />
                     </Button>
                     <Button
                       type="button"
