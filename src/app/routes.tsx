@@ -23,6 +23,7 @@ import { TeamForm } from './pages/admin/TeamForm';
 import { ClientsManagement } from './pages/admin/Clients';
 import { ClientForm } from './pages/admin/ClientForm';
 import { SectorsManagement } from './pages/admin/Sectors';
+import { SectorForm } from './pages/admin/SectorForm';
 import { FaqsSection } from './pages/admin/FaqsSection';
 import { PrivacyPolicySection } from './pages/admin/PrivacyPolicySection';
 import { AdminLogin } from './components/AdminLogin';
@@ -78,6 +79,8 @@ export const router = createBrowserRouter([
       { path: 'clients/add', Component: ClientForm },
       { path: 'clients/edit/:id', Component: ClientForm },
       { path: 'sectors', Component: SectorsManagement },
+      { path: 'sectors/add', Component: SectorForm },
+      { path: 'sectors/edit/:slug', Component: SectorForm },
       { path: 'faqs', Component: FaqsSection },
       { path: 'privacy-policy', Component: PrivacyPolicySection },
       { path: '*', Component: NotFound },
