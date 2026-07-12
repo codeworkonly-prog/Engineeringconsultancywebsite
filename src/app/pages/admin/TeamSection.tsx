@@ -30,7 +30,7 @@ export function TeamSection() {
 
     try {
       await deleteTeamMember(deleteTargetId);
-      toast.success("Team member deleted");
+      toast.success("Team member deleted successfully.");
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     } catch (error) {

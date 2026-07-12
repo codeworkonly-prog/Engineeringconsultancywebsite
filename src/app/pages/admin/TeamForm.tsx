@@ -106,10 +106,10 @@ export function TeamForm() {
 
     if (editingId) {
       updateTeamMember(editingId, form);
-      toast.success("Team member updated successfully");
+      toast.success("Team member updated successfully.");
     } else {
       addTeamMember(form);
-      toast.success("Team member added successfully");
+      toast.success("Team member added successfully.");
     }
 
     goBackToList();

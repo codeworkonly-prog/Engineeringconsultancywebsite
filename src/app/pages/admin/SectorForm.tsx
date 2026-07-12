@@ -74,10 +74,10 @@ export function SectorForm() {
     try {
       if (editingId) {
         await updateSector(editingId, { name: trimmedName, slug: trimmedSlug });
-        toast.success('Sector updated');
+        toast.success('Sector updated successfully.');
       } else {
         await addSector({ name: trimmedName, slug: trimmedSlug });
-        toast.success('Sector added');
+        toast.success('Sector added successfully.');
       }
       goBackToList();
     } catch (err: any) {

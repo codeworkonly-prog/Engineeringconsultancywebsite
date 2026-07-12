@@ -263,7 +263,7 @@ export function FaqsSection() {
     if (!deleteTargetId) return;
     try {
       await deleteHomeFaq(deleteTargetId);
-      toast.success('FAQ deleted');
+      toast.success('FAQ deleted successfully.');
     } catch (err: any) {
       toast.error(err?.message || 'Delete failed');
     } finally {

@@ -143,7 +143,7 @@ export function PortfolioForm() {
       setNewClientName("");
       setNewClientLogo("");
       setNewClientWebsite("");
-      toast.success("Client added");
+      toast.success(`Client "${name}" added successfully.`);
     } catch (err: any) {
       toast.error(err?.message || "Failed to add client");
     }
@@ -210,7 +210,7 @@ export function PortfolioForm() {
       updateForm("sector", name);
       setNewSectorName("");
       setSectorModalOpen(false);
-      toast.success(`Sector "${name}" added`);
+      toast.success(`Sector "${name}" added successfully.`);
     } catch (err: any) {
       toast.error(err?.message || "Failed to add sector");
     }
@@ -249,7 +249,7 @@ export function PortfolioForm() {
     setCustomFiscalYears((prev) => [...prev, nextFiscalYear]);
     updateForm("fiscalYear", nextFiscalYear);
 
-    toast.success(`Fiscal year ${nextFiscalYear} added`);
+    toast.success(`Fiscal year ${nextFiscalYear} added successfully.`);
   };
 
   const generateSlug = (title: string, existingId?: string) => {
@@ -401,10 +401,10 @@ export function PortfolioForm() {
         }
 
         await updatePortfolioItem(editingId, payload);
-        toast.success("Portfolio item updated");
+        toast.success("Portfolio item updated successfully.");
       } else {
         await addPortfolioItem(payload);
-        toast.success("Portfolio item added");
+        toast.success("Portfolio item added successfully.");
       }
 
       if (payload.isFlagship) {

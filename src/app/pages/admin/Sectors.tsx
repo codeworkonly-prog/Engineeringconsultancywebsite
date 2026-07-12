@@ -25,7 +25,7 @@ export function SectorsManagement() {
     if (!deleteTargetId) return;
     try {
       await deleteSector(deleteTargetId);
-      toast.success('Sector deleted');
+      toast.success('Sector deleted successfully.');
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     } catch (err: any) {

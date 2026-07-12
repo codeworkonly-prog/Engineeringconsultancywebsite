@@ -60,10 +60,10 @@ export function FaqForm() {
     try {
       if (editingId) {
         await updateHomeFaq(editingId, payload);
-        toast.success('FAQ updated successfully');
+        toast.success('FAQ updated successfully.');
       } else {
         await addHomeFaq(payload);
-        toast.success('FAQ added successfully');
+        toast.success('FAQ added successfully.');
       }
       goBackToList();
     } catch (err: any) {

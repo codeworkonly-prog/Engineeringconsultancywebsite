@@ -55,7 +55,7 @@ export function PortfolioSection() {
 
     try {
       await deletePortfolioItem(deleteTargetId);
-      toast.success("Portfolio item deleted");
+      toast.success("Portfolio item deleted successfully.");
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
     } catch (error) {
