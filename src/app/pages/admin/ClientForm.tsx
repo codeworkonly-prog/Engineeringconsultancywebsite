@@ -118,7 +118,28 @@ export function ClientForm() {
 
   return (
     <div className="space-y-6">
-      <Button type="button" variant="ghost" onClick={goBackToList} className="-ml-2">
+      <Button type="button" variant="ghost" onClick={goBackToList} className="
+  rounded-xl
+  px-5
+  font-semibold
+  shadow-md
+  transition-all
+  duration-200
+  cursor-pointer
+
+  border-2
+  border-brand-600
+  bg-white
+  text-brand-600
+
+  hover:bg-white
+  hover:brand-600
+  hover:shadow-lg
+  hover:text-brand-600
+  hover:scale-[1.02]
+
+  active:scale-[0.98]
+">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to Clients
       </Button>
@@ -191,12 +212,15 @@ export function ClientForm() {
               )}
             </div>
 
-            <div className="flex gap-2 border-t pt-4">
-              <Button type="submit" className="flex-1">
-                {editingId ? 'Update Client' : 'Add Client'}
-              </Button>
-              <Button type="button" variant="outline" onClick={goBackToList}>
+            <div className="flex justify-end gap-3 border-t pt-5">
+              <Button type="button" variant="outline" onClick={goBackToList}
+                className="h-11 px-6 rounded-lg cursor-pointer border-gray-300 hover:bg-gray-100"
+              >
                 Cancel
+              </Button>
+              <Button type="submit" className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer"
+              >
+                {editingId ? 'Update Client' : 'Add Client'}
               </Button>
             </div>
           </form>

@@ -50,6 +50,7 @@ export function ClientsManagement() {
               type="button"
               size="sm"
               onClick={() => navigate('/admin/clients/add')}
+                className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:bg-brand-700 transition-colors"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Client
