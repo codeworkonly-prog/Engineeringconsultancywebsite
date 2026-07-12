@@ -214,10 +214,10 @@ export function PortfolioSection() {
                       variant="ghost"
                       type="button"
                       title="Update Portfolio Item"
-                      className="cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+                      className="cursor-pointer hover:bg-brand-100 hover:text-brand-900"
                       onClick={() => navigate(`/admin/portfolio/edit/${item.slug}`)}
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4 text-brand-900" />
                     </Button>
 
                     <Button
