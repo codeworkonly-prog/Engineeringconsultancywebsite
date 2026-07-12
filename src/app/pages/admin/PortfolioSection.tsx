@@ -213,7 +213,8 @@ export function PortfolioSection() {
                       size="sm"
                       variant="ghost"
                       type="button"
-                      className="cursor-pointer"
+                      title="Update Portfolio Item"
+                      className="cursor-pointer hover:bg-gray-100 hover:text-gray-900"
                       onClick={() => navigate(`/admin/portfolio/edit/${item.slug}`)}
                     >
                       <Edit className="h-4 w-4" />
@@ -223,7 +224,8 @@ export function PortfolioSection() {
                       size="sm"
                       variant="ghost"
                       type="button"
-                      className="cursor-pointer"
+                      title="Delete Portfolio Item"
+                      className="cursor-pointer hover:bg-red-50 hover:text-red-600"
                       onClick={() => openDeleteDialog(item.id)}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />

@@ -495,7 +495,7 @@ export function PortfolioForm() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {isEditing ? "Edit Portfolio Item" : "Add Portfolio Item"}
+            {isEditing ? "Update Portfolio Item" : "Add Portfolio Item"}
           </CardTitle>
         </CardHeader>
 
