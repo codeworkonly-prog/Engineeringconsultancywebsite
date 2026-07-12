@@ -25,10 +25,11 @@ import { ClientForm } from './pages/admin/ClientForm';
 import { SectorsManagement } from './pages/admin/Sectors';
 import { SectorForm } from './pages/admin/SectorForm';
 import { FaqsSection } from './pages/admin/FaqsSection';
+import { FaqForm } from './pages/admin/FaqForm';
 import { PrivacyPolicySection } from './pages/admin/PrivacyPolicySection';
 import { AdminLogin } from './components/AdminLogin';
 import { NotFound } from './pages/NotFound';
-import { Faq } from './pages/Faq'; //
+import { Faq } from './pages/Faq'; 
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 
@@ -82,6 +83,8 @@ export const router = createBrowserRouter([
       { path: 'sectors/add', Component: SectorForm },
       { path: 'sectors/edit/:slug', Component: SectorForm },
       { path: 'faqs', Component: FaqsSection },
+      { path: 'faqs/add', Component: FaqForm },
+      { path: 'faqs/edit/:slug', Component: FaqForm },
       { path: 'privacy-policy', Component: PrivacyPolicySection },
       { path: '*', Component: NotFound },
     ],

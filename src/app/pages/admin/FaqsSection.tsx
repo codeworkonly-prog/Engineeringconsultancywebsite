@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
 import { Button } from '../../components/ui/button';
 import {
   Dialog,
@@ -14,7 +11,7 @@ import {
 } from '../../components/ui/dialog';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
-import { Edit, Trash2, X, Search, ArrowRight } from 'lucide-react';
+import { Edit, Trash2, Plus, Search, ArrowRight } from 'lucide-react';
 
 /* ─────────────────────────────────────────────
    Custom diamond-chevron SVG used as FAQ bullet
@@ -34,7 +31,6 @@ function FaqIcon({ isOpen }: { isOpen: boolean }) {
         transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
       }}
     >
-      {/* Outer diamond ring */}
       <path
         d="M12 2L22 12L12 22L2 12Z"
         stroke="currentColor"
@@ -44,7 +40,6 @@ function FaqIcon({ isOpen }: { isOpen: boolean }) {
         style={{ transition: 'fill 0.3s ease' }}
         opacity={isOpen ? 0.15 : 1}
       />
-      {/* Inner chevron arrow */}
       <path
         d="M10 9L14 12L10 15"
         stroke="currentColor"
@@ -57,23 +52,14 @@ function FaqIcon({ isOpen }: { isOpen: boolean }) {
 }
 
 /* ─────────────────────────────────────────────
-   Animated accordion answer — stays in DOM
-   Uses max-height CSS trick for SEO crawlability
+   Animated accordion answer
 ───────────────────────────────────────────── */
-function AccordionAnswer({
-  answer,
-  isOpen,
-}: {
-  answer: string;
-  isOpen: boolean;
-}) {
+function AccordionAnswer({ answer, isOpen }: { answer: string; isOpen: boolean }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
 
   useEffect(() => {
-    if (contentRef.current) {
-      setHeight(contentRef.current.scrollHeight);
-    }
+    if (contentRef.current) setHeight(contentRef.current.scrollHeight);
   }, [answer]);
 
   return (
@@ -150,7 +136,6 @@ function FaqItem({
         <FaqIcon isOpen={isOpen} />
         <span style={{ flex: 1 }}>{faq.question}</span>
       </button>
-      {/* Answer always in DOM — hidden via CSS max-height for SEO */}
       <AccordionAnswer answer={faq.answer} isOpen={isOpen} />
     </div>
   );
@@ -162,10 +147,8 @@ function FaqItem({
 function useFaqSchema(faqs: Array<{ question: string; answer: string }>) {
   useEffect(() => {
     if (!faqs.length) return;
-
     const existing = document.querySelector('#faq-schema-ld');
     if (existing) existing.remove();
-
     const script = document.createElement('script');
     script.id = 'faq-schema-ld';
     script.type = 'application/ld+json';
@@ -175,17 +158,11 @@ function useFaqSchema(faqs: Array<{ question: string; answer: string }>) {
       mainEntity: faqs.map((faq) => ({
         '@type': 'Question',
         name: faq.question,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: faq.answer,
-        },
+        acceptedAnswer: { '@type': 'Answer', text: faq.answer },
       })),
     });
     document.head.appendChild(script);
-
-    return () => {
-      script.remove();
-    };
+    return () => { script.remove(); };
   }, [faqs]);
 }
 
@@ -198,60 +175,28 @@ export function HomeFaqDisplay() {
   const [query, setQuery] = useState('');
 
   const top5 = homeFaqs.slice(0, 5);
-
   const filtered = query.trim()
     ? top5.filter(
         (faq) =>
           faq.question.toLowerCase().includes(query.toLowerCase()) ||
-          faq.answer.toLowerCase().includes(query.toLowerCase())
+          faq.answer.toLowerCase().includes(query.toLowerCase()),
       )
     : top5;
 
   useFaqSchema(top5);
-
   if (!homeFaqs.length) return null;
 
   return (
     <section
-      style={{
-        padding: '5rem 0',
-        background: '#FAFAF9',
-        // CSS custom property for accent color, matching brand
-        '--faq-accent': 'var(--brand-600)',
-      } as React.CSSProperties}
+      style={{ padding: '5rem 0', background: '#FAFAF9', '--faq-accent': 'var(--brand-600)' } as React.CSSProperties}
       aria-labelledby="faq-heading"
     >
-      <div
-        style={{
-          maxWidth: '780px',
-          margin: '0 auto',
-          padding: '0 1.5rem',
-        }}
-      >
-        {/* Header */}
+      <div style={{ maxWidth: '780px', margin: '0 auto', padding: '0 1.5rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <p
-            style={{
-              fontSize: '0.8125rem',
-              fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--brand-600)',
-              marginBottom: '0.75rem',
-            }}
-          >
+          <p style={{ fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--brand-600)', marginBottom: '0.75rem' }}>
             Support
           </p>
-          <h2
-            id="faq-heading"
-            style={{
-              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-              fontWeight: 700,
-              color: '#111827',
-              margin: '0 0 0.875rem',
-              lineHeight: 1.2,
-            }}
-          >
+          <h2 id="faq-heading" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, color: '#111827', margin: '0 0 0.875rem', lineHeight: 1.2 }}>
             Frequently Asked Questions
           </h2>
           <p style={{ color: '#6B7280', fontSize: '1.0625rem', maxWidth: '520px', margin: '0 auto' }}>
@@ -259,117 +204,36 @@ export function HomeFaqDisplay() {
           </p>
         </div>
 
-        {/* Search bar */}
-        <div
-          style={{
-            position: 'relative',
-            marginBottom: '2rem',
-          }}
-        >
-          <Search
-            size={16}
-            style={{
-              position: 'absolute',
-              left: '0.9rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#9CA3AF',
-              pointerEvents: 'none',
-            }}
-            aria-hidden
-          />
+        <div style={{ position: 'relative', marginBottom: '2rem' }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} aria-hidden />
           <input
             type="search"
             placeholder="Search questions…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Search FAQs"
-            style={{
-              width: '100%',
-              boxSizing: 'border-box',
-              paddingLeft: '2.5rem',
-              paddingRight: '1rem',
-              paddingTop: '0.625rem',
-              paddingBottom: '0.625rem',
-              fontSize: '0.9375rem',
-              border: '1.5px solid #D1D5DB',
-              borderRadius: '9999px',
-              background: '#fff',
-              color: '#111827',
-              outline: 'none',
-              transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-              fontFamily: 'inherit',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'var(--brand-600)';
-              e.currentTarget.style.boxShadow = '0 0 0 3px color-mix(in srgb, var(--brand-600) 10%, transparent)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = '#D1D5DB';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
+            style={{ width: '100%', boxSizing: 'border-box', paddingLeft: '2.5rem', paddingRight: '1rem', paddingTop: '0.625rem', paddingBottom: '0.625rem', fontSize: '0.9375rem', border: '1.5px solid #D1D5DB', borderRadius: '9999px', background: '#fff', color: '#111827', outline: 'none', transition: 'border-color 0.2s ease, box-shadow 0.2s ease', fontFamily: 'inherit' }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-600)'; e.currentTarget.style.boxShadow = '0 0 0 3px color-mix(in srgb, var(--brand-600) 10%, transparent)'; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = '#D1D5DB'; e.currentTarget.style.boxShadow = 'none'; }}
           />
         </div>
 
-        {/* Accordion list */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: '16px',
-            border: '1.5px solid #E5E7EB',
-            overflow: 'hidden',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.05)',
-          }}
-        >
+        <div style={{ background: '#fff', borderRadius: '16px', border: '1.5px solid #E5E7EB', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.05)' }}>
           {filtered.length === 0 ? (
-            <p
-              style={{
-                padding: '2.5rem',
-                textAlign: 'center',
-                color: '#9CA3AF',
-                fontSize: '0.9375rem',
-              }}
-            >
-              No questions match your search.
-            </p>
+            <p style={{ padding: '2.5rem', textAlign: 'center', color: '#9CA3AF', fontSize: '0.9375rem' }}>No questions match your search.</p>
           ) : (
             filtered.map((faq) => (
-              <FaqItem
-                key={faq.id}
-                faq={faq}
-                isOpen={openId === faq.id}
-                onToggle={() => setOpenId(openId === faq.id ? null : faq.id)}
-              />
+              <FaqItem key={faq.id} faq={faq} isOpen={openId === faq.id} onToggle={() => setOpenId(openId === faq.id ? null : faq.id)} />
             ))
           )}
         </div>
 
-        {/* View All FAQs CTA */}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
           <Link
             to="/faq"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.6875rem 1.75rem',
-              borderRadius: '9999px',
-              border: '1.5px solid var(--brand-600)',
-              color: 'var(--brand-600)',
-              fontWeight: 600,
-              fontSize: '0.9375rem',
-              textDecoration: 'none',
-              transition: 'background 0.2s ease, color 0.2s ease',
-              letterSpacing: '0.01em',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'var(--brand-600)';
-              (e.currentTarget as HTMLAnchorElement).style.color = '#fff';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
-              (e.currentTarget as HTMLAnchorElement).style.color = 'var(--brand-600)';
-            }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6875rem 1.75rem', borderRadius: '9999px', border: '1.5px solid var(--brand-600)', color: 'var(--brand-600)', fontWeight: 600, fontSize: '0.9375rem', textDecoration: 'none', transition: 'background 0.2s ease, color 0.2s ease', letterSpacing: '0.01em' }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = 'var(--brand-600)'; (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; (e.currentTarget as HTMLAnchorElement).style.color = 'var(--brand-600)'; }}
           >
             View All FAQs
             <ArrowRight size={16} />
@@ -381,59 +245,14 @@ export function HomeFaqDisplay() {
 }
 
 /* ─────────────────────────────────────────────
-   Admin CMS panel — add / edit / delete FAQs
+   Admin CMS panel — list + delete only
 ───────────────────────────────────────────── */
 export function FaqsSection() {
-  const { homeFaqs, addHomeFaq, updateHomeFaq, deleteHomeFaq } = useContent();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
+  const { homeFaqs, deleteHomeFaq } = useContent();
+  const navigate = useNavigate();
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-
-  const reset = () => {
-    setEditingId(null);
-    setQuestion('');
-    setAnswer('');
-  };
-
-  const handleEdit = (id: string) => {
-    const faq = homeFaqs.find((item) => item.id === id);
-    if (!faq) return;
-    setEditingId(id);
-    setQuestion(faq.question || '');
-    setAnswer(faq.answer || '');
-  };
-
-  const handleSave = async (event?: React.FormEvent) => {
-    event?.preventDefault();
-    const trimmedQuestion = question.trim();
-    const trimmedAnswer = answer.trim();
-    if (!trimmedQuestion) return toast.error('Question is required');
-    if (!trimmedAnswer) return toast.error('Answer is required');
-
-    const now = new Date().toISOString();
-    const existing = editingId ? homeFaqs.find((item) => item.id === editingId) : undefined;
-    const payload = {
-      question: trimmedQuestion,
-      answer: trimmedAnswer,
-      createdAt: existing?.createdAt || now,
-      updatedAt: now,
-    };
-
-    try {
-      if (editingId) {
-        await updateHomeFaq(editingId, payload);
-        toast.success('FAQ updated');
-      } else {
-        await addHomeFaq(payload);
-        toast.success('FAQ added');
-      }
-      reset();
-    } catch (err: any) {
-      toast.error(err?.message || 'Save failed');
-    }
-  };
 
   const openDeleteDialog = (id: string) => {
     setDeleteTargetId(id);
@@ -444,7 +263,6 @@ export function FaqsSection() {
     if (!deleteTargetId) return;
     try {
       await deleteHomeFaq(deleteTargetId);
-      if (editingId === deleteTargetId) reset();
       toast.success('FAQ deleted');
     } catch (err: any) {
       toast.error(err?.message || 'Delete failed');
@@ -458,48 +276,18 @@ export function FaqsSection() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>{editingId ? 'Edit FAQ' : 'Add FAQ'}</CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          <form onSubmit={handleSave} className="space-y-4">
-            <div>
-              <Label>Question *</Label>
-              <Input
-                value={question}
-                onChange={(event) => setQuestion(event.target.value)}
-                placeholder="What services does Diksha Consulting and Projects provide?"
-                required
-              />
-            </div>
-
-            <div>
-              <Label>Answer *</Label>
-              <Textarea
-                value={answer}
-                onChange={(event) => setAnswer(event.target.value)}
-                rows={5}
-                placeholder="Write a clear answer that helps visitors and search engines understand your services."
-                required
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button type="submit">{editingId ? 'Update FAQ' : 'Add FAQ'}</Button>
-              {editingId && (
-                <Button type="button" variant="outline" onClick={reset}>
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>FAQs ({homeFaqs.length})</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>FAQs ({homeFaqs.length})</CardTitle>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => navigate('/admin/faqs/add')}
+                className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:bg-brand-700 transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add FAQ
+            </Button>
+          </div>
         </CardHeader>
 
         <CardContent>
@@ -516,7 +304,9 @@ export function FaqsSection() {
                 >
                   <div className="min-w-0">
                     <h3 className="font-semibold text-gray-900">{faq.question}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-600">{faq.answer}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-600 line-clamp-2">
+                      {faq.answer}
+                    </p>
                   </div>
 
                   <div className="flex shrink-0 gap-2">
@@ -524,7 +314,9 @@ export function FaqsSection() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleEdit(faq.id)}
+                      title="Edit FAQ"
+                      onClick={() => navigate(`/admin/faqs/edit/${faq.id}`)}
+                      className="cursor-pointer hover:bg-gray-100 hover:text-gray-900"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -532,6 +324,8 @@ export function FaqsSection() {
                       type="button"
                       variant="ghost"
                       size="sm"
+                      title="Delete FAQ"
+                      className="cursor-pointer hover:bg-red-50 hover:text-red-600"
                       onClick={() => openDeleteDialog(faq.id)}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
@@ -549,11 +343,9 @@ export function FaqsSection() {
           <DialogHeader>
             <DialogTitle>Delete FAQ</DialogTitle>
           </DialogHeader>
-
           <p className="text-sm text-gray-600">
             Are you sure you want to delete this FAQ? This action cannot be undone.
           </p>
-
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
               Cancel
