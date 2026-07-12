@@ -347,10 +347,10 @@ export function FaqsSection() {
             Are you sure you want to delete this FAQ? This action cannot be undone.
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="cursor-pointer">
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button variant="destructive" onClick={handleDelete} className="cursor-pointer">
               Delete
             </Button>
           </DialogFooter>
