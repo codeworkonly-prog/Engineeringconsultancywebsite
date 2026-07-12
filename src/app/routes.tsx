@@ -77,7 +77,7 @@ export const router = createBrowserRouter([
       { path: 'team/edit/:slug', Component: TeamForm },
       { path: 'clients', Component: ClientsManagement },
       { path: 'clients/add', Component: ClientForm },
-      { path: 'clients/edit/:id', Component: ClientForm },
+      { path: 'clients/edit/:slug', Component: ClientForm },
       { path: 'sectors', Component: SectorsManagement },
       { path: 'sectors/add', Component: SectorForm },
       { path: 'sectors/edit/:slug', Component: SectorForm },

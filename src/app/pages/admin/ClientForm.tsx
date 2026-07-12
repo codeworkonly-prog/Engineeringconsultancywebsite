@@ -1,14 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
+import { Button } from '../../components/ui/button';
 import { ImageUpload } from '../../components/ui/imageupload';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
@@ -18,28 +13,33 @@ import { getUniqueSlug, slugPattern, slugify } from '../../../utils/slug';
 export function ClientForm() {
   const { clients, addClient, updateClient } = useContent();
   const navigate = useNavigate();
-  const { id } = useParams<{ id?: string }>();
-  const editingId = id || null;
+  const { slug } = useParams<{ slug?: string }>();
 
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
+  const [currentSlug, setCurrentSlug] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [website, setWebsite] = useState('');
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!editingId) {
+    if (!slug) {
+      setEditingId(null);
       setName('');
-      setSlug('');
+      setCurrentSlug('');
       setLogoUrl('');
       setWebsite('');
       return;
     }
 
-    const existing = clients.find((c) => c.id === editingId);
+    const existing = clients.find(
+      (c) => (c.slug || slugify(c.name)) === slug,
+    );
+
     if (existing) {
+      setEditingId(existing.id);
       setName(existing.name || '');
-      setSlug(existing.slug || slugify(existing.name || ''));
+      setCurrentSlug(existing.slug || slugify(existing.name || ''));
       setLogoUrl(existing.logoUrl || '');
       setWebsite(existing.website || '');
       setNotFound(false);
@@ -47,7 +47,7 @@ export function ClientForm() {
       setNotFound(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editingId, clients.length]);
+  }, [slug, clients.length]);
 
   const goBackToList = () => navigate('/admin/clients');
 
@@ -61,19 +61,21 @@ export function ClientForm() {
 
   const handleNameChange = (value: string) => {
     setName(value);
-    setSlug(generateSlug(value));
+    setCurrentSlug(generateSlug(value));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedName = name.trim();
-    const trimmedSlug = slug.trim();
+    const trimmedSlug = currentSlug.trim();
 
     if (!trimmedName) return toast.error('Client name is required');
     if (!trimmedSlug) return toast.error('Client slug is required');
     if (!slugPattern.test(trimmedSlug)) {
-      return toast.error('Use lowercase letters, numbers, and hyphens only for the slug');
+      return toast.error(
+        'Use lowercase letters, numbers, and hyphens only for the slug',
+      );
     }
 
     try {
@@ -100,14 +102,34 @@ export function ClientForm() {
     }
   };
 
-  if (editingId && notFound) {
+  if (slug && notFound) {
     return (
       <Card>
         <CardContent className="space-y-4 p-8 text-center">
           <p className="text-gray-600">
             This client could not be found. It may have been deleted.
           </p>
-          <Button type="button" onClick={goBackToList}>
+          <Button type="button" onClick={goBackToList} className="
+  rounded-xl
+  px-5
+  font-semibold
+  shadow-md
+  transition-all
+  duration-200
+  cursor-pointer
+
+  border-2
+  border-brand-600
+  bg-white
+  text-brand-600
+
+  hover:bg-white
+  hover:brand-600
+  hover:shadow-lg
+  hover:text-brand-600
+  hover:scale-[1.02]
+
+  active:scale-[0.98]">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Clients
           </Button>
@@ -138,15 +160,14 @@ export function ClientForm() {
   hover:text-brand-600
   hover:scale-[1.02]
 
-  active:scale-[0.98]
-">
+  active:scale-[0.98]">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to Clients
       </Button>
 
       <Card>
         <CardHeader>
-          <CardTitle>{editingId ? 'Edit Client' : 'Add Client'}</CardTitle>
+          <CardTitle>{slug ? 'Edit Client' : 'Add Client'}</CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -169,13 +190,13 @@ export function ClientForm() {
               <div>
                 <Label>Slug *</Label>
                 <Input
-                  value={slug}
-                  onChange={(e) => setSlug(slugify(e.target.value))}
+                  value={currentSlug}
+                  onChange={(e) => setCurrentSlug(slugify(e.target.value))}
                   placeholder="client-name"
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  /portfolio?client={slug || 'client-name'}
+                  /portfolio?client={currentSlug || 'client-name'}
                 </p>
               </div>
 
@@ -212,15 +233,21 @@ export function ClientForm() {
               )}
             </div>
 
-            <div className="flex justify-end gap-3 border-t pt-5">
-              <Button type="button" variant="outline" onClick={goBackToList}
+             <div className="flex justify-end gap-3 border-t pt-5">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={goBackToList}
                 className="h-11 px-6 rounded-lg cursor-pointer border-gray-300 hover:bg-gray-100"
               >
                 Cancel
               </Button>
-              <Button type="submit" className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer"
+
+              <Button
+                type="submit"
+                className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer"
               >
-                {editingId ? 'Update Client' : 'Add Client'}
+                 {slug ? 'Update Client' : 'Add Client'}
               </Button>
             </div>
           </form>
