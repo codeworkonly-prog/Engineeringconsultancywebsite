@@ -42,6 +42,61 @@ type PortfolioFormErrors = Partial<Record<keyof PortfolioItem, string>>;
 const createEmptyForm = (): PortfolioItem => ({ ...defaultPortfolioFormData });
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+const SHORT_DESCRIPTION_MAX = 160;
+
+// Shared button styles — was previously repeated verbatim on 5 buttons.
+const primaryModalBtn =
+  "h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors";
+
+const cancelModalBtn =
+  "h-10 rounded-md px-5 font-semibold bg-white cursor-pointer text-brand-600 hover:text-brand-800 hover:bg-white transition-colors";
+
+const backButtonClass = `
+  rounded-xl
+  px-5
+  font-semibold
+  shadow-md
+  transition-all
+  duration-200
+  cursor-pointer
+
+  border-2
+  border-brand-600
+  bg-white
+  text-brand-600
+
+  hover:bg-white
+  hover:brand-600
+  hover:shadow-lg
+  hover:text-brand-600
+  hover:scale-[1.02]
+
+  active:scale-[0.98]
+`;
+
+// Config-driven type-details block — replaces three near-identical
+// Project/Consulting/Training sections with a single render path.
+const typeConfig: Record<
+  PortfolioType,
+  { label: string; typeField: keyof PortfolioItem; typeLabel: string }
+> = {
+  project: {
+    label: "Project Details",
+    typeField: "projectType",
+    typeLabel: "Project Type",
+  },
+  consulting: {
+    label: "Consulting Details",
+    typeField: "serviceType",
+    typeLabel: "Service Type",
+  },
+  training: {
+    label: "Training Details",
+    typeField: "trainingType",
+    typeLabel: "Training Type",
+  },
+};
+
 const formatType = (type: PortfolioType) => {
   const labels: Record<PortfolioType, string> = {
     project: "Project",
@@ -95,6 +150,7 @@ export function PortfolioForm() {
   const [form, setForm] = useState<PortfolioItem>(createEmptyForm);
   const [errors, setErrors] = useState<PortfolioFormErrors>({});
   const [notFound, setNotFound] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const selectedTypeLabel = formatType(form.type).toLowerCase();
 
   // Client modal state for adding a new client directly from portfolio form
@@ -390,6 +446,8 @@ export function PortfolioForm() {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       await ensureSectorRecord(form.sector?.trim());
       const payload = getPayload();
@@ -415,6 +473,8 @@ export function PortfolioForm() {
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong while saving");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -429,27 +489,7 @@ export function PortfolioForm() {
             type="button"
             onClick={goBackToList}
             variant="outline"
-            className="
-  rounded-xl
-  px-5
-  font-semibold
-  shadow-md
-  transition-all
-  duration-200
-  cursor-pointer
-
-  border-2
-  border-brand-600
-  bg-white
-  text-brand-600
-
-  hover:bg-white
-  hover:brand-600
-  hover:shadow-lg
-  hover:scale-[1.02]
-
-  active:scale-[0.98]
-"
+            className={backButtonClass}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Portfolio List
@@ -459,34 +499,15 @@ export function PortfolioForm() {
     );
   }
 
+  const activeTypeConfig = typeConfig[form.type];
+
   return (
     <div className="space-y-6">
       <Button
         type="button"
         onClick={goBackToList}
         variant="outline"
-        className="
-  rounded-xl
-  px-5
-  font-semibold
-  shadow-md
-  transition-all
-  duration-200
-  cursor-pointer
-
-  border-2
-  border-brand-600
-  bg-white
-  text-brand-600
-
-  hover:bg-white
-  hover:brand-600
-  hover:shadow-lg
-  hover:text-brand-600
-  hover:scale-[1.02]
-
-  active:scale-[0.98]
-"
+        className={backButtonClass}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Portfolio List
@@ -570,7 +591,7 @@ export function PortfolioForm() {
                     <Button
                       type="button"
                       variant="outline"
-                      className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors"
+                      className={primaryModalBtn}
                       onClick={handleAddFiscalYear}
                     >
                       <Plus className="h-4 w-4 mr-1" />
@@ -607,17 +628,129 @@ export function PortfolioForm() {
               </div>
             </div>
 
+            {/* Type-specific details — single config-driven block replaces the
+               three near-duplicated Project/Consulting/Training sections */}
+            <div className="border-t pt-6">
+              <div className="space-y-3 rounded-lg border p-4">
+                <h3 className="font-semibold">{activeTypeConfig.label}</h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <Input
+                    placeholder={activeTypeConfig.typeLabel}
+                    value={(form[activeTypeConfig.typeField] as string) || ""}
+                    onChange={(event) =>
+                      updateForm(activeTypeConfig.typeField, event.target.value as any)
+                    }
+                    aria-invalid={Boolean(errors[activeTypeConfig.typeField])}
+                  />
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="Contract Amount (NRs.)"
+                    value={form.contractAmount || ""}
+                    onChange={(event) =>
+                      updateForm("contractAmount", event.target.value)
+                    }
+                    aria-invalid={Boolean(errors.contractAmount)}
+                  />
+                  {form.type === "training" && (
+                    <Select
+                      value={form.mode || "physical"}
+                      onValueChange={(value) =>
+                        updateForm(
+                          "mode",
+                          value as "online" | "physical" | "hybrid",
+                        )
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="online">Online</SelectItem>
+                        <SelectItem value="physical">Physical</SelectItem>
+                        <SelectItem value="hybrid">Hybrid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                {getFieldError(errors, activeTypeConfig.typeField)}
+                {getFieldError(errors, "contractAmount")}
+                {form.type === "training" && getFieldError(errors, "mode")}
+              </div>
+            </div>
+
+            <div className="space-y-3 border-t pt-6">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Visibility
+              </h3>
+
+              <label className="flex items-start gap-3 rounded-lg border p-3 text-sm">
+                <Checkbox
+                  className="mt-0.5"
+                  checked={Boolean(form.displayOnHome)}
+                  onCheckedChange={(checked) =>
+                    updateForm("displayOnHome", checked === true)
+                  }
+                />
+                <span>
+                  <span className="font-medium">Display on Home Screen</span>
+                  <p className="text-gray-500">
+                    Marking this item will make it eligible for the home
+                    screen featured section (up to 4 items per type).
+                  </p>
+                </span>
+              </label>
+
+              <label className="flex items-center gap-3 rounded-lg border p-3 text-sm font-medium">
+                <Checkbox
+                  checked={Boolean(form.isFlagship)}
+                  onCheckedChange={(checked) =>
+                    updateForm("isFlagship", checked === true)
+                  }
+                  aria-describedby={
+                    currentFlagshipItem && form.isFlagship
+                      ? "flagship-warning"
+                      : undefined
+                  }
+                />
+                Flagship {selectedTypeLabel}
+              </label>
+
+              {currentFlagshipItem &&
+                currentFlagshipItem.id !== editingId &&
+                form.isFlagship && (
+                  <p id="flagship-warning" className="text-sm text-amber-700">
+                    Saving this will replace the current flagship{" "}
+                    {selectedTypeLabel}: {currentFlagshipItem.title}.
+                  </p>
+                )}
+            </div>
+
             <div className="space-y-4 border-t pt-6">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Description
               </h3>
               <div>
-                <Label>Short Description</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Short Description</Label>
+                  <span
+                    className={`text-xs ${(form.shortDescription?.length || 0) >
+                        SHORT_DESCRIPTION_MAX
+                        ? "text-red-500"
+                        : "text-gray-400"
+                      }`}
+                  >
+                    {form.shortDescription?.length || 0}/{SHORT_DESCRIPTION_MAX}
+                  </span>
+                </div>
                 <Textarea
                   value={form.shortDescription}
                   onChange={(event) =>
                     updateForm("shortDescription", event.target.value)
                   }
+                  maxLength={SHORT_DESCRIPTION_MAX}
+                  rows={2}
+                  placeholder="One or two sentences shown on cards and previews"
                   aria-invalid={Boolean(errors.shortDescription)}
                 />
                 {getFieldError(errors, "shortDescription")}
@@ -629,6 +762,7 @@ export function PortfolioForm() {
                   value={form.overview || ""}
                   onChange={(event) => updateForm("overview", event.target.value)}
                   rows={5}
+                  placeholder="Full narrative shown on the detail page (background, scope, outcome)"
                 />
               </div>
             </div>
@@ -668,7 +802,7 @@ export function PortfolioForm() {
                       onOpenChange={setClientModalOpen}
                     >
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors">
+                        <Button variant="outline" size="sm" className={primaryModalBtn}>
                           <Plus className="h-4 w-4 mr-2" /> Add Client
                         </Button>
                       </DialogTrigger>
@@ -711,14 +845,14 @@ export function PortfolioForm() {
                           <Button
                             type="button"
                             onClick={handleAddClientFromModal}
-                            className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors"
+                            className={primaryModalBtn}
                           >
                             Add Client
                           </Button>
                           <Button
                             variant="outline"
                             onClick={() => setClientModalOpen(false)}
-                            className="h-10 rounded-md px-5 font-semibold bg-white cursor-pointer text-brand-600 hover:text-brand-800 hover:bg-white transition-colors"
+                            className={cancelModalBtn}
                           >
                             Cancel
                           </Button>
@@ -765,7 +899,7 @@ export function PortfolioForm() {
                       onOpenChange={setSectorModalOpen}
                     >
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors">
+                        <Button variant="outline" size="sm" className={primaryModalBtn}>
                           <Plus className="h-4 w-4 mr-2" /> Add Sector
                         </Button>
                       </DialogTrigger>
@@ -787,13 +921,13 @@ export function PortfolioForm() {
                         </div>
 
                         <DialogFooter>
-                          <Button type="button" onClick={handleAddSector} className="h-10 rounded-md px-5 font-semibold bg-brand-600 cursor-pointer text-white hover:text-white hover:bg-brand-700 transition-colors">
+                          <Button type="button" onClick={handleAddSector} className={primaryModalBtn}>
                             <Plus className="h-4 w-4 mr-1" /> Add Sector
                           </Button>
                           <Button
                             variant="outline"
                             onClick={() => setSectorModalOpen(false)}
-                            className="h-10 rounded-md px-5 font-semibold bg-white cursor-pointer text-brand-600 hover:text-brand-800 hover:bg-white transition-colors"
+                            className={cancelModalBtn}
                           >
                             Cancel
                           </Button>
@@ -873,152 +1007,12 @@ export function PortfolioForm() {
               )}
             </div>
 
-            <div className="border-t pt-6">
-              {form.type === "project" && (
-                <div className="space-y-3 rounded-lg border p-4">
-                  <h3 className="font-semibold">Project Details</h3>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <Input
-                      placeholder="Project Type"
-                      value={form.projectType || ""}
-                      onChange={(event) =>
-                        updateForm("projectType", event.target.value)
-                      }
-                      aria-invalid={Boolean(errors.projectType)}
-                    />
-                    <Input
-                      placeholder="Contract Amount"
-                      value={form.contractAmount || ""}
-                      onChange={(event) =>
-                        updateForm("contractAmount", event.target.value)
-                      }
-                      aria-invalid={Boolean(errors.contractAmount)}
-                    />
-                  </div>
-                  {getFieldError(errors, "projectType")}
-                  {getFieldError(errors, "contractAmount")}
-                </div>
-              )}
-
-              {form.type === "consulting" && (
-                <div className="space-y-3 rounded-lg border p-4">
-                  <h3 className="font-semibold">Consulting Details</h3>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <Input
-                      placeholder="Service Type"
-                      value={form.serviceType || ""}
-                      onChange={(event) =>
-                        updateForm("serviceType", event.target.value)
-                      }
-                      aria-invalid={Boolean(errors.serviceType)}
-                    />
-                    <Input
-                      placeholder="Contract Amount (NRs.)"
-                      value={form.contractAmount || ""}
-                      onChange={(event) =>
-                        updateForm("contractAmount", event.target.value)
-                      }
-                      aria-invalid={Boolean(errors.contractAmount)}
-                    />
-                  </div>
-                  {getFieldError(errors, "serviceType")}
-                  {getFieldError(errors, "contractAmount")}
-                </div>
-              )}
-
-              {form.type === "training" && (
-                <div className="space-y-3 rounded-lg border p-4">
-                  <h3 className="font-semibold">Training Details</h3>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <Input
-                      placeholder="Training Type"
-                      value={form.trainingType || ""}
-                      onChange={(event) =>
-                        updateForm("trainingType", event.target.value)
-                      }
-                      aria-invalid={Boolean(errors.trainingType)}
-                    />
-                    <Input
-                      placeholder="Contract Amount (NRs.)"
-                      value={form.contractAmount || ""}
-                      onChange={(event) =>
-                        updateForm("contractAmount", event.target.value)
-                      }
-                      aria-invalid={Boolean(errors.contractAmount)}
-                    />
-                    <Select
-                      value={form.mode || "physical"}
-                      onValueChange={(value) =>
-                        updateForm(
-                          "mode",
-                          value as "online" | "physical" | "hybrid",
-                        )
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="online">Online</SelectItem>
-                        <SelectItem value="physical">Physical</SelectItem>
-                        <SelectItem value="hybrid">Hybrid</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {getFieldError(errors, "trainingType")}
-                  {getFieldError(errors, "contractAmount")}
-                  {getFieldError(errors, "mode")}
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-3 border-t pt-6">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Visibility
-              </h3>
-
-              <label className="flex items-start gap-3 rounded-lg border p-3 text-sm">
-                <Checkbox
-                  className="mt-0.5"
-                  checked={Boolean(form.displayOnHome)}
-                  onCheckedChange={(checked) =>
-                    updateForm("displayOnHome", checked === true)
-                  }
-                />
-                <span>
-                  <span className="font-medium">Display on Home Screen</span>
-                  <p className="text-gray-500">
-                    Marking this item will make it eligible for the home
-                    screen featured section (up to 4 items per type).
-                  </p>
-                </span>
-              </label>
-
-              <label className="flex items-center gap-3 rounded-lg border p-3 text-sm font-medium">
-                <Checkbox
-                  checked={Boolean(form.isFlagship)}
-                  onCheckedChange={(checked) =>
-                    updateForm("isFlagship", checked === true)
-                  }
-                />
-                Flagship {selectedTypeLabel}
-              </label>
-
-              {currentFlagshipItem &&
-                currentFlagshipItem.id !== editingId &&
-                form.isFlagship && (
-                  <p className="text-sm text-amber-700">
-                    Saving this will replace the current flagship{" "}
-                    {selectedTypeLabel}: {currentFlagshipItem.title}.
-                  </p>
-                )}
-            </div>
-
             <div className="flex justify-end gap-3 border-t pt-5">
               <Button
                 type="button"
                 variant="outline"
                 onClick={goBackToList}
+                disabled={isSubmitting}
                 className="h-11 px-6 rounded-lg cursor-pointer border-gray-300 hover:bg-gray-100"
               >
                 Cancel
@@ -1026,9 +1020,14 @@ export function PortfolioForm() {
 
               <Button
                 type="submit"
-                className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer"
+                disabled={isSubmitting}
+                className="h-11 px-8 rounded-lg bg-brand-700 text-white hover:bg-brand-800 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isEditing ? "Update Portfolio Item" : "Add Portfolio Item"}
+                {isSubmitting
+                  ? "Saving..."
+                  : isEditing
+                    ? "Update Portfolio Item"
+                    : "Add Portfolio Item"}
               </Button>
             </div>
           </form>
