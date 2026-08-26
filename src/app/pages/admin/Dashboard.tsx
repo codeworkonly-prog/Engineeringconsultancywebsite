@@ -12,6 +12,7 @@ import {
   Landmark,
   Factory,
   ClipboardList,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Section } from './types';
 
@@ -22,6 +23,7 @@ const NAV_ITEMS: { id: Section; label: string; to: string; icon: React.ReactNode
   { id: 'clients', label: 'Clients', to: '/admin/clients', icon: <Landmark className="h-5 w-5" /> },
   { id: 'sectors', label: 'Sectors', to: '/admin/sectors', icon: <Factory className="h-5 w-5" /> },
   { id: 'faqs', label: 'FAQs', to: '/admin/faqs', icon: <CircleHelp className="h-5 w-5" /> },
+  { id: 'hero-carousel', label: 'Hero Carousel', to: '/admin/hero-carousel', icon: <ImageIcon className="h-5 w-5" /> },
   { id: 'privacy-policy', label: 'Privacy Policy', to: '/admin/privacy-policy', icon: <ShieldCheck className="h-5 w-5" /> },
 ];
 
@@ -32,6 +34,7 @@ const SECTION_LABELS: Record<Section, string> = {
   clients: 'Clients',
   sectors: 'Sectors',
   faqs: 'FAQs',
+  'hero-carousel': 'Hero Carousel',
   'privacy-policy': 'Privacy Policy',
 };
 

@@ -8,6 +8,7 @@ import {
   Users,
   Landmark,
   Factory,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Section } from './types';
 
@@ -23,7 +24,7 @@ const SECTION_ROUTES: Record<Section, string> = {
 
 export function DashboardHome() {
   const navigate = useNavigate();
-  const { teamMembers, clients, portfolio, sectors } = useContent();
+  const { teamMembers, clients, portfolio, sectors, heroImages } = useContent();
 
   const consultingCount = portfolio.filter(
     (item) => item.type === 'consulting'
@@ -78,6 +79,12 @@ export function DashboardHome() {
       value: sectors.length,
       icon: Factory,
       section: 'sectors',
+    },
+    {
+      label: 'Hero Images',
+      value: heroImages.length,
+      icon: ImageIcon,
+      section: 'hero-carousel',
     },
   ];
 

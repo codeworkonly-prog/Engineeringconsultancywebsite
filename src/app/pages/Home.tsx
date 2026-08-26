@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
@@ -9,8 +9,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "../components/ui/carousel";
 import { HomeFaqDisplay } from "./admin/FaqsSection";
-import { CheckCircle, Users, Award, Lightbulb } from "lucide-react";
+import { CheckCircle, Users, Award, Lightbulb, ChevronLeft, ChevronRight } from "lucide-react";
 import { useContent } from "../contexts/ContentContext";
 import { PortfolioItem, PortfolioType } from "../../types/portfolio.types";
 const engineering = new URL("../../imports/engineering.webp", import.meta.url)
@@ -25,9 +31,38 @@ const portfolioTypeLabels: Record<PortfolioType, string> = {
 };
 
 export function Home() {
-  const { clients, portfolio } = useContent();
+  const { clients, portfolio, heroImages } = useContent();
   const [selectedPortfolioType, setSelectedPortfolioType] =
     useState<PortfolioType>("project");
+  const [heroApi, setHeroApi] = useState<CarouselApi | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto-play carousel
+  useEffect(() => {
+    if (!heroApi || heroImages.length <= 1) return;
+
+    const interval = setInterval(() => {
+      heroApi.scrollNext();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [heroApi, heroImages.length]);
+
+  // Track current slide for dot indicators
+  useEffect(() => {
+    if (!heroApi) return;
+
+    const onSelect = () => {
+      setCurrentSlide(heroApi.selectedScrollSnap());
+    };
+
+    heroApi.on("select", onSelect);
+    onSelect();
+
+    return () => {
+      heroApi.off("select", onSelect);
+    };
+  }, [heroApi]);
 
   const featuredPortfolioItems = portfolio
     .filter((item) => item.type === selectedPortfolioType && item.displayOnHome)
@@ -113,20 +148,86 @@ export function Home() {
       <div>
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center text-white overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <img
-              src={engineering}
-              alt="Engineering Consultancy"
-              className="w-full h-full object-cover"
-            />
+          {heroImages.length > 0 ? (
+            /* Dynamic Carousel */
+            <>
+              <Carousel
+                className="absolute inset-0"
+                opts={{ loop: true, align: "start" }}
+                setApi={setHeroApi}
+              >
+                <CarouselContent className="-ml-0">
+                  {heroImages
+                    .sort((a, b) => a.order - b.order)
+                    .map((image) => (
+                      <CarouselItem key={image.id} className="pl-0 basis-full">
+                        <div className="relative w-full h-screen">
+                          <img
+                            src={image.url}
+                            alt="Hero slide"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                </CarouselContent>
+              </Carousel>
 
-            {/* Optional Overlay */}
-            <div className="absolute inset-0 bg-black/40"></div>
-          </div>
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-black/40 z-[1]" />
+
+              {/* Navigation Arrows */}
+              {heroImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() => heroApi?.scrollPrev()}
+                    className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[3] w-12 h-12 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm flex items-center justify-center transition-all duration-300 cursor-pointer border border-white/30"
+                    aria-label="Previous slide"
+                  >
+                    <ChevronLeft className="h-6 w-6 text-white" />
+                  </button>
+                  <button
+                    onClick={() => heroApi?.scrollNext()}
+                    className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[3] w-12 h-12 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm flex items-center justify-center transition-all duration-300 cursor-pointer border border-white/30"
+                    aria-label="Next slide"
+                  >
+                    <ChevronRight className="h-6 w-6 text-white" />
+                  </button>
+                </>
+              )}
+
+              {/* Dot Indicators */}
+              {heroImages.length > 1 && (
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[3] flex gap-2">
+                  {heroImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => heroApi?.scrollTo(index)}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer border-0 ${
+                        currentSlide === index
+                          ? "bg-white scale-110"
+                          : "bg-white/40 hover:bg-white/60"
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            /* Fallback: Static hero image */
+            <div className="absolute inset-0">
+              <img
+                src={engineering}
+                alt="Engineering Consultancy"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/40"></div>
+            </div>
+          )}
 
           {/* Content */}
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="relative z-[2] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div className="max-w-3xl">
               <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
                 Engineering Consultancy & Project Experts in Nepal

@@ -5,6 +5,7 @@ export type Section =
   | 'clients'
   | 'sectors'
   | 'faqs'
+  | 'hero-carousel'
   | 'privacy-policy';
 
 

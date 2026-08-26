@@ -97,6 +97,12 @@ export interface Event {
   slug: string;
 }
 
+export interface HeroCarouselImage {
+  id: string;
+  url: string;
+  order: number;
+}
+
 export interface HomeFaq {
   id: string;
   question: string;
@@ -123,6 +129,7 @@ interface ContentContextType {
   portfolio: PortfolioItem[];
   homeFaqs: HomeFaq[];
   privacyPolicy: PrivacyPolicy | null;
+  heroImages: HeroCarouselImage[];
 
   addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
   updateTeamMember: (
@@ -176,6 +183,10 @@ interface ContentContextType {
   deleteHomeFaq: (id: string) => Promise<void>;
 
   savePrivacyPolicy: (policy: PrivacyPolicy) => Promise<void>;
+
+  addHeroImage: (image: Omit<HeroCarouselImage, "id">) => Promise<void>;
+  deleteHeroImage: (id: string) => Promise<void>;
+  updateHeroImages: (images: HeroCarouselImage[]) => Promise<void>;
 }
 
 /* =========================
@@ -204,6 +215,7 @@ export function ContentProvider({
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [homeFaqs, setHomeFaqs] = useState<HomeFaq[]>([]);
   const [privacyPolicy, setPrivacyPolicy] = useState<PrivacyPolicy | null>(null);
+  const [heroImages, setHeroImages] = useState<HeroCarouselImage[]>([]);
 
   /* =========================
      Fetch Data
@@ -219,6 +231,7 @@ export function ContentProvider({
     fetchPortfolio();
     fetchHomeFaqs();
     fetchPrivacyPolicy();
+    fetchHeroImages();
   }, []);
 
   /* =========================
@@ -844,11 +857,74 @@ export function ContentProvider({
       console.error("Error deleting portfolio item:", error);
       throw error;
     }
+  };  /* =========================
+     HERO CAROUSEL IMAGES
+     ========================= */
+
+  const fetchHeroImages = async () => {
+    try {
+      const snapshot = await getDoc(doc(db, "siteContent", "heroCarousel"));
+
+      if (!snapshot.exists()) {
+        setHeroImages([]);
+        return;
+      }
+
+      const data = snapshot.data() as { images: HeroCarouselImage[] };
+      setHeroImages((data.images || []).sort((a, b) => a.order - b.order));
+    } catch (error) {
+      console.error("Error fetching hero carousel images:", error);
+    }
+  };
+
+  const saveHeroImages = async (images: HeroCarouselImage[]) => {
+    try {
+      const payload = { images };
+      await setDoc(doc(db, "siteContent", "heroCarousel"), payload);
+      setHeroImages(images.sort((a, b) => a.order - b.order));
+    } catch (error) {
+      console.error("Error saving hero carousel images:", error);
+      throw error;
+    }
+  };
+
+  const addHeroImage = async (image: Omit<HeroCarouselImage, "id">) => {
+    try {
+      const id = `hero_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const newImage = { ...image, id };
+      const updated = [...heroImages, newImage]
+        .sort((a, b) => a.order - b.order);
+      await saveHeroImages(updated);
+    } catch (error) {
+      console.error("Error adding hero image:", error);
+      throw error;
+    }
+  };
+
+  const deleteHeroImage = async (id: string) => {
+    try {
+      const updated = heroImages
+        .filter((img) => img.id !== id)
+        .map((img, index) => ({ ...img, order: index }));
+      await saveHeroImages(updated);
+    } catch (error) {
+      console.error("Error deleting hero image:", error);
+      throw error;
+    }
+  };
+
+  const updateHeroImages = async (images: HeroCarouselImage[]) => {
+    try {
+      await saveHeroImages(images);
+    } catch (error) {
+      console.error("Error updating hero images:", error);
+      throw error;
+    }
   };
 
   /* =========================
      HOME FAQS
-  ========================= */
+     ========================= */
 
   const sortHomeFaqs = (items: HomeFaq[]) =>
     [...items].sort((a, b) =>
@@ -962,6 +1038,7 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
         portfolio,
         homeFaqs,
         privacyPolicy,
+        heroImages,
 
         addTeamMember,
         updateTeamMember,
@@ -996,6 +1073,10 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
         deleteHomeFaq,
 
         savePrivacyPolicy,
+
+        addHeroImage,
+        deleteHeroImage,
+        updateHeroImages,
       }}
     >
       {children}
