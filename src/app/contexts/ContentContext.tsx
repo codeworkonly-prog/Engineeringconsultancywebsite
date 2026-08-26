@@ -119,6 +119,13 @@ export interface PrivacyPolicy {
   publishedAt?: string;
 }
 
+export interface ContactInfo {
+  address: string;
+  email: string;
+  phone: string;
+  businessHours?: string;
+}
+
 interface ContentContextType {
   teamMembers: TeamMember[];
   projects: Project[];
@@ -130,6 +137,7 @@ interface ContentContextType {
   homeFaqs: HomeFaq[];
   privacyPolicy: PrivacyPolicy | null;
   heroImages: HeroCarouselImage[];
+  contactInfo: ContactInfo | null;
 
   addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
   updateTeamMember: (
@@ -187,6 +195,8 @@ interface ContentContextType {
   addHeroImage: (image: Omit<HeroCarouselImage, "id">) => Promise<void>;
   deleteHeroImage: (id: string) => Promise<void>;
   updateHeroImages: (images: HeroCarouselImage[]) => Promise<void>;
+
+  saveContactInfo: (info: ContactInfo) => Promise<void>;
 }
 
 /* =========================
@@ -216,6 +226,7 @@ export function ContentProvider({
   const [homeFaqs, setHomeFaqs] = useState<HomeFaq[]>([]);
   const [privacyPolicy, setPrivacyPolicy] = useState<PrivacyPolicy | null>(null);
   const [heroImages, setHeroImages] = useState<HeroCarouselImage[]>([]);
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
 
   /* =========================
      Fetch Data
@@ -232,6 +243,7 @@ export function ContentProvider({
     fetchHomeFaqs();
     fetchPrivacyPolicy();
     fetchHeroImages();
+    fetchContactInfo();
   }, []);
 
   /* =========================
@@ -923,6 +935,39 @@ export function ContentProvider({
   };
 
   /* =========================
+     CONTACT INFO
+     ========================= */
+
+  const fetchContactInfo = async () => {
+    try {
+      const snapshot = await getDoc(doc(db, "siteContent", "contactInfo"));
+
+      if (!snapshot.exists()) {
+        setContactInfo(null);
+        return;
+      }
+
+      setContactInfo(snapshot.data() as ContactInfo);
+    } catch (error) {
+      console.error("Error fetching contact info:", error);
+    }
+  };
+
+  const saveContactInfo = async (info: ContactInfo) => {
+    try {
+      const payload = Object.fromEntries(
+        Object.entries(info).filter(([, v]) => v !== undefined)
+      ) as ContactInfo;
+
+      await setDoc(doc(db, "siteContent", "contactInfo"), payload);
+      setContactInfo(payload);
+    } catch (error) {
+      console.error("Error saving contact info:", error);
+      throw error;
+    }
+  };
+
+  /* =========================
      HOME FAQS
      ========================= */
 
@@ -1039,6 +1084,7 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
         homeFaqs,
         privacyPolicy,
         heroImages,
+        contactInfo,
 
         addTeamMember,
         updateTeamMember,
@@ -1077,6 +1123,8 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
         addHeroImage,
         deleteHeroImage,
         updateHeroImages,
+
+        saveContactInfo,
       }}
     >
       {children}

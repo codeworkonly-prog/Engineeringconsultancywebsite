@@ -10,6 +10,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
+import { RichTextEditor } from "../../components/ui/rich-text-editor";
 import { Checkbox } from "../../components/ui/checkbox";
 import { ImageUpload } from "../../components/ui/imageupload";
 import {
@@ -41,8 +42,6 @@ type PortfolioFormErrors = Partial<Record<keyof PortfolioItem, string>>;
 
 const createEmptyForm = (): PortfolioItem => ({ ...defaultPortfolioFormData });
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-const SHORT_DESCRIPTION_MAX = 160;
 
 // Shared button styles — was previously repeated verbatim on 5 buttons.
 const primaryModalBtn =
@@ -733,36 +732,26 @@ export function PortfolioForm() {
               <div>
                 <div className="flex items-center justify-between">
                   <Label>Short Description</Label>
-                  <span
-                    className={`text-xs ${(form.shortDescription?.length || 0) >
-                        SHORT_DESCRIPTION_MAX
-                        ? "text-red-500"
-                        : "text-gray-400"
-                      }`}
-                  >
-                    {form.shortDescription?.length || 0}/{SHORT_DESCRIPTION_MAX}
+                  <span className="text-xs text-gray-400">
+                    Brief summary shown on cards and previews
                   </span>
                 </div>
-                <Textarea
+                <RichTextEditor
                   value={form.shortDescription}
-                  onChange={(event) =>
-                    updateForm("shortDescription", event.target.value)
-                  }
-                  maxLength={SHORT_DESCRIPTION_MAX}
-                  rows={2}
+                  onChange={(html) => updateForm("shortDescription", html)}
                   placeholder="One or two sentences shown on cards and previews"
-                  aria-invalid={Boolean(errors.shortDescription)}
+                  minHeight="100px"
                 />
                 {getFieldError(errors, "shortDescription")}
               </div>
 
               <div>
                 <Label>Overview</Label>
-                <Textarea
+                <RichTextEditor
                   value={form.overview || ""}
-                  onChange={(event) => updateForm("overview", event.target.value)}
-                  rows={5}
+                  onChange={(html) => updateForm("overview", html)}
                   placeholder="Full narrative shown on the detail page (background, scope, outcome)"
+                  minHeight="200px"
                 />
               </div>
             </div>

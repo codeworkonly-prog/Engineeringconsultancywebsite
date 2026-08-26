@@ -6,6 +6,7 @@ import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
 import { PortfolioFiltersState } from '../../types/portfolio.types';
+import { SanitizedHtml } from '../components/ui/sanitized-html';
 
 export function ConsultingService() {
   const { portfolio, clients } = useContent();
@@ -45,7 +46,7 @@ export function ConsultingService() {
     const matchesSearch =
       !search ||
       item.title.toLowerCase().includes(search) ||
-      item.shortDescription.toLowerCase().includes(search);
+      item.shortDescription.replace(/<[^>]*>/g, '').toLowerCase().includes(search);
     const matchesSector = !filters.sector || item.sector === filters.sector;
     const matchesFiscalYear = !filters.fiscalYear || item.fiscalYear === filters.fiscalYear;
     const matchesClient = !filters.client || item.clientId === filters.client;
@@ -179,7 +180,10 @@ export function ConsultingService() {
                             <span>{assignment.location}</span>
                           </div>
                         )}
-                        <p className="text-sm text-gray-600 line-clamp-3 mb-4">{assignment.shortDescription}</p>
+                        <SanitizedHtml
+                          html={assignment.shortDescription}
+                          className="text-sm text-gray-600 line-clamp-3 mb-4 [&_p]:mb-1 [&_strong]:font-semibold [&_em]:italic [&_a]:text-brand-600 [&_a]:underline [&_table]:text-xs [&_th]:text-xs [&_td]:text-xs [&_th]:border-gray-200 [&_td]:border-gray-200 [&_th]:px-2 [&_td]:px-2 [&_th]:py-1 [&_td]:py-1 [&_th]:bg-gray-50 [&_table]:border-collapse [&_table]:w-full"
+                        />
                         <div className="text-sm text-gray-500 space-y-1 mb-4">
                           {clients.find((c) => c.id === assignment.clientId)?.name && (
                             <p>Client: {clients.find((c) => c.id === assignment.clientId)?.name}</p>

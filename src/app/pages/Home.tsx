@@ -19,6 +19,7 @@ import { HomeFaqDisplay } from "./admin/FaqsSection";
 import { CheckCircle, Users, Award, Lightbulb, ChevronLeft, ChevronRight } from "lucide-react";
 import { useContent } from "../contexts/ContentContext";
 import { PortfolioItem, PortfolioType } from "../../types/portfolio.types";
+import { SanitizedHtml } from "../components/ui/sanitized-html";
 const engineering = new URL("../../imports/engineering.webp", import.meta.url)
   .href;
 import { Helmet } from "react-helmet-async";
@@ -416,9 +417,10 @@ export function Home() {
                           {item.title}
                         </h3>
 
-                        <p className="text-sm text-gray-600">
-                          {item.shortDescription}
-                        </p>
+                        <SanitizedHtml
+                          html={item.shortDescription}
+                          className="text-sm text-gray-600 [&_p]:mb-1 [&_a]:text-brand-600 [&_a]:underline [&_strong]:font-semibold [&_em]:italic [&_table]:text-xs [&_th]:text-xs [&_td]:text-xs [&_th]:border-gray-200 [&_td]:border-gray-200 [&_th]:px-2 [&_td]:px-2 [&_th]:py-1 [&_td]:py-1 [&_th]:bg-gray-50 [&_table]:border-collapse [&_table]:w-full [&_table]:my-1 line-clamp-3"
+                        />
                       </CardContent>
                     </Card>
                   </Link>

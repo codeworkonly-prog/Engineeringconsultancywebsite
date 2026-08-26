@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { SanitizedHtml } from "../../components/ui/sanitized-html";
 import { useNavigate } from "react-router";
 import {
   Card,
@@ -188,9 +189,10 @@ export function PortfolioSection() {
                       </span>
                     </div>
 
-                    <p className="mt-1 line-clamp-2 text-sm text-gray-600">
-                      {item.shortDescription}
-                    </p>
+                    <SanitizedHtml
+                      html={item.shortDescription}
+                      className="mt-1 line-clamp-2 text-sm text-gray-600 [&_p]:mb-0 [&_strong]:font-semibold [&_em]:italic [&_a]:text-brand-600 [&_a]:underline [&_table]:text-xs [&_th]:text-xs [&_td]:text-xs [&_th]:border-gray-200 [&_td]:border-gray-200 [&_th]:px-1 [&_td]:px-1 [&_th]:py-0.5 [&_td]:py-0.5 [&_th]:bg-gray-50 [&_table]:border-collapse"
+                    />
 
                     <p className="mt-2 text-xs text-gray-500">
                       {[

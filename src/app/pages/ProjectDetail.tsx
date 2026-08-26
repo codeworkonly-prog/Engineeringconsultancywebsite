@@ -5,6 +5,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Calendar, ArrowLeft, MapPin, Ruler, CheckCircle2, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { PortfolioItemDetail } from './PortfolioItemDetail';
+import { SanitizedHtml } from '../components/ui/sanitized-html';
 
 export function ProjectDetail() {
   const { slug } = useParams();
@@ -61,7 +62,10 @@ export function ProjectDetail() {
               </span>
             </div>
             <h1 className="text-5xl font-bold text-white mb-3">{project.title}</h1>
-            <p className="text-xl text-gray-200 max-w-3xl">{project.description}</p>
+            <SanitizedHtml
+              html={project.description}
+              className="text-xl text-gray-200 max-w-3xl [&_a]:text-cyan-300 [&_a]:underline [&_strong]:text-white [&_em]:text-gray-200 [&_table]:text-sm [&_th]:text-gray-200 [&_td]:text-gray-200 [&_th]:border-gray-600 [&_td]:border-gray-600 [&_p]:mb-2"
+            />
           </div>
         </div>
       </section>
@@ -116,11 +120,12 @@ export function ProjectDetail() {
       {project.overview && (
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto min-w-0 overflow-hidden">
               <h2 className="text-3xl font-bold mb-6">Project Overview</h2>
-              <p className="text-gray-700 leading-relaxed text-lg whitespace-pre-line">
-                {project.overview}
-              </p>
+              <SanitizedHtml
+                html={project.overview || ''}
+                className="text-gray-700 leading-relaxed text-lg"
+              />
 
               {project.servicesProvided && project.servicesProvided.filter(Boolean).length > 0 && (
                 <div className="mt-8">
@@ -281,9 +286,10 @@ export function ProjectDetail() {
                       <h3 className="font-semibold text-lg mt-3 mb-2 group-hover:text-brand-600 transition-colors">
                         {relatedProject.title}
                       </h3>
-                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                        {relatedProject.description}
-                      </p>
+                      <SanitizedHtml
+                        html={relatedProject.description}
+                        className="text-sm text-gray-600 line-clamp-2 mb-3 [&_p]:mb-1 [&_strong]:font-semibold [&_em]:italic [&_a]:text-brand-600 [&_a]:underline [&_table]:text-xs [&_th]:text-xs [&_td]:text-xs [&_th]:border-gray-200 [&_td]:border-gray-200 [&_th]:px-1 [&_td]:px-1 [&_th]:py-0.5 [&_td]:py-0.5 [&_th]:bg-gray-50 [&_table]:border-collapse"
+                      />
                       <div className="flex items-center text-brand-600 text-sm font-medium group-hover:gap-2 transition-all">
                         <span>View Project</span>
                         <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />

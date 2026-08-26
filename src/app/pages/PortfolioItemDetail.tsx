@@ -1,20 +1,27 @@
-import { Link, useParams } from 'react-router';
-import { ArrowLeft, BriefcaseBusiness, Calendar, MapPin, UserRound } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { useContent } from '../contexts/ContentContext';
-import { PortfolioItem, PortfolioType } from '../../types/portfolio.types';
-import { formatContractAmount } from '../../services/portfolio.service';
+import { Link, useParams } from "react-router";
+import {
+  ArrowLeft,
+  BriefcaseBusiness,
+  Calendar,
+  MapPin,
+  UserRound,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import { useContent } from "../contexts/ContentContext";
+import { PortfolioItem, PortfolioType } from "../../types/portfolio.types";
+import { formatContractAmount } from "../../services/portfolio.service";
+import { SanitizedHtml } from "../components/ui/sanitized-html";
 
 const typeLabels: Record<PortfolioType, string> = {
-  project: 'Project',
-  consulting: 'Consulting Assignment',
-  training: 'Training Program',
+  project: "Project",
+  consulting: "Consulting Assignment",
+  training: "Training Program",
 };
 
 const backLinks: Record<PortfolioType, string> = {
-  project: '/portfolio',
-  consulting: '/portfolio',
-  training: '/portfolio',
+  project: "/portfolio",
+  consulting: "/portfolio",
+  training: "/portfolio",
 };
 
 interface PortfolioItemDetailProps {
@@ -22,26 +29,31 @@ interface PortfolioItemDetailProps {
 }
 
 function getSpecificLabel(item: PortfolioItem) {
-  if (item.type === 'project') return item.projectType || 'Engineering Project';
-  if (item.type === 'consulting') return item.serviceType || 'Consulting Service';
-  return item.trainingType || 'Training & Capacity Building';
+  if (item.type === "project") return item.projectType || "Engineering Project";
+  if (item.type === "consulting")
+    return item.serviceType || "Consulting Service";
+  return item.trainingType || "Training & Capacity Building";
 }
 
-export function PortfolioItemDetail({ expectedType }: PortfolioItemDetailProps) {
+export function PortfolioItemDetail({
+  expectedType,
+}: PortfolioItemDetailProps) {
   const { slug } = useParams();
   const { portfolio, clients } = useContent();
 
   const item = portfolio.find(
     (portfolioItem) =>
       portfolioItem.slug === slug &&
-      (!expectedType || portfolioItem.type === expectedType)
+      (!expectedType || portfolioItem.type === expectedType),
   );
 
   if (!item) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-slate-950">Portfolio Item Not Found</h1>
+          <h1 className="text-4xl font-bold text-slate-950">
+            Portfolio Item Not Found
+          </h1>
           <p className="mt-3 text-slate-600">
             The assignment you are looking for does not exist in the portfolio.
           </p>
@@ -87,10 +99,13 @@ export function PortfolioItemDetail({ expectedType }: PortfolioItemDetailProps) 
                 </span>
               )}
             </div>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{item.title}</h1>
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-200">
-              {item.shortDescription}
-            </p>
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+              {item.title}
+            </h1>
+            <SanitizedHtml
+              html={item.shortDescription}
+              className="mt-5 max-w-3xl text-lg leading-8 text-slate-200 [&_a]:text-cyan-300 [&_a]:underline [&_strong]:text-white [&_em]:text-slate-200 [&_table]:text-sm [&_th]:text-slate-200 [&_td]:text-slate-200 [&_th]:border-slate-600 [&_td]:border-slate-600"
+            />
           </div>
         </div>
       </section>
@@ -99,62 +114,92 @@ export function PortfolioItemDetail({ expectedType }: PortfolioItemDetailProps) 
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <UserRound className="mb-3 h-5 w-5 text-cyan-700" />
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Client</p>
-            <p className="mt-1 font-semibold text-slate-950">{clients.find((c) => c.id === item.clientId)?.name || '-'}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Client
+            </p>
+            <p className="mt-1 font-semibold text-slate-950">
+              {clients.find((c) => c.id === item.clientId)?.name || "-"}
+            </p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <BriefcaseBusiness className="mb-3 h-5 w-5 text-cyan-700" />
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Category</p>
-            <p className="mt-1 font-semibold text-slate-950">{getSpecificLabel(item)}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Category
+            </p>
+            <p className="mt-1 font-semibold text-slate-950">
+              {getSpecificLabel(item)}
+            </p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <Calendar className="mb-3 h-5 w-5 text-cyan-700" />
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Fiscal Year</p>
-            <p className="mt-1 font-semibold text-slate-950">{item.fiscalYear || '-'}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Fiscal Year
+            </p>
+            <p className="mt-1 font-semibold text-slate-950">
+              {item.fiscalYear || "-"}
+            </p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <MapPin className="mb-3 h-5 w-5 text-cyan-700" />
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Location</p>
-            <p className="mt-1 font-semibold text-slate-950">{item.location || '-'}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Location
+            </p>
+            <p className="mt-1 font-semibold text-slate-950">
+              {item.location || "-"}
+            </p>
           </div>
         </div>
       </section>
 
       <section className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-950">Assignment Overview</h2>
-          <p className="mt-6 whitespace-pre-line text-lg leading-8 text-slate-700">
-            {item.overview || item.fullDescription || item.shortDescription}
-          </p>
+        <div className="min-w-0 overflow-hidden">
+          <h2 className="text-3xl font-bold text-slate-950">
+            Assignment Overview
+          </h2>
+          <SanitizedHtml
+            html={
+              item.overview || item.fullDescription || item.shortDescription
+            }
+            className="mt-6 text-lg leading-8 text-slate-700"
+          />
         </div>
 
         <aside className="h-fit rounded-lg border border-slate-200 bg-slate-50 p-6">
-          <h3 className="text-lg font-bold text-slate-950">Project Information</h3>
+          <h3 className="text-lg font-bold text-slate-950">
+            Project Information
+          </h3>
           <dl className="mt-5 space-y-4 text-sm">
             <div>
               <dt className="text-slate-500">Sector</dt>
-              <dd className="mt-1 font-semibold text-slate-900">{item.sector || '-'}</dd>
+              <dd className="mt-1 font-semibold text-slate-900">
+                {item.sector || "-"}
+              </dd>
             </div>
             <div>
               <dt className="text-slate-500">Contract Amount</dt>
               <dd className="mt-1 font-semibold text-slate-900">
-                {formatContractAmount(item.contractAmount || '')}
+                {formatContractAmount(item.contractAmount || "")}
               </dd>
             </div>
             <div>
               <dt className="text-slate-500">Partner Firms</dt>
-              <dd className="mt-1 font-semibold text-slate-900">{item.partnerFirms || '-'}</dd>
+              <dd className="mt-1 font-semibold text-slate-900">
+                {item.partnerFirms || "-"}
+              </dd>
             </div>
             <div>
               <dt className="text-slate-500">Timeline</dt>
               <dd className="mt-1 font-semibold text-slate-900">
-                {[item.startDate, item.endDate].filter(Boolean).join(' - ') || '-'}
+                {[item.startDate, item.endDate].filter(Boolean).join(" - ") ||
+                  "-"}
               </dd>
             </div>
-            {item.type === 'training' && (
+            {item.type === "training" && (
               <div>
                 <dt className="text-slate-500">Mode</dt>
-                <dd className="mt-1 font-semibold capitalize text-slate-900">{item.mode || '-'}</dd>
+                <dd className="mt-1 font-semibold capitalize text-slate-900">
+                  {item.mode || "-"}
+                </dd>
               </div>
             )}
           </dl>

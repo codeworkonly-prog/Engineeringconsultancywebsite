@@ -1,13 +1,19 @@
 import { useLocation, Link } from 'react-router';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import { useContent } from '../contexts/ContentContext';
 
 export function Footer() {
   const location = useLocation();
+  const { contactInfo } = useContent();
   const isAdmin = location.pathname.startsWith('/admin');
 
   if (isAdmin) {
-    return null; // Don't show main footer in admin area
+    return null;
   }
+
+  const address = contactInfo?.address || '';
+  const email = contactInfo?.email || '';
+  const phone = contactInfo?.phone || '';
 
   return (
     <footer className="bg-gray-900 text-white mt-auto">
@@ -23,25 +29,44 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Contact Us</h4>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 text-gray-400">
-                <Phone className="h-5 w-5" />
-                <span><a href="tel:+977-9841707077" className="hover:text-white transition-colors">
-                          +977-9841707077
-                        </a>
-                        </span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-400">
-                <Mail className="h-5 w-5" />
-                <span><a href="mailto:consultingdiksha@gmail.com" className="hover:text-white transition-colors">
-                  consultingdiksha@gmail.com
-                </a></span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-400">
-                <MapPin className="h-5 w-5" />
-                <span><a href="https://maps.google.com/?q=Ghattekulo-32,+Kathmandu" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                  Ghattekulo-32, Kathmandu
-                </a></span>
-              </div>
+              {phone && (
+                <div className="flex items-center space-x-3 text-gray-400">
+                  <Phone className="h-5 w-5" />
+                  <span>
+                    <a href={`tel:${phone}`} className="hover:text-white transition-colors">
+                      {phone}
+                    </a>
+                  </span>
+                </div>
+              )}
+              {email && (
+                <div className="flex items-center space-x-3 text-gray-400">
+                  <Mail className="h-5 w-5" />
+                  <span>
+                    <a href={`mailto:${email}`} className="hover:text-white transition-colors">
+                      {email}
+                    </a>
+                  </span>
+                </div>
+              )}
+              {address && (
+                <div className="flex items-center space-x-3 text-gray-400">
+                  <MapPin className="h-5 w-5" />
+                  <span>
+                    <a
+                      href={`https://maps.google.com/?q=${encodeURIComponent(address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      {address}
+                    </a>
+                  </span>
+                </div>
+              )}
+              {!phone && !email && !address && (
+                <p className="text-gray-500 text-sm">Contact information not yet configured.</p>
+              )}
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Calendar, Clock, CheckCircle, ArrowLeft, Tag } from 'lucide-react';
 import { PortfolioItemDetail } from './PortfolioItemDetail';
+import { SanitizedHtml } from '../components/ui/sanitized-html';
 
 export function EventDetail() {
   const { slug } = useParams();
@@ -27,7 +28,10 @@ export function EventDetail() {
             </Button>
           </Link>
           <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
-          <p className="text-xl text-brand-50 mb-6">{event.description}</p>
+          <SanitizedHtml
+            html={event.description}
+            className="text-xl text-brand-50 mb-6 [&_a]:text-cyan-200 [&_a]:underline [&_strong]:text-white [&_em]:text-brand-100 [&_table]:text-sm [&_th]:text-brand-100 [&_td]:text-brand-100 [&_th]:border-brand-400 [&_td]:border-brand-400 [&_p]:mb-2"
+          />
           <div className="flex flex-wrap items-center gap-4">
             <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm flex items-center gap-2">
               <Tag className="h-3 w-3" />
@@ -141,7 +145,10 @@ export function EventDetail() {
                           {relatedEvent.type}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{relatedEvent.description}</p>
+                      <SanitizedHtml
+                        html={relatedEvent.description}
+                        className="text-sm text-gray-600 mb-3 line-clamp-2 [&_p]:mb-1 [&_strong]:font-semibold [&_em]:italic [&_a]:text-brand-600 [&_a]:underline [&_table]:text-xs [&_th]:text-xs [&_td]:text-xs [&_th]:border-gray-200 [&_td]:border-gray-200 [&_th]:px-1 [&_td]:px-1 [&_th]:py-0.5 [&_td]:py-0.5 [&_th]:bg-gray-50 [&_table]:border-collapse"
+                      />
                       <div className="flex items-center text-xs text-gray-500 gap-2">
                         <Calendar className="h-3 w-3" />
                         <span>{relatedEvent.startDate}</span>

@@ -5,6 +5,11 @@ import {
   PortfolioSortOrder,
 } from '../types/portfolio.types';
 
+/** Strip HTML tags for plain-text search */
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+}
+
 // ============================================================================
 // FILTERING
 // ============================================================================
@@ -42,8 +47,8 @@ export function filterPortfolioItems(
       const searchLower = filters.search.toLowerCase();
       const matchesSearch =
         item.title.toLowerCase().includes(searchLower) ||
-        item.shortDescription.toLowerCase().includes(searchLower) ||
-        (item.overview || item.fullDescription || '').toLowerCase().includes(searchLower) ||
+        stripHtml(item.shortDescription).toLowerCase().includes(searchLower) ||
+        stripHtml(item.overview || item.fullDescription || '').toLowerCase().includes(searchLower) ||
         (item.clientId || '').toLowerCase().includes(searchLower) ||
         (item.sector || '').toLowerCase().includes(searchLower);
 

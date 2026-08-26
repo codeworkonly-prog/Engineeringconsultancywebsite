@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { ArrowRight, BookOpen, Users, Award, CheckCircle, Calendar, GraduationCap, MapPin, LayoutGrid, Table2, ArrowUp, ArrowDown } from 'lucide-react';
 import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
+import { SanitizedHtml } from '../components/ui/sanitized-html';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
 import { PortfolioFiltersState } from '../../types/portfolio.types';
 
@@ -207,7 +208,10 @@ export function Training() {
                           <span>{event.location}</span>
                         </div>
                       )}
-                      <p className="text-sm text-gray-600 line-clamp-3 mb-4">{event.description}</p>
+                      <SanitizedHtml
+                        html={event.description}
+                        className="text-sm text-gray-600 line-clamp-3 mb-4 [&_p]:mb-1 [&_strong]:font-semibold [&_em]:italic [&_a]:text-brand-600 [&_a]:underline [&_table]:text-xs [&_th]:text-xs [&_td]:text-xs [&_th]:border-gray-200 [&_td]:border-gray-200 [&_th]:px-2 [&_td]:px-2 [&_th]:py-1 [&_td]:py-1 [&_th]:bg-gray-50 [&_table]:border-collapse [&_table]:w-full"
+                      />
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                         <Calendar className="h-4 w-4" />
                         <span>{event.startDate} - {event.endDate}</span>

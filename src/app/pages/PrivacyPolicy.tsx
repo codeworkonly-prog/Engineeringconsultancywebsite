@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
 import { ArrowLeft } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
+import { SanitizedHtml } from '../components/ui/sanitized-html';
 
 function formatDate(value?: string) {
   if (!value) return 'Not yet published';
@@ -97,13 +98,11 @@ export function PrivacyPolicy() {
             borderRadius: '8px',
             padding: 'clamp(1.5rem, 4vw, 3rem)',
             boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
+            overflow: 'hidden',
           }}
         >
           {isPublished ? (
-            <div
-              className="privacy-policy-content"
-              dangerouslySetInnerHTML={{ __html: privacyPolicy?.content || '' }}
-            />
+            <SanitizedHtml html={privacyPolicy?.content || ''} />
           ) : (
             <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#6B7280' }}>
               <h2 style={{ color: '#111827', fontSize: '1.35rem', marginBottom: '0.75rem' }}>
@@ -130,44 +129,7 @@ export function PrivacyPolicy() {
         </div>
       </section>
 
-      <style>{`
-        .privacy-policy-content {
-          color: #374151;
-          font-size: 1rem;
-          line-height: 1.8;
-        }
 
-        .privacy-policy-content h1,
-        .privacy-policy-content h2,
-        .privacy-policy-content h3,
-        .privacy-policy-content h4 {
-          color: #111827;
-          line-height: 1.25;
-          margin: 1.75rem 0 0.75rem;
-        }
-
-        .privacy-policy-content h1:first-child,
-        .privacy-policy-content h2:first-child,
-        .privacy-policy-content h3:first-child {
-          margin-top: 0;
-        }
-
-        .privacy-policy-content p,
-        .privacy-policy-content ul,
-        .privacy-policy-content ol {
-          margin: 0 0 1rem;
-        }
-
-        .privacy-policy-content ul,
-        .privacy-policy-content ol {
-          padding-left: 1.5rem;
-        }
-
-        .privacy-policy-content a {
-          color: var(--brand-600);
-          font-weight: 600;
-        }
-      `}</style>
     </>
   );
 }

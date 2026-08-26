@@ -8,9 +8,16 @@ import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useContent } from "../contexts/ContentContext";
 
 export function Contact() {
+  const { contactInfo } = useContent();
   const [loading, setLoading] = useState(false);
+
+  const address = contactInfo?.address || '';
+  const email = contactInfo?.email || '';
+  const phone = contactInfo?.phone || '';
+  const businessHours = contactInfo?.businessHours || '';
 
   const [formData, setFormData] = useState({
     name: "",
@@ -94,7 +101,8 @@ Message:
 ${formData.message}
       `;
 
-      const whatsappURL = `https://wa.me/9779841707077?text=${encodeURIComponent(
+      const phoneDigits = phone.replace(/[^0-9]/g, "");
+      const whatsappURL = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(
         whatsappMessage
       )}`;
 
@@ -166,6 +174,7 @@ ${formData.message}
               </p>
               <div className="space-y-6">
 
+                {address && (
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
@@ -175,14 +184,15 @@ ${formData.message}
                     <div>
                         <h3 className="font-semibold mb-1">Office Address</h3>
                       <p className="text-gray-600">
-                          Ghattekulo-32, Kathmandu<br />
-                          Nepal
+                          {address}
                       </p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
+                )}
 
+                {email && (
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
@@ -192,16 +202,18 @@ ${formData.message}
                     <div>
                         <h3 className="font-semibold mb-1">Email</h3>
                         <a
-                          href="mailto:consultingdiksha@gmail.com"
+                          href={`mailto:${email}`}
                           className="text-brand-600 hover:underline"
                         >
-                        consultingdiksha@gmail.com
+                        {email}
                         </a>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
+                )}
 
+                {phone && (
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
@@ -210,14 +222,16 @@ ${formData.message}
                       </div>
                     <div>
                         <h3 className="font-semibold mb-1">Phone</h3>
-                        <p className="text-gray-600"><a href="tel:+977-9841707077" className="text-brand-600 hover:underline">
-                          +977-9841707077
+                        <p className="text-gray-600"><a href={`tel:${phone}`} className="text-brand-600 hover:underline">
+                          {phone}
                         </a></p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
+                )}
 
+                {businessHours && (
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
@@ -227,13 +241,21 @@ ${formData.message}
                     <div>
                         <h3 className="font-semibold mb-1">Business Hours</h3>
                       <p className="text-gray-600">
-                        Sunday - Friday: 10:00 AM - 5:00 PM<br />
-                        Saturday: Closed
+                        {businessHours}
                       </p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
+                )}
+
+                {!address && !email && !phone && !businessHours && (
+                <Card>
+                  <CardContent className="pt-6 text-center text-gray-500">
+                    <p>Contact information not yet configured.</p>
+                  </CardContent>
+                </Card>
+                )}
 
               </div>
             </div>

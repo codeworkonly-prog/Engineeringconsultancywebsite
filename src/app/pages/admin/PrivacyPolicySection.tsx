@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
+import { RichTextEditor } from '../../components/ui/rich-text-editor';
 import { useContent } from '../../contexts/ContentContext';
+import { isHtmlEmpty } from '../../../utils/sanitize';
+import { SanitizedHtml } from '../../components/ui/sanitized-html';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Save, Globe } from 'lucide-react';
 
@@ -130,23 +133,19 @@ export function PrivacyPolicySection() {
 
         <CardContent>
           {preview ? (
-            <div
-              className="privacy-policy-content prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: content || '<p class="text-gray-400">Nothing to preview yet.</p>' }}
+            <SanitizedHtml
+              html={content}
+              className="max-w-none"
+              emptyClassName="text-gray-400"
+              fallback={<p className="text-gray-400">Nothing to preview yet.</p>}
             />
           ) : (
-            <div className="space-y-2">
-              <p className="text-sm text-gray-500">
-                Paste or write HTML here. Supports headings, paragraphs, lists, and links.
-              </p>
-              <textarea
-                value={content}
-                onChange={(e) => handleContentChange(e.target.value)}
-                rows={28}
-                placeholder={`<h2>Information We Collect</h2>\n<p>We collect information you provide directly to us...</p>`}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono leading-relaxed shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y"
-              />
-            </div>
+            <RichTextEditor
+              value={content}
+              onChange={handleContentChange}
+              placeholder="Start writing your privacy policy..."
+              minHeight="400px"
+            />
           )}
         </CardContent>
       </Card>
@@ -158,7 +157,7 @@ export function PrivacyPolicySection() {
         </CardHeader>
         <CardContent>
           <ul className="text-sm text-gray-500 space-y-1 list-disc list-inside">
-            <li>Write the policy as HTML — use <code className="bg-gray-100 px-1 rounded">&lt;h2&gt;</code>, <code className="bg-gray-100 px-1 rounded">&lt;p&gt;</code>, <code className="bg-gray-100 px-1 rounded">&lt;ul&gt;</code> tags.</li>
+            <li>Use the toolbar to format content — headings, bold, italic, lists, links, and tables are all supported.</li>
             <li><strong>Save Draft</strong> saves your changes without making them visible to visitors.</li>
             <li><strong>Publish</strong> saves and immediately makes the policy live at <code className="bg-gray-100 px-1 rounded">/privacy-policy</code>.</li>
             <li>Toggle <strong>Preview</strong> to see rendered output before publishing.</li>
@@ -166,25 +165,7 @@ export function PrivacyPolicySection() {
         </CardContent>
       </Card>
 
-      <style>{`
-        .privacy-policy-content h1,
-        .privacy-policy-content h2,
-        .privacy-policy-content h3,
-        .privacy-policy-content h4 {
-          color: #111827;
-          font-weight: 700;
-          line-height: 1.25;
-          margin: 1.75rem 0 0.75rem;
-        }
-        .privacy-policy-content h2 { font-size: 1.25rem; }
-        .privacy-policy-content h3 { font-size: 1.1rem; }
-        .privacy-policy-content p,
-        .privacy-policy-content ul,
-        .privacy-policy-content ol { margin: 0 0 1rem; color: #374151; line-height: 1.8; }
-        .privacy-policy-content ul,
-        .privacy-policy-content ol { padding-left: 1.5rem; }
-        .privacy-policy-content a { color: var(--brand-600); font-weight: 600; }
-      `}</style>
+
     </div>
   );
 }
