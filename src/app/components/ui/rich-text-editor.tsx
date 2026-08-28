@@ -182,9 +182,7 @@ function LinkDialog({
     inputRef.current?.focus();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleSave = () => {
     if (url.trim()) {
       editor
         .chain()
@@ -198,18 +196,23 @@ function LinkDialog({
     onClose();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === "Escape") {
+      onClose();
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
-      onClick={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
+      onMouseDown={(e) => e.preventDefault()}
     >
-      <form
-        onSubmit={handleSubmit}
-        onClick={(e) => e.stopPropagation()}
+      <div
         className="rounded-lg border bg-white p-4 shadow-lg w-96"
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <p className="text-sm font-semibold mb-2">Insert Link</p>
         <input
@@ -217,28 +220,27 @@ function LinkDialog({
           type="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="https://example.com"
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring mb-3"
         />
         <div className="flex justify-end gap-2">
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              onClose();
-            }}
+            onClick={onClose}
             className="rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 cursor-pointer"
           >
             Cancel
           </button>
           <button
-            type="submit"
+            type="button"
+            onClick={handleSave}
             className="rounded-md bg-brand-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-800 cursor-pointer"
           >
             Save
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
