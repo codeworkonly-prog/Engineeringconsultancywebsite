@@ -736,11 +736,13 @@ export function PortfolioForm() {
                     Brief summary shown on cards and previews
                   </span>
                 </div>
-                <RichTextEditor
+                <Input
                   value={form.shortDescription}
-                  onChange={(html) => updateForm("shortDescription", html)}
+                  onChange={(event) =>
+                    updateForm("shortDescription", event.target.value)
+                  }
                   placeholder="One or two sentences shown on cards and previews"
-                  minHeight="100px"
+                  aria-invalid={Boolean(errors.shortDescription)}
                 />
                 {getFieldError(errors, "shortDescription")}
               </div>
