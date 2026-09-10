@@ -124,6 +124,11 @@ export interface ContactInfo {
   email: string;
   phone: string;
   businessHours?: string;
+  instagram?: string;
+  facebook?: string;
+  youtube?: string;
+  tiktok?: string;
+  x?: string;
 }
 
 interface ContentContextType {

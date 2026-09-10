@@ -7,12 +7,18 @@ import { Textarea } from "../../components/ui/textarea";
 import { useContent, ContactInfo } from "../../contexts/ContentContext";
 import { toast } from "sonner";
 import { Save, Building2, Mail, Phone, Clock } from "lucide-react";
+import { SiInstagram, SiFacebook, SiYoutube, SiTiktok, SiX } from "react-icons/si";
 
 const defaultContactInfo: ContactInfo = {
   address: "",
   email: "",
   phone: "",
   businessHours: "",
+  instagram: "",
+  facebook: "",
+  youtube: "",
+  tiktok: "",
+  x: "",
 };
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,6 +37,11 @@ export function ContactInfoSection() {
         email: contactInfo.email || "",
         phone: contactInfo.phone || "",
         businessHours: contactInfo.businessHours || "",
+        instagram: contactInfo.instagram || "",
+        facebook: contactInfo.facebook || "",
+        youtube: contactInfo.youtube || "",
+        tiktok: contactInfo.tiktok || "",
+        x: contactInfo.x || "",
       });
     }
     setLoading(false);
@@ -71,7 +82,12 @@ export function ContactInfoSection() {
         address: form.address.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
-        businessHours: form.businessHours.trim(),
+        businessHours: form.businessHours?.trim() || "",
+        instagram: form.instagram?.trim(),
+        facebook: form.facebook?.trim(),
+        youtube: form.youtube?.trim(),
+        tiktok: form.tiktok?.trim(),
+        x: form.x?.trim(),
       });
       toast.success("Contact information updated");
     } catch {
@@ -187,6 +203,38 @@ export function ContactInfoSection() {
                   placeholder="e.g. Sunday - Friday: 10:00 AM - 5:00 PM"
                   className="mt-2"
                 />
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div className="space-y-4 border-t pt-6">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Social Media Links
+              </h3>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {[
+                  { key: "instagram", label: "Instagram", icon: SiInstagram, placeholder: "https://instagram.com/your-account" },
+                  { key: "facebook", label: "Facebook", icon: SiFacebook, placeholder: "https://facebook.com/your-page" },
+                  { key: "youtube", label: "YouTube", icon: SiYoutube, placeholder: "https://youtube.com/@your-channel" },
+                  { key: "tiktok", label: "TikTok", icon: SiTiktok, placeholder: "https://tiktok.com/@your-account" },
+                  { key: "x", label: "X", icon: SiX, placeholder: "https://x.com/your-account" },
+                ].map(({ key, label, icon: Icon, placeholder }) => (
+                  <div key={key}>
+                    <Label htmlFor={`contact-${key}`} className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-brand-600" />
+                      {label}
+                    </Label>
+                    <Input
+                      id={`contact-${key}`}
+                      type="url"
+                      value={form[key as keyof ContactInfo] || ""}
+                      onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                      placeholder={placeholder}
+                      className="mt-2"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
