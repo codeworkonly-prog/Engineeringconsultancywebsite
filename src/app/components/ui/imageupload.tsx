@@ -6,6 +6,9 @@ import { uploadImage } from "../../../cloudinary";
 import { Label } from "./label";
 import { Button } from "./button";
 
+// Maximum accepted image size: 200 MB, enforced before upload.
+const MAX_IMAGE_SIZE_BYTES = 200 * 1024 * 1024;
+
 type ImageUploadProps = {
   label?: string;
   value?: string;
@@ -34,8 +37,8 @@ export function ImageUpload({
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Maximum file size is 5MB");
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      toast.error("Maximum file size is 200MB");
       return;
     }
 
