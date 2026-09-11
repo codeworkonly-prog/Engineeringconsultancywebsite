@@ -149,7 +149,7 @@ ${formData.message}
   };
 
   return (
-   <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -175,86 +175,93 @@ ${formData.message}
               <div className="space-y-6">
 
                 {address && (
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-brand-100 p-3 rounded-full">
-                        <MapPin className="h-6 w-6 text-brand-600" />
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-brand-100 p-3 rounded-full">
+                          <MapPin className="h-6 w-6 text-brand-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold mb-1">Office Address</h3>
+                          <p className="text-gray-600">
+                            <a
+                              href={`https://maps.google.com/?q=${encodeURIComponent(address)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-brand-600 hover:underline"
+                            >
+                              {address}
+                            </a>
+                          </p>
+                        </div>
                       </div>
-                    <div>
-                        <h3 className="font-semibold mb-1">Office Address</h3>
-                      <p className="text-gray-600">
-                          {address}
-                      </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
                 )}
 
                 {email && (
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-brand-100 p-3 rounded-full">
-                        <Mail className="h-6 w-6 text-brand-600" />
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-brand-100 p-3 rounded-full">
+                          <Mail className="h-6 w-6 text-brand-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold mb-1">Email</h3>
+                          <a
+                            href={`mailto:${email}`}
+                            className="text-brand-600 hover:underline"
+                          >
+                            {email}
+                          </a>
+                        </div>
                       </div>
-                    <div>
-                        <h3 className="font-semibold mb-1">Email</h3>
-                        <a
-                          href={`mailto:${email}`}
-                          className="text-brand-600 hover:underline"
-                        >
-                        {email}
-                        </a>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
                 )}
 
                 {phone && (
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-brand-100 p-3 rounded-full">
-                        <Phone className="h-6 w-6 text-brand-600" />
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-brand-100 p-3 rounded-full">
+                          <Phone className="h-6 w-6 text-brand-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold mb-1">Phone</h3>
+                          <p className="text-gray-600"><a href={`tel:${phone}`} className="text-brand-600 hover:underline">
+                            {phone}
+                          </a></p>
+                        </div>
                       </div>
-                    <div>
-                        <h3 className="font-semibold mb-1">Phone</h3>
-                        <p className="text-gray-600"><a href={`tel:${phone}`} className="text-brand-600 hover:underline">
-                          {phone}
-                        </a></p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
                 )}
 
                 {businessHours && (
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-brand-100 p-3 rounded-full">
-                        <Clock className="h-6 w-6 text-brand-600" />
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-brand-100 p-3 rounded-full">
+                          <Clock className="h-6 w-6 text-brand-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold mb-1">Business Hours</h3>
+                          <p className="text-gray-600">
+                            {businessHours}
+                          </p>
+                        </div>
                       </div>
-                    <div>
-                        <h3 className="font-semibold mb-1">Business Hours</h3>
-                      <p className="text-gray-600">
-                        {businessHours}
-                      </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
                 )}
 
                 {!address && !email && !phone && !businessHours && (
-                <Card>
-                  <CardContent className="pt-6 text-center text-gray-500">
-                    <p>Contact information not yet configured.</p>
-                  </CardContent>
-                </Card>
+                  <Card>
+                    <CardContent className="pt-6 text-center text-gray-500">
+                      <p>Contact information not yet configured.</p>
+                    </CardContent>
+                  </Card>
                 )}
 
               </div>
