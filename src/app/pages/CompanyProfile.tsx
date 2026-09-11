@@ -1,12 +1,12 @@
 import { Card, CardContent } from '../components/ui/card';
 import { Link } from 'react-router';
-import { CheckCircle, Building2, Users, Award, Lightbulb } from 'lucide-react';
+import { CheckCircle, Factory, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 import { FlagshipProjectSection } from '../pages/admin/FlagshipProjectSection';
 import { slugify } from '../../utils/slug';
 
 export function CompanyProfile() {
-   const { clients } = useContent();
+  const { clients, sectors } = useContent();
   const getClientPortfolioLink = (clientId: string) =>
     `/portfolio?client=${encodeURIComponent(
       clients.find((client) => client.id === clientId)?.slug ||
@@ -76,16 +76,6 @@ export function CompanyProfile() {
     },
   ];
 
-
-  const projectTypes = [
-    'Water supply and wastewater management systems',
-    'Special Economic Zone (SEZ) infrastructure design',
-    'Fuel depots, storage systems, and pipelines',
-    'Urban infrastructure and tourism master planning',
-    'Disaster risk management and reconstruction projects',
-    'Institutional strengthening and training programs',
-  ];
-
   return (
     <div>
       {/* Header Section */}
@@ -139,20 +129,20 @@ export function CompanyProfile() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Our Experience</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We have successfully delivered <span className="font-bold text-brand-600">100+ consulting assignments</span> across Nepal,
+              We have successfully delivered <span className="font-bold text-brand-600">100+ assignments</span> across Nepal,
               working with government agencies, development partners, and private sector clients.
             </p>
           </div>
 
           <div className="mb-12">
-            <h3 className="text-2xl font-semibold mb-6 text-center">Our Project Portfolio Includes:</h3>
+            <h3 className="text-2xl font-semibold mb-6 text-center">Our Portfolio Includes:</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projectTypes.map((type, index) => (
-                <Card key={index}>
+              {sectors.map((sector) => (
+                <Card key={sector.id}>
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-3">
-                      <Building2 className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-gray-700">{type}</p>
+                      <Factory className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-gray-700">{sector.name}</p>
                     </div>
                   </CardContent>
                 </Card>
