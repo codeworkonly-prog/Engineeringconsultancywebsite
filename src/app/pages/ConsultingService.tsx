@@ -7,6 +7,7 @@ import { useContent } from '../contexts/ContentContext';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
 import { PortfolioFiltersState } from '../../types/portfolio.types';
 import { SanitizedHtml } from '../components/ui/sanitized-html';
+import { Seo } from '../components/Seo';
 
 export function ConsultingService() {
   const { portfolio, clients } = useContent();
@@ -95,6 +96,11 @@ export function ConsultingService() {
 
   return (
     <div>
+      <Seo
+        title="Consulting Services | Diksha Consulting and Projects"
+        description="Professional engineering and management consulting in Nepal — feasibility studies, detailed design, DPR preparation, procurement support, and construction supervision."
+        canonicalPath="/consulting"
+      />
       {/* Hero */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -156,7 +162,7 @@ export function ConsultingService() {
                     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full group">
                       <div className="relative overflow-hidden">
                         {assignment.featuredImage ? (
-                          <img src={assignment.featuredImage} alt={assignment.title} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300" />
+                          <img src={assignment.featuredImage} alt={assignment.title} loading="lazy" decoding="async" className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300" />
                         ) : (
                           <div className="h-64 bg-gradient-to-br from-brand-600 via-brand-500 to-slate-800" />
                         )}

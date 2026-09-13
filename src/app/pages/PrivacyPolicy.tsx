@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { Seo } from '../components/Seo';
 import { Link } from 'react-router';
 import { ArrowLeft } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
@@ -24,15 +24,11 @@ export function PrivacyPolicy() {
 
   return (
     <>
-      <Helmet>
-        <title>Privacy Policy | Diksha Consulting and Projects</title>
-        <meta
-          name="description"
-          content="Read the privacy policy for Diksha Consulting and Projects Pvt. Ltd."
-        />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://www.dikshacp.com.np/privacy-policy" />
-      </Helmet>
+      <Seo
+        title="Privacy Policy | Diksha Consulting and Projects"
+        description="Read the privacy policy for Diksha Consulting and Projects Pvt. Ltd."
+        canonicalPath="/privacy-policy"
+      />
 
       <section
         style={{

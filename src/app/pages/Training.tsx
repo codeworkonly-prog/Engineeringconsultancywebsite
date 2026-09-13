@@ -7,6 +7,7 @@ import { useContent } from '../contexts/ContentContext';
 import { SanitizedHtml } from '../components/ui/sanitized-html';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
 import { PortfolioFiltersState } from '../../types/portfolio.types';
+import { Seo } from '../components/Seo';
 
 export function Training() {
   const { events, portfolio, clients } = useContent();
@@ -107,6 +108,11 @@ export function Training() {
 
   return (
     <div>
+      <Seo
+        title="Training & Capacity Building | Diksha Consulting and Projects"
+        description="Professional development programs, workshops, and technical training delivered by Diksha Consulting and Projects across Nepal."
+        canonicalPath="/training"
+      />
       {/* Hero */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -188,7 +194,7 @@ export function Training() {
                   <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full group">
                     <div className="relative overflow-hidden">
                       {event.imageUrl ? (
-                        <img src={event.imageUrl} alt={event.title} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300" />
+                        <img src={event.imageUrl} alt={event.title} loading="lazy" decoding="async" className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300" />
                       ) : (
                         <div className="h-64 bg-gradient-to-br from-brand-600 via-brand-500 to-slate-800" />
                       )}

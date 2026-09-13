@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "./ui/button";
 import { AlertCircle, Lock } from "lucide-react";
+import { Seo } from "./Seo";
 
 export function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -29,6 +30,12 @@ export function AdminLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-indigo-100 flex items-center justify-center px-4">
       {" "}
+      <Seo
+        title="Admin Portal"
+        robots="noindex, nofollow"
+        noCanonical
+        image=""
+      />
       <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
         {" "}
         <div className="text-center mb-8">

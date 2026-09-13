@@ -2,6 +2,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Target, Eye, Award, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
+import { Seo } from '../components/Seo';
 import aboutUs from "../../imports/About_us.webp";
 import aboutUsHeader from "../../imports/aboutUsHeader.webp";
 
@@ -20,6 +21,11 @@ export function About() {
 
   return (
     <div>
+      <Seo
+        title="About Us | Diksha Consulting and Projects"
+        description="A multidisciplinary engineering and management consulting firm in Kathmandu, Nepal — infrastructure planning, construction supervision, feasibility studies, and capacity building."
+        canonicalPath="/about"
+      />
       {/* Header Section */}
       <section
         className="relative h-[420px] flex items-center text-white overflow-hidden"
@@ -126,19 +132,19 @@ export function About() {
 
               {/* CTA */}
               <div className="flex gap-4">
-                <a
-                  href="/services"
+                <Link
+                  to="/consulting"
                   className="bg-brand-600 hover:bg-brand-700 transition text-white px-6 py-3 rounded-xl font-semibold shadow-lg"
                 >
                   Explore Services
-                </a>
+                </Link>
 
-                <a
-                  href="/contact"
+                <Link
+                  to="/contact"
                   className="border border-gray-300 hover:border-brand-600 hover:text-brand-600 transition px-6 py-3 rounded-xl font-semibold text-gray-700"
                 >
                   Contact Us
-                </a>
+                </Link>
               </div>
             </div>
 

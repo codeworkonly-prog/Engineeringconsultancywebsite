@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useContent } from "../contexts/ContentContext";
+import { Seo } from "../components/Seo";
 
 export function Contact() {
   const { contactInfo } = useContent();
@@ -150,6 +151,11 @@ ${formData.message}
 
   return (
    <div className="flex flex-col min-h-screen bg-gray-50">
+      <Seo
+        title="Contact Us | Diksha Consulting and Projects"
+        description="Get in touch with Diksha Consulting and Projects in Kathmandu, Nepal for engineering consultancy, project management, and training inquiries."
+        canonicalPath="/contact"
+      />
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

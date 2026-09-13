@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Helmet } from 'react-helmet-async';
 import { Search, ArrowLeft } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
+import { Seo, type JsonLdObject } from '../components/Seo';
 
 /* ─────────────────────────────────────────────
    Custom diamond-chevron SVG icon
@@ -136,28 +136,20 @@ function FaqItem({
 }
 
 /* ─────────────────────────────────────────────
-   JSON-LD schema injection
+   JSON-LD FAQPage schema (injected via <Seo>)
 ───────────────────────────────────────────── */
-function useFaqSchema(faqs: Array<{ question: string; answer: string }>) {
-  useEffect(() => {
-    if (!faqs.length) return;
-    const existing = document.querySelector('#faq-page-schema-ld');
-    if (existing) existing.remove();
-    const script = document.createElement('script');
-    script.id = 'faq-page-schema-ld';
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: faqs.map((faq) => ({
-        '@type': 'Question',
-        name: faq.question,
-        acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-      })),
-    });
-    document.head.appendChild(script);
-    return () => { script.remove(); };
-  }, [faqs]);
+function buildFaqSchema(
+  faqs: Array<{ question: string; answer: string }>,
+): JsonLdObject | undefined {
+  if (!faqs.length) return undefined;
+  return {
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
+  };
 }
 
 /* ─────────────────────────────────────────────
@@ -168,7 +160,7 @@ export function Faq() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
 
-  useFaqSchema(homeFaqs);
+  const faqSchema = buildFaqSchema(homeFaqs);
 
   const filtered = query.trim()
     ? homeFaqs.filter(
@@ -182,15 +174,13 @@ export function Faq() {
 
   return (
     <>
-      <Helmet>
-        <title>FAQ | Diksha Consulting and Projects</title>
-        <meta
-          name="description"
-          content="Find answers to frequently asked questions about Diksha Consulting and Projects — engineering consultancy, project management, and training services in Nepal."
-        />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://www.dikshacp.com.np/faq" />
-      </Helmet>
+      <Seo
+        title="FAQ | Diksha Consulting and Projects"
+        description="Find answers to frequently asked questions about Diksha Consulting and Projects — engineering consultancy, project management, and training services in Nepal."
+        canonicalPath="/faq"
+        jsonLd={faqSchema}
+        jsonLdId="faq-page-schema-ld"
+      />
 
       <style>{`
         @keyframes fadeSlideIn {

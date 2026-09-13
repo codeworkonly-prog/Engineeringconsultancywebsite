@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { PortfolioFilters as PortfolioFiltersComponent } from "../components/portfolio/PortfolioFilters";
 import { PortfolioFiltersState } from "../../types/portfolio.types";
+import { Seo } from "../components/Seo";
 import project1 from "../../imports/project1.jpg";
 import project2 from "../../imports/project2.jpg";
 import project3 from "../../imports/project3.jpg";
@@ -221,6 +222,11 @@ export function Projects() {
 
   return (
     <div>
+      <Seo
+        title="Projects | Diksha Consulting and Projects"
+        description="Infrastructure projects delivered by Diksha Consulting and Projects across Nepal — design and build, construction supervision, water supply, and urban development."
+        canonicalPath="/projects"
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white min-h-[580px] flex items-center">
         <div
@@ -350,6 +356,8 @@ export function Projects() {
                             <img
                               src={project.imageUrl}
                               alt={project.title}
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                             />
                           ) : (

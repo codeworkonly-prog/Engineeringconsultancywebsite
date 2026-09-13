@@ -5,6 +5,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Calendar, Clock, CheckCircle, ArrowLeft, Tag } from 'lucide-react';
 import { PortfolioItemDetail } from './PortfolioItemDetail';
 import { SanitizedHtml } from '../components/ui/sanitized-html';
+import { Seo, SITE_URL, SITE_NAME } from '../components/Seo';
 
 export function EventDetail() {
   const { slug } = useParams();
@@ -16,8 +17,63 @@ export function EventDetail() {
     return <PortfolioItemDetail expectedType="training" />;
   }
 
+  const eventUrl = `${SITE_URL}/training/${event.slug}`;
+
   return (
     <div>
+      <Seo
+        title={`${event.title} | ${SITE_NAME}`}
+        description={
+          event.description?.replace(/<[^>]*>/g, "").trim() ||
+          `Training program by Diksha Consulting and Projects in Nepal.`
+        }
+        canonicalPath={eventUrl}
+        ogType="article"
+        jsonLd={[
+          {
+            "@type": "Event",
+            name: event.title,
+            description: event.description?.replace(/<[^>]*>/g, "").trim(),
+            url: eventUrl,
+            startDate: event.startDate || undefined,
+            endDate: event.endDate || undefined,
+            eventAttendanceMode:
+              "https://schema.org/OfflineEventAttendanceMode",
+            location: {
+              "@type": "Place",
+              name: "Diksha Consulting and Projects",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Kathmandu",
+                addressCountry: "NP",
+              },
+            },
+          },
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: `${SITE_URL}/`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Training",
+                item: `${SITE_URL}/training`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: event.title,
+              },
+            ],
+          },
+        ]}
+        jsonLdId="event-detail-jsonld"
+      />
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

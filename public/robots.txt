@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Private / authenticated areas
+Disallow: /admin
+Disallow: /admin/login
+
+Sitemap: https://www.dikshacp.com.np/sitemap.xml

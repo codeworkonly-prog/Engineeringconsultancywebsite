@@ -22,7 +22,7 @@ import { PortfolioItem, PortfolioType } from "../../types/portfolio.types";
 import { SanitizedHtml } from "../components/ui/sanitized-html";
 const engineering = new URL("../../imports/engineering.webp", import.meta.url)
   .href;
-import { Helmet } from "react-helmet-async";
+import { Seo } from "../components/Seo";
 import { slugify } from "../../utils/slug";
 
 const portfolioTypeLabels: Record<PortfolioType, string> = {
@@ -85,42 +85,12 @@ export function Home() {
 
   return (
     <>
-      <Helmet>
-        {/* Basic meta tags — highest SEO priority */}
-        <title>
-          Diksha Consulting and Projects | Engineering Consultancy Nepal
-        </title>
-        <meta
-          name="description"
-          content="Diksha Consulting and Projects Pvt. Ltd. is a Nepal-based engineering consultancy specializing in infrastructure development, project management, water supply engineering, structural design, and technical training solutions."
-        />
-        <meta name="robots" content="index, follow" />
-        <meta
-          name="keywords"
-          content="engineering consultancy Nepal, infrastructure development Nepal, project management Nepal, structural engineering Nepal, water supply engineering Nepal, DPR consultant Nepal"
-        />
-        <link rel="canonical" href="https://www.dikshacp.com.np" />
-
-        {/* Open Graph — for social sharing previews */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.dikshacp.com.np" />
-        <meta
-          property="og:title"
-          content="Diksha Consulting and Projects | Engineering Consultancy Nepal"
-        />
-        <meta
-          property="og:description"
-          content="Expert engineering consultancy, project management, and training solutions across Nepal."
-        />
-        <meta
-          property="og:image"
-          content="https://www.dikshacp.com.np/og-image.webp"
-        />
-
-        {/* Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
+      <Seo
+        title="Diksha Consulting and Projects | Engineering Consultancy Nepal"
+        description="Diksha Consulting and Projects Pvt. Ltd. is a Nepal-based engineering consultancy specializing in infrastructure development, project management, water supply engineering, structural design, and technical training solutions."
+        canonicalPath="/"
+        jsonLd={[
+          {
             "@type": "EngineeringCompany",
             name: "Diksha Consulting and Projects Pvt. Ltd.",
             url: "https://www.dikshacp.com.np",
@@ -139,12 +109,14 @@ export function Home() {
               addressCountry: "NP",
             },
             areaServed: "Nepal",
-            sameAs: [
-              // add your LinkedIn, Facebook etc.
-            ],
-          })}
-        </script>
-      </Helmet>
+          },
+          {
+            "@type": "WebSite",
+            name: "Diksha Consulting and Projects Pvt. Ltd.",
+            url: "https://www.dikshacp.com.np",
+          },
+        ]}
+      />
 
       <div>
         {/* Hero Section */}
@@ -404,6 +376,8 @@ export function Home() {
                         <img
                           src={item.featuredImage}
                           alt={item.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
@@ -462,6 +436,8 @@ export function Home() {
                     <img
                       src={client.logoUrl}
                       alt={client.name}
+                      loading="lazy"
+                      decoding="async"
                       className="max-h-16 max-w-full object-contain"
                     />
                   </Link>

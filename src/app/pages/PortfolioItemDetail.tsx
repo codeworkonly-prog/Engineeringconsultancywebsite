@@ -11,6 +11,7 @@ import { useContent } from "../contexts/ContentContext";
 import { PortfolioItem, PortfolioType } from "../../types/portfolio.types";
 import { formatContractAmount } from "../../services/portfolio.service";
 import { SanitizedHtml } from "../components/ui/sanitized-html";
+import { Seo, SITE_URL, SITE_NAME } from "../components/Seo";
 
 const typeLabels: Record<PortfolioType, string> = {
   project: "Project",
@@ -50,6 +51,12 @@ export function PortfolioItemDetail({
   if (!item) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+        <Seo
+          title="Portfolio Item Not Found"
+          robots="noindex, follow"
+          noCanonical
+          image=""
+        />
         <div className="text-center">
           <h1 className="text-4xl font-bold text-slate-950">
             Portfolio Item Not Found
@@ -68,8 +75,58 @@ export function PortfolioItemDetail({
     );
   }
 
+  // Strip HTML so meta description/social previews show plain text.
+  const itemDescription =
+    item.shortDescription?.replace(/<[^>]*>/g, "").trim() ||
+    item.overview?.replace(/<[^>]*>/g, "").trim() ||
+    undefined;
+  const detailUrl = `${SITE_URL}/${item.type === "project" ? "projects" : item.type === "consulting" ? "consulting" : "training"}/${item.slug}`;
+
   return (
     <div className="bg-white">
+      <Seo
+        title={`${item.title} | ${SITE_NAME}`}
+        description={itemDescription}
+        canonicalPath={detailUrl}
+        image={item.featuredImage || undefined}
+        ogType="article"
+        jsonLd={[
+          {
+            "@type": "WebPage",
+            name: item.title,
+            description: itemDescription,
+            url: detailUrl,
+          },
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: `${SITE_URL}/`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name:
+                  item.type === "project"
+                    ? "Projects"
+                    : item.type === "consulting"
+                      ? "Consulting"
+                      : "Training",
+                item: `${SITE_URL}/${item.type === "project" ? "projects" : item.type === "consulting" ? "consulting" : "training"}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: item.title,
+              },
+            ],
+          },
+        ]}
+        jsonLdId="portfolio-detail-jsonld"
+      />
       <section className="relative min-h-[520px] bg-slate-950 text-white">
         {item.featuredImage && (
           <img

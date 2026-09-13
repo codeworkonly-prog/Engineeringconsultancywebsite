@@ -1,39 +1,50 @@
+import { lazy, Suspense, type ComponentType } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { Root } from './Root';
-import { Home } from './pages/Home';
-import { About } from './pages/About';
-import { Training } from './pages/Training';
-import { Projects } from './pages/Projects';
-import { ProjectDetail } from './pages/ProjectDetail';
-import { EventDetail } from './pages/EventDetail';
-import { Contact } from './pages/Contact';
-import { Portfolio } from './pages/Portfolio';
-import { Team } from './pages/Team';
-import { TeamMemberDetail } from './pages/TeamMemberDetail';
-import { CompanyProfile } from './pages/CompanyProfile';
-import { CompanySector } from './pages/CompanySector';
-import { ConsultingService } from './pages/ConsultingService';
-import { PortfolioItemDetail } from './pages/PortfolioItemDetail';
-import { AdminLayout } from './pages/admin/Dashboard';
-import { DashboardHome } from './pages/admin/DashboardHome';
-import { PortfolioSection } from './pages/admin/PortfolioSection';
-import { PortfolioForm } from './pages/admin/PortfolioForm';
-import { TeamSection } from './pages/admin/TeamSection';
-import { TeamForm } from './pages/admin/TeamForm';
-import { ClientsManagement } from './pages/admin/Clients';
-import { ClientForm } from './pages/admin/ClientForm';
-import { SectorsManagement } from './pages/admin/Sectors';
-import { SectorForm } from './pages/admin/SectorForm';
-import { FaqsSection } from './pages/admin/FaqsSection';
-import { FaqForm } from './pages/admin/FaqForm';
-import { PrivacyPolicySection } from './pages/admin/PrivacyPolicySection';
-import { HeroCarouselSection } from './pages/admin/HeroCarouselSection';
-import { ContactInfoSection } from './pages/admin/ContactInfoSection';
-import { AdminLogin } from './components/AdminLogin';
-import { NotFound } from './pages/NotFound';
-import { Faq } from './pages/Faq'; 
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { NotFound } from './pages/NotFound';
+
+// Route-level code splitting: each page is a separate chunk loaded on
+// demand, so the public initial bundle stays small. Root and NotFound
+// stay eager so the layout shell and 404s render instantly.
+const page = (name: string, loader: () => Promise<Record<string, unknown>>) =>
+  lazy(async () => {
+    const m = await loader();
+    return { default: m[name] as ComponentType<any> };
+  });
+
+const Home = page('Home', () => import('./pages/Home'));
+const About = page('About', () => import('./pages/About'));
+const Training = page('Training', () => import('./pages/Training'));
+const Projects = page('Projects', () => import('./pages/Projects'));
+const ProjectDetail = page('ProjectDetail', () => import('./pages/ProjectDetail'));
+const EventDetail = page('EventDetail', () => import('./pages/EventDetail'));
+const Contact = page('Contact', () => import('./pages/Contact'));
+const Portfolio = page('Portfolio', () => import('./pages/Portfolio'));
+const Team = page('Team', () => import('./pages/Team'));
+const TeamMemberDetail = page('TeamMemberDetail', () => import('./pages/TeamMemberDetail'));
+const CompanyProfile = page('CompanyProfile', () => import('./pages/CompanyProfile'));
+const CompanySector = page('CompanySector', () => import('./pages/CompanySector'));
+const ConsultingService = page('ConsultingService', () => import('./pages/ConsultingService'));
+const PortfolioItemDetail = page('PortfolioItemDetail', () => import('./pages/PortfolioItemDetail'));
+const AdminLayout = page('AdminLayout', () => import('./pages/admin/Dashboard'));
+const DashboardHome = page('DashboardHome', () => import('./pages/admin/DashboardHome'));
+const PortfolioSection = page('PortfolioSection', () => import('./pages/admin/PortfolioSection'));
+const PortfolioForm = page('PortfolioForm', () => import('./pages/admin/PortfolioForm'));
+const TeamSection = page('TeamSection', () => import('./pages/admin/TeamSection'));
+const TeamForm = page('TeamForm', () => import('./pages/admin/TeamForm'));
+const ClientsManagement = page('ClientsManagement', () => import('./pages/admin/Clients'));
+const ClientForm = page('ClientForm', () => import('./pages/admin/ClientForm'));
+const SectorsManagement = page('SectorsManagement', () => import('./pages/admin/Sectors'));
+const SectorForm = page('SectorForm', () => import('./pages/admin/SectorForm'));
+const FaqsSection = page('FaqsSection', () => import('./pages/admin/FaqsSection'));
+const FaqForm = page('FaqForm', () => import('./pages/admin/FaqForm'));
+const PrivacyPolicySection = page('PrivacyPolicySection', () => import('./pages/admin/PrivacyPolicySection'));
+const HeroCarouselSection = page('HeroCarouselSection', () => import('./pages/admin/HeroCarouselSection'));
+const ContactInfoSection = page('ContactInfoSection', () => import('./pages/admin/ContactInfoSection'));
+const AdminLogin = page('AdminLogin', () => import('./components/AdminLogin'));
+const Faq = page('Faq', () => import('./pages/Faq'));
+const PrivacyPolicy = page('PrivacyPolicy', () => import('./pages/PrivacyPolicy'));
 
 export const router = createBrowserRouter([
   {

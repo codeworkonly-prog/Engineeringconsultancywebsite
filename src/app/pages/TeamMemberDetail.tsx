@@ -3,6 +3,7 @@ import { useContent } from '../contexts/ContentContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ArrowLeft, Mail, Phone } from 'lucide-react';
+import { Seo, SITE_URL, SITE_NAME } from '../components/Seo';
 
 export function TeamMemberDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -13,6 +14,12 @@ export function TeamMemberDetail() {
   if (!member) {
     return (
       <div className="min-h-screen flex items-center justify-center">
+        <Seo
+          title="Team Member Not Found"
+          robots="noindex, follow"
+          noCanonical
+          image=""
+        />
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Team Member Not Found</h1>
           <p className="text-gray-600 mb-8">The team member you're looking for doesn't exist.</p>
@@ -25,9 +32,58 @@ export function TeamMemberDetail() {
   }
 
   const otherMembers = teamMembers.filter((m) => m.id !== member.id).slice(0, 3);
+  const memberUrl = `${SITE_URL}/team/${member.slug}`;
 
   return (
     <div>
+      <Seo
+        title={`${member.name} | ${SITE_NAME}`}
+        description={
+          member.bio?.trim() ||
+          `${member.name} — ${member.position} at Diksha Consulting and Projects, Nepal.`
+        }
+        canonicalPath={memberUrl}
+        image={member.imageUrl || undefined}
+        ogType="profile"
+        jsonLd={[
+          {
+            "@type": "Person",
+            name: member.name,
+            jobTitle: member.position,
+            description: member.bio,
+            url: memberUrl,
+            image: member.imageUrl || undefined,
+            worksFor: {
+              "@type": "Organization",
+              name: SITE_NAME,
+              url: `${SITE_URL}/`,
+            },
+          },
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: `${SITE_URL}/`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Team",
+                item: `${SITE_URL}/team`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: member.name,
+              },
+            ],
+          },
+        ]}
+        jsonLdId="team-member-jsonld"
+      />
       {/* Back Button */}
       <section className="bg-gray-50 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

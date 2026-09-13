@@ -2,6 +2,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Link } from 'react-router';
 import { CheckCircle, Building2, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
+import { Seo } from '../components/Seo';
 import { FlagshipProjectSection } from '../pages/admin/FlagshipProjectSection';
 import { slugify } from '../../utils/slug';
 
@@ -88,6 +89,11 @@ export function CompanyProfile() {
 
   return (
     <div>
+      <Seo
+        title="Company Profile | Diksha Consulting and Projects"
+        description="A comprehensive overview of Diksha Consulting and Projects — engineering consultancy services, procurement support, design-build projects, and training programs in Nepal."
+        canonicalPath="/company-profile"
+      />
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

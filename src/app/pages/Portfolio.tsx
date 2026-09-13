@@ -22,6 +22,7 @@ import {
 } from '../../services/portfolio.service';
 import { slugify } from '../../utils/slug';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
+import { Seo } from '../components/Seo';
 
 const PAGE_SIZE = 10;
 const COMPANY_START_BS_YEAR = 2072;
@@ -253,6 +254,11 @@ export function Portfolio() {
 
   return (
     <div className="bg-slate-50">
+      <Seo
+        title="Our Portfolio | Diksha Consulting and Projects"
+        description="Browse projects, consulting assignments, and training programs delivered by Diksha Consulting and Projects across Nepal, by sector, client, and fiscal year."
+        canonicalPath="/portfolio"
+      />
       <section className="relative overflow-hidden bg-slate-950 text-white">
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(14,165,233,0.24),transparent_38%),linear-gradient(45deg,rgba(16,185,129,0.16),transparent_45%)]" />
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">

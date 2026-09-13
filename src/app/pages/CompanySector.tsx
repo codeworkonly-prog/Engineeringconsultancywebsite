@@ -2,6 +2,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Link } from 'react-router';
 import { CheckCircle, Building2, Factory, Droplet, Zap, Home, Hammer } from 'lucide-react';
 import { slugify } from '../../utils/slug';
+import { Seo } from '../components/Seo';
 
 export function CompanySector() {
   const sectors = [
@@ -105,6 +106,11 @@ export function CompanySector() {
 
   return (
     <div>
+      <Seo
+        title="Company Sectors | Diksha Consulting and Projects"
+        description="Engineering and consulting expertise across water supply, infrastructure, energy, building construction, project management, and power utilities in Nepal."
+        canonicalPath="/company-sector"
+      />
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

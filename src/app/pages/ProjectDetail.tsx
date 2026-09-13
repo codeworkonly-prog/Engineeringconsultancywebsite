@@ -6,6 +6,7 @@ import { Calendar, ArrowLeft, MapPin, Ruler, CheckCircle2, ChevronDown, ChevronU
 import { useState } from 'react';
 import { PortfolioItemDetail } from './PortfolioItemDetail';
 import { SanitizedHtml } from '../components/ui/sanitized-html';
+import { Seo } from '../components/Seo';
 
 export function ProjectDetail() {
   const { slug } = useParams();
@@ -30,8 +31,51 @@ export function ProjectDetail() {
   const clientName =
     clients.find((c) => c.id === project.clientId)?.name || project.clientName;
 
+  const projectUrl = `https://www.dikshacp.com.np/projects/${project.slug}`;
+
   return (
     <div>
+      <Seo
+        title={`${project.title} | Diksha Consulting and Projects`}
+        description={
+          project.description?.replace(/<[^>]*>/g, "").trim() ||
+          `Infrastructure project by Diksha Consulting and Projects in Nepal.`
+        }
+        canonicalPath={projectUrl}
+        image={project.imageUrl || undefined}
+        ogType="article"
+        jsonLd={[
+          {
+            "@type": "WebPage",
+            name: project.title,
+            description: project.description?.replace(/<[^>]*>/g, "").trim(),
+            url: projectUrl,
+          },
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://www.dikshacp.com.np/",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Projects",
+                item: "https://www.dikshacp.com.np/projects",
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: project.title,
+              },
+            ],
+          },
+        ]}
+        jsonLdId="project-detail-jsonld"
+      />
       {/* Hero Section */}
       <section className="relative h-[500px] bg-gray-900">
         <img

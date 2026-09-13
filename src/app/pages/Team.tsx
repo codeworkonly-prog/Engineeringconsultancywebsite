@@ -1,6 +1,7 @@
 import { Card, CardContent } from '../components/ui/card';
 import { useContent } from '../contexts/ContentContext';
 import { Link } from 'react-router';
+import { Seo } from '../components/Seo';
 
 export function Team() {
   const { teamMembers } = useContent();
@@ -9,6 +10,11 @@ export function Team() {
 
   return (
     <div>
+      <Seo
+        title="Our Team | Diksha Consulting and Projects"
+        description="Meet the engineers, project managers, and procurement experts at Diksha Consulting and Projects delivering engineering excellence across Nepal."
+        canonicalPath="/team"
+      />
       {/* Header Section */}
       <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

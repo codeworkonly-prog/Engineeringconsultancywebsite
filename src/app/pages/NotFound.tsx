@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Home, Briefcase, Calendar, FileText, Building2 } from 'lucide-react';
+import { Seo } from '../components/Seo';
 
 // Construction Crane Animation Component
 function ConstructionCrane() {
@@ -134,6 +135,13 @@ export function NotFound() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-16">
+      <Seo
+        title="Page Not Found (404) | Diksha Consulting and Projects"
+        description="The page you are looking for does not exist."
+        robots="noindex, follow"
+        noCanonical
+        image=""
+      />
       <div className="max-w-4xl w-full">
         {/* 404 Hero Section */}
         <div className="text-center mb-12">

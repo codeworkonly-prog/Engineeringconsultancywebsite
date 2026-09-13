@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { Button } from '../../components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
+import { Seo } from '../../components/Seo';
 import {
   LayoutDashboard,
   Users,
@@ -61,6 +62,12 @@ export function AdminLayout() {
 
   return (
     <div className="flex h-screen bg-gray-50">
+      <Seo
+        title="Admin Panel"
+        robots="noindex, nofollow"
+        noCanonical
+        image=""
+      />
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r flex flex-col">
         <div className="p-6 border-b">
