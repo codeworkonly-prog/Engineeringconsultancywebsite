@@ -25,6 +25,7 @@ export function Header() {
     { path: '/consulting', label: 'Consulting' },
     { path: '/projects', label: 'Projects' },
     { path: '/training', label: 'Training' },
+    { path: '/gallery', label: 'Gallery' },
     { path: '/contact', label: 'Contact Us' },
   ];
 

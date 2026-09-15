@@ -37,6 +37,7 @@ export interface PortfolioItem {
   overview?: string;
   fullDescription?: string;
   featuredImage: string;
+  galleryImages?: string[];
   sector?: string;
   clientId?: string;
   partnerFirms?: string;
@@ -64,6 +65,7 @@ export const defaultPortfolioFormData: PortfolioItem = {
   shortDescription: '',
   overview: '',
   featuredImage: '',
+  galleryImages: [],
   sector: '',
   clientId: '',
   fiscalYear: '',

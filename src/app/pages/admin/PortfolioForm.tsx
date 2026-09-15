@@ -12,7 +12,7 @@ import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { RichTextEditor } from "../../components/ui/rich-text-editor";
 import { Checkbox } from "../../components/ui/checkbox";
-import { ImageUpload } from "../../components/ui/imageupload";
+import { ImageUpload, MultiImageUpload } from "../../components/ui/imageupload";
 import {
   Select,
   SelectContent,
@@ -30,7 +30,7 @@ import {
 } from "../../components/ui/dialog";
 import { useContent } from "../../contexts/ContentContext";
 import { toast } from "sonner";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, ChevronUp, ChevronDown, X } from "lucide-react";
 import {
   PortfolioItem,
   PortfolioStatus,
@@ -290,6 +290,29 @@ export function PortfolioForm() {
     });
   };
 
+  const galleryImages = form.galleryImages || [];
+
+  const addGalleryImages = (urls: string[]) => {
+    if (urls.length === 0) return;
+    updateForm("galleryImages", [...galleryImages, ...urls]);
+  };
+
+  const removeGalleryImage = (index: number) => {
+    updateForm(
+      "galleryImages",
+      galleryImages.filter((_, i) => i !== index),
+    );
+  };
+
+  const moveGalleryImage = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= galleryImages.length) return;
+
+    const next = [...galleryImages];
+    [next[index], next[target]] = [next[target], next[index]];
+    updateForm("galleryImages", next);
+  };
+
   const handleAddFiscalYear = () => {
     const latestYear = fiscalYearOptions
       .map((fy) => Number(fy.split("/")[0]))
@@ -362,6 +385,7 @@ export function PortfolioForm() {
       shortDescription: form.shortDescription.trim(),
       overview: form.overview?.trim(),
       featuredImage: form.featuredImage.trim(),
+      galleryImages: (form.galleryImages || []).filter(Boolean),
       sector: form.sector?.trim(),
       clientId: form.clientId?.trim(),
       partnerFirms: form.partnerFirms?.trim(),
@@ -996,6 +1020,71 @@ export function PortfolioForm() {
                   className="h-44 w-full rounded-lg border object-cover"
                 />
               )}
+            </div>
+
+            <div className="space-y-4 border-t pt-6">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Item Gallery
+              </h3>
+              <p className="text-sm text-gray-500">
+                Photos for this item&apos;s public gallery — select multiple
+                files at once. The detail page shows the first four with a
+                &quot;View Full Gallery&quot; link.
+              </p>
+
+              {galleryImages.length > 0 && (
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                  {galleryImages.map((url, index) => (
+                    <div
+                      key={`${url}-${index}`}
+                      className="group relative overflow-hidden rounded-lg border"
+                    >
+                      <img
+                        src={url}
+                        alt={`Gallery image ${index + 1}`}
+                        className="h-28 w-full object-cover"
+                      />
+
+                      <div className="absolute inset-0 flex items-center justify-center gap-1 bg-slate-950/50 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() => moveGalleryImage(index, -1)}
+                          disabled={index === 0}
+                          title="Move earlier"
+                          className="rounded bg-white/90 p-1 text-slate-800 disabled:opacity-40"
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveGalleryImage(index, 1)}
+                          disabled={index === galleryImages.length - 1}
+                          title="Move later"
+                          className="rounded bg-white/90 p-1 text-slate-800 disabled:opacity-40"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(index)}
+                          title="Remove"
+                          className="rounded bg-red-600 p-1 text-white"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="max-w-md">
+                <MultiImageUpload
+                  label="Upload Gallery Images"
+                  folder={`portfolio-galleries/${form.slug || "unsorted"}`}
+                  onChange={addGalleryImages}
+                />
+              </div>
             </div>
 
             <div className="flex justify-end gap-3 border-t pt-5">

@@ -35,6 +35,8 @@ import { NotFound } from './pages/NotFound';
 import { Faq } from './pages/Faq'; 
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { Gallery } from './pages/Gallery';
+import { GalleryDetail } from './pages/GalleryDetail';
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +57,8 @@ export const router = createBrowserRouter([
       { path: 'projects/:slug', Component: ProjectDetail },
       { path: 'portfolio', Component: Portfolio },
       { path: 'contact', Component: Contact },
+      { path: 'gallery', Component: Gallery },
+      { path: 'gallery/:slug', Component: GalleryDetail },
       { path: 'faq', Component: Faq },
       { path: 'privacy-policy', Component: PrivacyPolicy },
       { path: '*', Component: NotFound },

@@ -5,6 +5,7 @@ import {
   Calendar,
   MapPin,
   UserRound,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useContent } from "../contexts/ContentContext";
@@ -67,6 +68,8 @@ export function PortfolioItemDetail({
       </div>
     );
   }
+
+  const gallery = (item.galleryImages || []).filter(Boolean);
 
   return (
     <div className="bg-white">
@@ -205,6 +208,47 @@ export function PortfolioItemDetail({
           </dl>
         </aside>
       </section>
+
+      {gallery.length > 0 && (
+        <section className="border-t bg-slate-50 py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <h2 className="text-3xl font-bold text-slate-950">
+                Project Gallery
+              </h2>
+              <Link
+                to={`/gallery/${item.slug}`}
+                className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-brand-700"
+              >
+                View Full Gallery
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+              {gallery.slice(0, 4).map((src, index) => (
+                <Link
+                  key={index}
+                  to={`/gallery/${item.slug}`}
+                  className="group relative overflow-hidden rounded-lg"
+                >
+                  <img
+                    src={src}
+                    alt={`${item.title} — gallery photo ${index + 1}`}
+                    loading="lazy"
+                    className="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {index === 3 && gallery.length > 4 && (
+                    <span className="absolute inset-0 flex items-center justify-center bg-slate-950/60 text-sm font-semibold text-white">
+                      +{gallery.length - 4} more
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
