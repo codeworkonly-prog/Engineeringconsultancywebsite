@@ -103,6 +103,18 @@ export interface HeroCarouselImage {
   order: number;
 }
 
+export interface PageHeroImages {
+  about?: string;
+  companyProfile?: string;
+  portfolio?: string;
+  consulting?: string;
+  training?: string;
+  projects?: string;
+  contact?: string;
+  team?: string;
+  companySector?: string;
+}
+
 export interface HomeFaq {
   id: string;
   question: string;
@@ -143,6 +155,7 @@ interface ContentContextType {
   privacyPolicy: PrivacyPolicy | null;
   heroImages: HeroCarouselImage[];
   contactInfo: ContactInfo | null;
+  pageHeroImages: PageHeroImages;
 
   addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>;
   updateTeamMember: (
@@ -201,6 +214,8 @@ interface ContentContextType {
   deleteHeroImage: (id: string) => Promise<void>;
   updateHeroImages: (images: HeroCarouselImage[]) => Promise<void>;
 
+  updatePageHeroImages: (images: PageHeroImages) => Promise<void>;
+
   saveContactInfo: (info: ContactInfo) => Promise<void>;
 }
 
@@ -232,6 +247,7 @@ export function ContentProvider({
   const [privacyPolicy, setPrivacyPolicy] = useState<PrivacyPolicy | null>(null);
   const [heroImages, setHeroImages] = useState<HeroCarouselImage[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const [pageHeroImages, setPageHeroImages] = useState<PageHeroImages>({});
 
   /* =========================
      Fetch Data
@@ -249,6 +265,7 @@ export function ContentProvider({
     fetchPrivacyPolicy();
     fetchHeroImages();
     fetchContactInfo();
+    fetchPageHeroImages();
   }, []);
 
   /* =========================
@@ -940,6 +957,39 @@ export function ContentProvider({
   };
 
   /* =========================
+     PAGE HERO BACKGROUNDS
+     ========================= */
+
+  const fetchPageHeroImages = async () => {
+    try {
+      const snapshot = await getDoc(doc(db, "siteContent", "pageHeroImages"));
+
+      if (!snapshot.exists()) {
+        setPageHeroImages({});
+        return;
+      }
+
+      setPageHeroImages(snapshot.data() as PageHeroImages);
+    } catch (error) {
+      console.error("Error fetching page hero images:", error);
+    }
+  };
+
+  const updatePageHeroImages = async (images: PageHeroImages) => {
+    try {
+      const payload = Object.fromEntries(
+        Object.entries(images).filter(([, v]) => v !== undefined && v !== "")
+      ) as PageHeroImages;
+
+      await setDoc(doc(db, "siteContent", "pageHeroImages"), payload);
+      setPageHeroImages(payload);
+    } catch (error) {
+      console.error("Error saving page hero images:", error);
+      throw error;
+    }
+  };
+
+  /* =========================
      CONTACT INFO
      ========================= */
 
@@ -1090,6 +1140,7 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
         privacyPolicy,
         heroImages,
         contactInfo,
+        pageHeroImages,
 
         addTeamMember,
         updateTeamMember,
@@ -1128,6 +1179,8 @@ const savePrivacyPolicy = async (policy: PrivacyPolicy) => {
         addHeroImage,
         deleteHeroImage,
         updateHeroImages,
+
+        updatePageHeroImages,
 
         saveContactInfo,
       }}

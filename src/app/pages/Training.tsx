@@ -4,12 +4,13 @@ import { Button } from '../components/ui/button';
 import { ArrowRight, BookOpen, Users, Award, CheckCircle, Calendar, GraduationCap, MapPin, LayoutGrid, Table2, ArrowUp, ArrowDown } from 'lucide-react';
 import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
+import { PageHeroBackground } from '../components/PageHeroBackground';
 import { SanitizedHtml } from '../components/ui/sanitized-html';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
 import { PortfolioFiltersState } from '../../types/portfolio.types';
 
 export function Training() {
-  const { events, portfolio, clients } = useContent();
+  const { events, portfolio, clients, pageHeroImages } = useContent();
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
   const [filters, setFilters] = useState<PortfolioFiltersState>({
@@ -108,7 +109,10 @@ export function Training() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
+      <PageHeroBackground
+        image={pageHeroImages?.training}
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Training</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
@@ -119,7 +123,7 @@ export function Training() {
             <p className="mt-1 text-sm text-brand-100">Training Programs Conducted</p>
           </div>
         </div>
-      </section>
+      </PageHeroBackground>
 
       {/* Programs Section */}
       <section className="py-16">

@@ -1,23 +1,27 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 import { toast } from "sonner";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../../firebase";
 import { useContent } from "../contexts/ContentContext";
+import { PageHeroBackground } from '../components/PageHeroBackground';
 
 export function Contact() {
-  const { contactInfo } = useContent();
+  const { contactInfo, pageHeroImages } = useContent();
   const [loading, setLoading] = useState(false);
 
-  const address = contactInfo?.address || '';
-  const email = contactInfo?.email || '';
-  const phone = contactInfo?.phone || '';
-  const businessHours = contactInfo?.businessHours || '';
+  const address = contactInfo?.address || "";
+  const email = contactInfo?.email || "";
+  const phone = contactInfo?.phone || "";
+  const businessHours = contactInfo?.businessHours || "";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -82,48 +86,47 @@ export function Contact() {
     setLoading(true);
 
     try {
-      await addDoc(collection(db, "contactMessages"), {
-        ...formData,
-        createdAt: serverTimestamp(),
+      const payload: Record<string, string> = {
+        access_key: import.meta.env.WEB3FORMS_ACCESS_KEY,
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        ...(formData.phone && { phone: formData.phone }),
+        ...(formData.subject && { subject: formData.subject }),
+      };
+
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
-      const whatsappMessage = `
-Hello Diksha Consulting,
+      const json = await res.json();
 
-I would like to contact you regarding:
+      if (json.success) {
+        toast.success("Message sent successfully!");
 
-Name: ${formData.name}
-Email: ${formData.email}
-Phone: ${formData.phone}
-Subject: ${formData.subject}
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
 
-Message:
-${formData.message}
-      `;
-
-      const phoneDigits = phone.replace(/[^0-9]/g, "");
-      const whatsappURL = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(
-        whatsappMessage
-      )}`;
-
-      window.open(whatsappURL, "_blank");
-
-      toast.success("Redirecting to WhatsApp...");
-
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
-      });
-
-      setErrors({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-      });
+        setErrors({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        });
+      } else {
+        console.error(json);
+        toast.error(json.message || "Failed to send message");
+      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to send message");
@@ -133,7 +136,7 @@ ${formData.message}
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -151,29 +154,30 @@ ${formData.message}
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
+      <PageHeroBackground
+        image={pageHeroImages?.contact}
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
             Get in touch with us for any inquiries or project consultations
           </p>
         </div>
-      </section>
+      </PageHeroBackground>
 
       {/* Contact Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
             {/* LEFT INFO */}
             <div>
               <h2 className="text-3xl font-bold mb-6">Get In Touch</h2>
               <p className="text-gray-600 mb-8">
-                We'd love to hear from you. Our team is ready to assist you with your engineering
-                and project management needs.
+                We'd love to hear from you. Our team is ready to assist you with
+                your engineering and project management needs.
               </p>
               <div className="space-y-6">
-
                 {address && (
                   <Card>
                     <CardContent className="pt-6">
@@ -229,9 +233,14 @@ ${formData.message}
                         </div>
                         <div>
                           <h3 className="font-semibold mb-1">Phone</h3>
-                          <p className="text-gray-600"><a href={`tel:${phone}`} className="text-brand-600 hover:underline">
-                            {phone}
-                          </a></p>
+                          <p className="text-gray-600">
+                            <a
+                              href={`tel:${phone}`}
+                              className="text-brand-600 hover:underline"
+                            >
+                              {phone}
+                            </a>
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -247,9 +256,7 @@ ${formData.message}
                         </div>
                         <div>
                           <h3 className="font-semibold mb-1">Business Hours</h3>
-                          <p className="text-gray-600">
-                            {businessHours}
-                          </p>
+                          <p className="text-gray-600">{businessHours}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -263,7 +270,6 @@ ${formData.message}
                     </CardContent>
                   </Card>
                 )}
-
               </div>
             </div>
 
@@ -276,7 +282,7 @@ ${formData.message}
                   </CardTitle>
 
                   <p className="text-gray-500 mt-2 leading-relaxed">
-                    Contact us instantly via WhatsApp — we usually respond within 24 hours.
+                    Send us a message — we usually respond within 24 hours.
                   </p>
 
                   {/* subtle divider instead of heavy gradient */}
@@ -285,10 +291,8 @@ ${formData.message}
 
                 <CardContent className="px-8 pb-8">
                   <form onSubmit={handleSubmit} className="space-y-6">
-
                     {/* Name + Phone */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
                       <div>
                         <Label className="text-sm font-medium text-gray-700">
                           Full Name *
@@ -303,7 +307,9 @@ ${formData.message}
                         />
 
                         {errors.name && (
-                          <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.name}
+                          </p>
                         )}
                       </div>
 
@@ -321,7 +327,9 @@ ${formData.message}
                         />
 
                         {errors.phone && (
-                          <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.phone}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -342,7 +350,9 @@ ${formData.message}
                       />
 
                       {errors.email && (
-                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.email}
+                        </p>
                       )}
                     </div>
 
@@ -377,7 +387,9 @@ ${formData.message}
                       />
 
                       {errors.message && (
-                        <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.message}
+                        </p>
                       )}
                     </div>
 
@@ -386,10 +398,11 @@ ${formData.message}
                       type="submit"
                       disabled={!isFormValid || loading}
                       className={`w-full h-12 rounded-xl font-semibold text-white shadow-md transition-all duration-300 flex items-center justify-center gap-2
-    ${isFormValid && !loading
-                          ? "bg-green-500 hover:bg-green-600 hover:shadow-lg active:scale-[0.98]"
-                          : "bg-brand-600 hover:bg-brand-700 opacity-80 cursor-not-allowed"
-                        }`}
+    ${
+      isFormValid && !loading
+        ? "bg-green-500 hover:bg-green-600 hover:shadow-lg active:scale-[0.98]"
+        : "bg-brand-600 hover:bg-brand-700 opacity-80 cursor-not-allowed"
+    }`}
                     >
                       {loading ? (
                         <>
@@ -416,17 +429,15 @@ ${formData.message}
                         </>
                       ) : (
                         <>
-                          <Phone className="w-4 h-4" />
-                          Send via WhatsApp
+                          <Send className="w-4 h-4" />
+                          Send Message
                         </>
                       )}
                     </Button>
-
                   </form>
                 </CardContent>
               </Card>
             </div>
-
           </div>
         </div>
       </section>

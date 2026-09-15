@@ -1,23 +1,27 @@
 import { Card, CardContent } from '../components/ui/card';
 import { useContent } from '../contexts/ContentContext';
+import { PageHeroBackground } from '../components/PageHeroBackground';
 import { Link } from 'react-router';
 
 export function Team() {
-  const { teamMembers } = useContent();
+  const { teamMembers, pageHeroImages } = useContent();
   const leadershipMember = teamMembers.find(member => member.isLeadership);
   const otherMembers = teamMembers.filter(member => !member.isLeadership);
 
   return (
     <div>
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
+      <PageHeroBackground
+        image={pageHeroImages?.team}
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Our Team</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
             Meet the experienced professionals who drive our success and deliver excellence in every project
           </p>
         </div>
-      </section>
+      </PageHeroBackground>
 
       {/* Team Members Section */}
       <section className="py-16">

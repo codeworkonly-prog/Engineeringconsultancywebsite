@@ -6,7 +6,7 @@ import aboutUs from "../../imports/About_us.webp";
 import aboutUsHeader from "../../imports/aboutUsHeader.webp";
 
 export function About() {
-  const { teamMembers } = useContent();
+  const { teamMembers, pageHeroImages } = useContent();
   const leadershipMember = teamMembers.find(member => member.isLeadership);
   const otherMembers = teamMembers.filter(member => !member.isLeadership);
 
@@ -24,7 +24,7 @@ export function About() {
       <section
         className="relative h-[420px] flex items-center text-white overflow-hidden"
         style={{
-          backgroundImage: `url(${aboutUsHeader})`,
+          backgroundImage: `url(${pageHeroImages?.about || aboutUsHeader})`,
           backgroundSize: "cover",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",

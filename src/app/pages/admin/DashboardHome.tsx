@@ -20,6 +20,9 @@ const SECTION_ROUTES: Record<Section, string> = {
   sectors: '/admin/sectors',
   faqs: '/admin/faqs',
   'privacy-policy': '/admin/privacy-policy',
+  'hero-carousel': '/admin/hero-carousel',
+  'contact-info': '/admin/contact-info',
+  'page-heroes': '/admin/page-heroes',
 };
 
 export function DashboardHome() {

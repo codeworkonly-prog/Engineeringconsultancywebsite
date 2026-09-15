@@ -31,7 +31,7 @@ import project6 from "../../imports/project6.jpg";
 type ProjectStatus = "upcoming" | "ongoing" | "completed";
 
 export function Projects() {
-  const { projects, galleryImages, portfolio, clients } = useContent();
+  const { projects, galleryImages, portfolio, clients, pageHeroImages } = useContent();
   const [view, setView] = useState<"grid" | "table">("grid");
   const [fySortOrder, setFySortOrder] = useState<"desc" | "asc">("desc");
   const [filters, setFilters] = useState<PortfolioFiltersState>({
@@ -222,7 +222,19 @@ export function Projects() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white min-h-[580px] flex items-center">
+      <section
+        className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white min-h-[580px] flex items-center"
+        style={
+          pageHeroImages?.projects
+            ? {
+                backgroundImage: `url(${pageHeroImages.projects})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center center",
+                backgroundRepeat: "no-repeat",
+              }
+            : undefined
+        }
+      >
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{

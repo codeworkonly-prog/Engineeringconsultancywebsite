@@ -28,6 +28,7 @@ import { FaqsSection } from './pages/admin/FaqsSection';
 import { FaqForm } from './pages/admin/FaqForm';
 import { PrivacyPolicySection } from './pages/admin/PrivacyPolicySection';
 import { HeroCarouselSection } from './pages/admin/HeroCarouselSection';
+import { PageHeroesSection } from './pages/admin/PageHeroesSection';
 import { ContactInfoSection } from './pages/admin/ContactInfoSection';
 import { AdminLogin } from './components/AdminLogin';
 import { NotFound } from './pages/NotFound';
@@ -88,6 +89,7 @@ export const router = createBrowserRouter([
       { path: 'faqs/add', Component: FaqForm },
       { path: 'faqs/edit/:slug', Component: FaqForm },
       { path: 'hero-carousel', Component: HeroCarouselSection },
+      { path: 'page-heroes', Component: PageHeroesSection },
       { path: 'contact-info', Component: ContactInfoSection },
       { path: 'privacy-policy', Component: PrivacyPolicySection },
       { path: '*', Component: NotFound },

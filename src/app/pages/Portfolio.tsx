@@ -93,7 +93,7 @@ export function Portfolio() {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedClientParam = searchParams.get('client') || undefined;
   const selectedSectorParam = searchParams.get('sector') || undefined;
-  const { portfolio, clients, sectors } = useContent();
+  const { portfolio, clients, sectors, pageHeroImages } = useContent();
   const [page, setPage] = useState(1);
   const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
   const [filters, setFilters] = useState<PortfolioFiltersState>({
@@ -253,7 +253,19 @@ export function Portfolio() {
 
   return (
     <div className="bg-slate-50">
-      <section className="relative overflow-hidden bg-slate-950 text-white">
+      <section
+        className="relative overflow-hidden bg-slate-950 text-white"
+        style={
+          pageHeroImages?.portfolio
+            ? {
+                backgroundImage: `url(${pageHeroImages.portfolio})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                backgroundRepeat: 'no-repeat',
+              }
+            : undefined
+        }
+      >
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(14,165,233,0.24),transparent_38%),linear-gradient(45deg,rgba(16,185,129,0.16),transparent_45%)]" />
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="max-w-4xl">

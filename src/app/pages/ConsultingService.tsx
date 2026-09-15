@@ -4,12 +4,13 @@ import { ArrowRight, Calendar, CheckCircle, MapPin, Users, Target, BarChart, Lay
 import { Link } from 'react-router';
 import { Button } from '../components/ui/button';
 import { useContent } from '../contexts/ContentContext';
+import { PageHeroBackground } from '../components/PageHeroBackground';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
 import { PortfolioFiltersState } from '../../types/portfolio.types';
 import { SanitizedHtml } from '../components/ui/sanitized-html';
 
 export function ConsultingService() {
-  const { portfolio, clients } = useContent();
+  const { portfolio, clients, pageHeroImages } = useContent();
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [fySortOrder, setFySortOrder] = useState<'desc' | 'asc'>('desc');
   const [filters, setFilters] = useState<PortfolioFiltersState>({
@@ -96,7 +97,10 @@ export function ConsultingService() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
+      <PageHeroBackground
+        image={pageHeroImages?.consulting}
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Consulting Services</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
@@ -107,7 +111,7 @@ export function ConsultingService() {
             <p className="mt-1 text-sm text-brand-100">Consulting Assignments Delivered</p>
           </div>
         </div>
-      </section>
+      </PageHeroBackground>
 
       {/* Section heading */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 text-center">

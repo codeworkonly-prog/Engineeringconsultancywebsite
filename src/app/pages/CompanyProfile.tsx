@@ -2,11 +2,12 @@ import { Card, CardContent } from '../components/ui/card';
 import { Link } from 'react-router';
 import { CheckCircle, Factory, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
+import { PageHeroBackground } from '../components/PageHeroBackground';
 import { FlagshipProjectSection } from '../pages/admin/FlagshipProjectSection';
 import { slugify } from '../../utils/slug';
 
 export function CompanyProfile() {
-  const { clients, sectors } = useContent();
+  const { clients, sectors, pageHeroImages } = useContent();
   const getClientPortfolioLink = (clientId: string) =>
     `/portfolio?client=${encodeURIComponent(
       clients.find((client) => client.id === clientId)?.slug ||
@@ -79,14 +80,17 @@ export function CompanyProfile() {
   return (
     <div>
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16">
+      <PageHeroBackground
+        image={pageHeroImages?.companyProfile}
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Company Profile</h1>
           <p className="text-xl text-brand-50 max-w-3xl">
             A comprehensive overview of our services, experience, and capabilities
           </p>
         </div>
-      </section>
+      </PageHeroBackground>
 
       {/* Core Services Section */}
       <section className="py-16">
