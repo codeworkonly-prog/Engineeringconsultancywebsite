@@ -88,11 +88,17 @@ export function Contact() {
     try {
       const payload: Record<string, string> = {
         access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+
         name: formData.name,
         email: formData.email,
         message: formData.message,
+
+        subject:
+          formData.subject || `New contact form message from ${formData.name}`,
+
+        replyto: formData.email,
+
         ...(formData.phone && { phone: formData.phone }),
-        ...(formData.subject && { subject: formData.subject }),
       };
 
       const res = await fetch("https://api.web3forms.com/submit", {
