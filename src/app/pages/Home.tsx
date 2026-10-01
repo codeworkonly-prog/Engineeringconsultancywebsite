@@ -1,14 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
 import {
   Carousel,
   CarouselContent,
@@ -30,13 +23,15 @@ const portfolioTypeLabels: Record<PortfolioType, string> = {
   consulting: "Consulting",
   training: "Training",
 };
+const FEATURED_WORK_SCROLL_DURATION = 80_000;
 
 export function Home() {
   const { clients, portfolio, heroImages } = useContent();
-  const [selectedPortfolioType, setSelectedPortfolioType] =
-    useState<PortfolioType>("project");
   const [heroApi, setHeroApi] = useState<CarouselApi | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [featuredWorkPaused, setFeaturedWorkPaused] = useState(false);
+  const featuredMarqueeRef = useRef<HTMLDivElement | null>(null);
+  const featuredTrackRef = useRef<HTMLDivElement | null>(null);
 
   // Auto-play carousel
   useEffect(() => {
@@ -65,9 +60,41 @@ export function Home() {
     };
   }, [heroApi]);
 
-  const featuredPortfolioItems = portfolio
-    .filter((item) => item.type === selectedPortfolioType && item.displayOnHome)
-    .slice(0, 4);
+  const featuredPortfolioItems = portfolio.filter((item) => item.displayOnHome);
+  const featuredItemsPerLoop =
+    featuredPortfolioItems.length > 0
+      ? Math.max(1, Math.ceil(4 / featuredPortfolioItems.length))
+      : 1;
+  const featuredLoopItems = Array.from(
+    { length: featuredItemsPerLoop },
+    () => featuredPortfolioItems,
+  ).flat();
+
+  const moveFeaturedWork = (direction: -1 | 1) => {
+    const track = featuredTrackRef.current;
+    const group = track?.firstElementChild;
+    const firstCard = group?.firstElementChild;
+    const nextCard = firstCard?.nextElementSibling;
+    if (!track || !group || !firstCard || !nextCard) return;
+
+    const stepWidth =
+      nextCard.getBoundingClientRect().left - firstCard.getBoundingClientRect().left;
+    const animation = track.getAnimations()[0];
+
+    if (!animation) {
+      featuredMarqueeRef.current?.scrollBy({ left: direction * stepWidth });
+      return;
+    }
+
+    const stepDuration =
+      (FEATURED_WORK_SCROLL_DURATION * stepWidth) /
+      group.getBoundingClientRect().width;
+    const currentTime = Number(animation.currentTime ?? 0);
+    animation.currentTime =
+      ((currentTime + direction * stepDuration) % FEATURED_WORK_SCROLL_DURATION +
+        FEATURED_WORK_SCROLL_DURATION) %
+      FEATURED_WORK_SCROLL_DURATION;
+  };
 
   const getPortfolioLink = (item: PortfolioItem) => {
     if (item.type === "project") return `/projects/${item.slug}`;
@@ -360,77 +387,126 @@ export function Home() {
 
         {/* Featured Work */}
         <section className="py-16">
+          <style>{`
+            @keyframes featured-work-scroll {
+              to { transform: translateX(-50%); }
+            }
+            .featured-work-track {
+              animation: featured-work-scroll ${FEATURED_WORK_SCROLL_DURATION / 1000}s linear infinite;
+            }
+            .featured-work-track.featured-work-paused {
+              animation-play-state: paused;
+            }
+            .featured-work-marquee:hover .featured-work-track,
+            .featured-work-marquee:focus-within .featured-work-track {
+              animation-play-state: paused;
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .featured-work-marquee { overflow-x: auto; }
+              .featured-work-track { animation: none; }
+            }
+          `}</style>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-12">
-              <div className="text-center md:text-left">
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="text-center sm:text-left">
                 <h2 className="text-3xl font-bold mb-4">Featured Work</h2>
                 <p className="text-gray-600">
-                  Explore our portfolio by selecting the type of work you want
-                  to view.
+                  Explore our featured projects, consulting services, and training.
                 </p>
               </div>
-
-              <div className="w-full max-w-xs">
-                <Select
-                  value={selectedPortfolioType}
-                  onValueChange={(value) =>
-                    setSelectedPortfolioType(value as PortfolioType)
+              <div
+                className="flex items-center gap-2 self-center sm:self-auto"
+                onMouseLeave={() => setFeaturedWorkPaused(false)}
+                onBlurCapture={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                    setFeaturedWorkPaused(false);
                   }
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFeaturedWorkPaused(true);
+                    moveFeaturedWork(-1);
+                  }}
+                  aria-label="Previous featured work"
+                  title="Previous featured work"
+                  className="flex size-9 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select work type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="project">Project</SelectItem>
-                    <SelectItem value="consulting">
-                      Consulting Services
-                    </SelectItem>
-                    <SelectItem value="training">Training</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <ChevronLeft className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFeaturedWorkPaused(true);
+                    moveFeaturedWork(1);
+                  }}
+                  aria-label="Next featured work"
+                  title="Next featured work"
+                  className="flex size-9 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
               </div>
             </div>
 
             {featuredPortfolioItems.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {featuredPortfolioItems.map((item) => (
-                  <Link
-                    key={item.id}
-                    to={getPortfolioLink(item)}
-                    className="group"
-                  >
-                    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
-                      <div className="overflow-hidden">
-                        <img
-                          src={item.featuredImage}
-                          alt={item.title}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
+              <div
+                ref={featuredMarqueeRef}
+                className="featured-work-marquee overflow-hidden"
+              >
+                <div
+                  ref={featuredTrackRef}
+                  className={`featured-work-track flex w-max${
+                    featuredWorkPaused ? " featured-work-paused" : ""
+                  }`}
+                >
+                  {[0, 1].map((copy) => (
+                    <div
+                      key={copy}
+                      className="flex shrink-0 gap-8 pr-8"
+                      aria-hidden={copy === 1}
+                      inert={copy === 1}
+                    >
+                      {featuredLoopItems.map((item, index) => (
+                        <Link
+                          key={`${copy}-${item.id}-${index}`}
+                          to={getPortfolioLink(item)}
+                          className="group w-[85vw] max-w-sm shrink-0 md:w-[38vw] lg:w-[30vw]"
+                          tabIndex={copy === 1 ? -1 : undefined}
+                        >
+                          <Card className="h-full cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-xl">
+                            <div className="overflow-hidden">
+                              <img
+                                src={item.featuredImage}
+                                alt={item.title}
+                                className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                            </div>
 
-                      <CardContent className="pt-6">
-                        <div className="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full mb-3">
-                          {item.sector || portfolioTypeLabels[item.type]}
-                        </div>
+                            <CardContent className="pt-6">
+                              <div className="mb-3 inline-block rounded-full bg-brand-100 px-3 py-1 text-xs text-brand-600">
+                                {item.sector || portfolioTypeLabels[item.type]}
+                              </div>
 
-                        <h3 className="font-semibold mb-2 group-hover:text-brand-600 transition-colors">
-                          {item.title}
-                        </h3>
+                              <h3 className="mb-2 font-semibold transition-colors group-hover:text-brand-600">
+                                {item.title}
+                              </h3>
 
-                        <SanitizedHtml
-                          html={item.shortDescription}
-                          className="text-sm text-gray-600 [&_p]:mb-1 [&_a]:text-brand-600 [&_a]:underline [&_strong]:font-semibold [&_em]:italic [&_table]:text-xs [&_th]:text-xs [&_td]:text-xs [&_th]:border-gray-200 [&_td]:border-gray-200 [&_th]:px-2 [&_td]:px-2 [&_th]:py-1 [&_td]:py-1 [&_th]:bg-gray-50 [&_table]:border-collapse [&_table]:w-full [&_table]:my-1 line-clamp-3"
-                        />
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
+                              <SanitizedHtml
+                                html={item.shortDescription}
+                                className="line-clamp-3 text-sm text-gray-600 [&_p]:mb-1 [&_a]:text-brand-600 [&_a]:underline [&_strong]:font-semibold [&_em]:italic [&_table]:my-1 [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs [&_th]:border-gray-200 [&_th]:bg-gray-50 [&_th]:px-2 [&_th]:py-1 [&_th]:text-xs [&_td]:border-gray-200 [&_td]:px-2 [&_td]:py-1 [&_td]:text-xs"
+                              />
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      ))}
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
-              <p className="text-center text-gray-600">
-                No featured work available for{" "}
-                {portfolioTypeLabels[selectedPortfolioType]}.
-              </p>
+              <p className="text-center text-gray-600">No featured work available.</p>
             )}
 
             <div className="text-center mt-8">
