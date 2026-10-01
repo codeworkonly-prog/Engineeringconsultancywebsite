@@ -125,19 +125,6 @@ export function getPortfolioItemBySlug(items: PortfolioItem[], slug: string): Po
 }
 
 /**
- * Get flagship project
- */
-export function getFlagshipProject(items: PortfolioItem[]): PortfolioItem | null {
-  const projects = getItemsByType(items, 'project');
-  return projects.find((item) => {
-    if (item.type === 'project') {
-      return Boolean(item.isFlagship);
-    }
-    return false;
-  }) || null;
-}
-
-/**
  * Get items by sector
  */
 export function getItemsBySector(items: PortfolioItem[], sector: string): PortfolioItem[] {

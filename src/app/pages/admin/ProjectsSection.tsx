@@ -7,7 +7,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
-import { Edit, Trash2, X, Award } from 'lucide-react';
+import { Edit, Trash2, X } from 'lucide-react';
 import { PortfolioItem, ProjectMetadata, defaultProjectFormData } from '../../../types/portfolio.types';
 
 export function ProjectsSection() {
@@ -98,27 +98,9 @@ export function ProjectsSection() {
   );
 
   const metadata = form.metadata as ProjectMetadata;
-  const flagshipProject = projects.find((p) => p.metadata.isFlagship);
 
   return (
     <div className="space-y-6">
-      {/* Flagship Alert */}
-      {flagshipProject && (
-        <Card className="border-brand-200 bg-brand-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <Award className="h-6 w-6 text-brand-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-brand-900 mb-1">Current Flagship Project</h3>
-                <p className="text-sm text-brand-700">
-                  <strong>{flagshipProject.title}</strong> is currently featured on your company profile.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Form Card */}
       <Card>
         <CardHeader>
@@ -126,35 +108,6 @@ export function ProjectsSection() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Flagship Toggle */}
-            <div className="border-2 border-brand-200 rounded-lg p-4 bg-brand-50">
-              <div className="flex items-start gap-3">
-                <Award className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      id="flagship-toggle"
-                      checked={metadata.isFlagship}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          metadata: { ...metadata, isFlagship: e.target.checked },
-                        })
-                      }
-                      className="h-4 w-4 rounded border-gray-300 text-brand-600"
-                    />
-                    <Label htmlFor="flagship-toggle" className="font-semibold cursor-pointer">
-                      Mark as Flagship Project
-                    </Label>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1 ml-7">
-                    Featured on your company profile page
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* Basic Fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -417,9 +370,6 @@ export function ProjectsSection() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold">{project.title}</h3>
-                      {project.metadata.isFlagship && (
-                        <Award className="h-4 w-4 text-amber-500" />
-                      )}
                       <span className="px-2 py-1 bg-brand-100 text-brand-600 rounded text-xs">
                         {project.sector}
                       </span>

@@ -60,7 +60,6 @@ export interface Project {
   endDate: string;
   status: "ongoing" | "completed";
   slug: string;
-  isFlagship: boolean;
   client?: string;
   clientId?: string;
   location?: string;

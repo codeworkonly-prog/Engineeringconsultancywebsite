@@ -271,11 +271,6 @@ export function PortfolioForm() {
     }
   };
 
-  const currentFlagshipItem = useMemo(
-    () => portfolio.find((item) => item.isFlagship && item.type === form.type),
-    [portfolio, form.type],
-  );
-
   const updateForm = <K extends keyof PortfolioItem>(
     key: K,
     value: PortfolioItem[K],
@@ -433,31 +428,6 @@ export function PortfolioForm() {
     return nextErrors;
   };
 
-  const clearOtherFlagshipItems = async (
-    currentSlug: string,
-    currentType: PortfolioType,
-  ) => {
-    const updates = portfolio
-      .filter(
-        (item) =>
-          item.isFlagship &&
-          item.type === currentType &&
-          item.id !== editingId &&
-          item.slug !== currentSlug,
-      )
-      .map((item) => {
-        const { id: itemId, ...payload } = item;
-
-        return updatePortfolioItem(itemId, {
-          ...payload,
-          isFlagship: false,
-          updatedAt: new Date().toISOString(),
-        });
-      });
-
-    await Promise.all(updates);
-  };
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -486,10 +456,6 @@ export function PortfolioForm() {
       } else {
         await addPortfolioItem(payload);
         toast.success("Portfolio item added successfully.");
-      }
-
-      if (payload.isFlagship) {
-        await clearOtherFlagshipItems(payload.slug, payload.type);
       }
 
       goBackToList();
@@ -724,29 +690,6 @@ export function PortfolioForm() {
                 </span>
               </label>
 
-              <label className="flex items-center gap-3 rounded-lg border p-3 text-sm font-medium">
-                <Checkbox
-                  checked={Boolean(form.isFlagship)}
-                  onCheckedChange={(checked) =>
-                    updateForm("isFlagship", checked === true)
-                  }
-                  aria-describedby={
-                    currentFlagshipItem && form.isFlagship
-                      ? "flagship-warning"
-                      : undefined
-                  }
-                />
-                Flagship {selectedTypeLabel}
-              </label>
-
-              {currentFlagshipItem &&
-                currentFlagshipItem.id !== editingId &&
-                form.isFlagship && (
-                  <p id="flagship-warning" className="text-sm text-amber-700">
-                    Saving this will replace the current flagship{" "}
-                    {selectedTypeLabel}: {currentFlagshipItem.title}.
-                  </p>
-                )}
             </div>
 
             <div className="space-y-4 border-t pt-6">
