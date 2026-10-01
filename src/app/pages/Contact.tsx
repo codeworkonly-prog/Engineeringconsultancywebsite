@@ -12,7 +12,7 @@ import { Textarea } from "../components/ui/textarea";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useContent } from "../contexts/ContentContext";
-import { PageHeroBackground } from '../components/PageHeroBackground';
+import { PageHeroBackground } from "../components/PageHeroBackground";
 
 export function Contact() {
   const { contactInfo, pageHeroImages } = useContent();
@@ -87,7 +87,7 @@ export function Contact() {
 
     try {
       const payload: Record<string, string> = {
-        access_key: import.meta.env.WEB3FORMS_ACCESS_KEY,
+        access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
         name: formData.name,
         email: formData.email,
         message: formData.message,
