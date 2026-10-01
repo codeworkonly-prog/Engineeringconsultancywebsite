@@ -50,7 +50,6 @@ export type PortfolioForm = {
   clientTestimonial: string;
   clientName: string;
   faqs: string[];
-  isFlagship: boolean;
 };
 
 export const defaultPortfolioForm: PortfolioForm = {
@@ -75,7 +74,6 @@ export const defaultPortfolioForm: PortfolioForm = {
   clientTestimonial: '',
   clientName: '',
   faqs: [],
-  isFlagship: false, // NEW: defaults to false
 };
 
 

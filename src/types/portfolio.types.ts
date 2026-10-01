@@ -45,7 +45,6 @@ export interface PortfolioItem {
   location?: string;
   startDate?: string;
   endDate?: string;
-  isFlagship?: boolean;
   projectType?: string;
   contractAmount?: string;
   serviceType?: string;
@@ -70,7 +69,6 @@ export const defaultPortfolioFormData: PortfolioItem = {
   location: '',
   startDate: '',
   endDate: '',
-  isFlagship: false,
   projectType: '',
   contractAmount: '',
   serviceType: '',

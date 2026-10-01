@@ -2,7 +2,6 @@ import { Card, CardContent } from '../components/ui/card';
 import { Link } from 'react-router';
 import { CheckCircle, Factory, Users, Award, Lightbulb } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
-import { FlagshipProjectSection } from '../pages/admin/FlagshipProjectSection';
 import { slugify } from '../../utils/slug';
 
 export function CompanyProfile() {
@@ -151,9 +150,6 @@ export function CompanyProfile() {
           </div>
         </div>
       </section>
-
-      {/* Flagship Project Section */}
-      <FlagshipProjectSection />
 
       {/* Our Clients Section */}
       <section className="py-16 bg-gray-50">

@@ -25,7 +25,7 @@ import {
 } from "../../components/ui/dialog";
 import { useContent } from "../../contexts/ContentContext";
 import { toast } from "sonner";
-import { Award, Edit, Search, Trash2, Plus } from "lucide-react";
+import { Edit, Search, Trash2, Plus } from "lucide-react";
 import { PortfolioItem, PortfolioType } from "../../../types/portfolio.types";
 
 type TypeFilter = PortfolioType | "all";
@@ -176,9 +176,6 @@ export function PortfolioSection() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold">{item.title}</h3>
-                      {item.isFlagship && (
-                        <Award className="h-4 w-4 text-yellow-500" />
-                      )}
                       {item.displayOnHome && (
                         <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-brand-800">
                           Featured on Home
