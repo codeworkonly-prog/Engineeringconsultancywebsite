@@ -1,6 +1,6 @@
 import { Card, CardContent } from '../components/ui/card';
 import { Link } from 'react-router';
-import { CheckCircle, Factory, Layers, Users, Award, Lightbulb } from 'lucide-react';
+import { CheckCircle, Users, Award, Lightbulb, ChevronRightCircle } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 import { slugify } from '../../utils/slug';
 
@@ -134,7 +134,7 @@ export function CompanyProfile() {
           </div>
 
           <div className="mb-12">
-            <h3 className="text-2xl font-semibold mb-6 text-center">Our Portfolio Includes:</h3>
+            <h3 className="text-2xl font-semibold mb-6 text-center">Our Portfolio Sectors Include:</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...sectors]
                 .sort((a, b) => a.name.localeCompare(b.name))
@@ -142,7 +142,7 @@ export function CompanyProfile() {
                   <Card key={sector.id}>
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-3">
-                        <Layers className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
+                        <ChevronRightCircle className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
                         <p className="text-sm text-gray-700">{sector.name}</p>
                       </div>
                     </CardContent>
