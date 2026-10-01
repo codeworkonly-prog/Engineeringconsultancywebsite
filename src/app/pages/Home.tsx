@@ -293,7 +293,7 @@ export function Home() {
                   </Button>
                 </Link>
 
-                <Link to="/projects">
+                <Link to="/portfolio">
                   <Button
                     size="lg"
                     className="
@@ -308,7 +308,7 @@ export function Home() {
         backdrop-blur-sm
       "
                   >
-                    View Projects
+                    View Portfolio
                   </Button>
                 </Link>
               </div>
