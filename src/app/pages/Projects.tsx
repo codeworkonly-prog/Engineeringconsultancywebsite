@@ -226,7 +226,7 @@ export function Projects() {
       {/* Hero */}
       <PageHeroBackground
         image={pageHeroImages?.projects}
-        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

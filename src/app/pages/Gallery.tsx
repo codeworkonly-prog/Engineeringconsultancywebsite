@@ -26,7 +26,7 @@ export function Gallery() {
     <div className="min-h-screen bg-slate-50">
       <PageHeroBackground
         image={pageHeroImages?.gallery || ""}
-        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h1 className="text-4xl font-bold mb-4">Gallery</h1>

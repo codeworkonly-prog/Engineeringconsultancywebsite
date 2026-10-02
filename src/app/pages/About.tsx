@@ -23,19 +23,18 @@ export function About() {
     <div>
       {/* Header Section */}
 
-      <PageHeroBackground
-        image={pageHeroImages?.['about'] || ""}
-        fallbackClassName="relative bg-gradient-to-r from-brand-500 to-brand-700 text-white/5"
-      >
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
-          <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
+      <PageHeroBackground
+       image={pageHeroImages?.['about'] || ""}
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white"
+      >
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full py-16">
             <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
+              <h1 className="text-4xl font-bold mb-4 text-white">
                 About Us
               </h1>
 
-              <p className="text-lg md:text-2xl text-gray-200 leading-relaxed mb-6">
+              <p className="text-lg md:text-2xl leading-relaxed mb-6">
                 A multidisciplinary engineering and management consulting firm
                 dedicated to excellence.
               </p>
@@ -57,8 +56,8 @@ export function About() {
               </button>
             </div>
           </div>
-        </div>
-
+        
+      
       </PageHeroBackground>
 
 
