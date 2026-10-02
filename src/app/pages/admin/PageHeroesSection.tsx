@@ -15,7 +15,7 @@ const PAGES: { key: keyof PageHeroImages; label: string; hint: string }[] = [
   { key: "projects", label: "Projects", hint: "/projects" },
   { key: "contact", label: "Contact", hint: "/contact" },
   { key: "team", label: "Team", hint: "/team" },
-  { key: "companySector", label: "Company Sectors", hint: "/company-sector" },
+  // { key: "companySector", label: "Company Sectors", hint: "/company-sector" },
 ];
 
 export function PageHeroesSection() {

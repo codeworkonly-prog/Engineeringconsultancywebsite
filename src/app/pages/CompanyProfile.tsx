@@ -13,6 +13,11 @@ export function CompanyProfile() {
       slugify(clients.find((client) => client.id === clientId)?.name || clientId)
     )}`;
 
+  const getSectorPortfolioLink = (sectorName: string) => {
+    const sector = sectors.find((item) => item.name === sectorName);
+    return `/portfolio?sector=${encodeURIComponent(sector?.slug || slugify(sectorName))}`;
+  };
+
   const services = [
     {
       category: 'Engineering Consultancy & Infrastructure Design',
@@ -143,14 +148,16 @@ export function CompanyProfile() {
               {[...sectors]
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((sector) => (
-                  <Card key={sector.id}>
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-3">
-                        <ChevronRightCircle className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-gray-700">{sector.name}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <Link key={sector.id} to={getSectorPortfolioLink(sector.name)} className="block h-full">
+                    <Card className="h-full hover:shadow-lg transition-shadow duration-200">
+                      <CardContent className="pt-6">
+                        <div className="flex items-start gap-3">
+                          <ChevronRightCircle className="h-5 w-5 text-brand-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-gray-700">{sector.name}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
             </div>
           </div>

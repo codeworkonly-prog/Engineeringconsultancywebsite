@@ -51,13 +51,13 @@ export function About() {
           <div className="flex flex-wrap gap-4">
             <button
               onClick={() => scrollToSection('who-we-are')}
-              className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white border border-white/30 transition-colors duration-200"
+              className="px-6 py-2 bg-white/10 hover:bg-white/20 cursor-pointer rounded-full text-white border border-white/30 transition-colors duration-200"
             >
               Who We Are
             </button>
             <button
               onClick={() => scrollToSection('our-team')}
-              className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white border border-white/30 transition-colors duration-200"
+              className="px-6 py-2 bg-white/10 hover:bg-white/20 cursor-pointer rounded-full text-white border border-white/30 transition-colors duration-200"
             >
               Our Team
             </button>
@@ -127,10 +127,10 @@ export function About() {
               {/* CTA */}
               <div className="flex gap-4">
                 <a
-                  href="/services"
+                  href="/portfolio"
                   className="bg-brand-600 hover:bg-brand-700 transition text-white px-6 py-3 rounded-xl font-semibold shadow-lg"
                 >
-                  Explore Services
+                  Explore Our Portfolio
                 </a>
 
                 <a

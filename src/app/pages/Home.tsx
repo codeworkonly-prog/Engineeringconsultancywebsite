@@ -105,9 +105,9 @@ export function Home() {
   const getClientPortfolioLink = (clientId: string) =>
     `/portfolio?client=${encodeURIComponent(
       clients.find((client) => client.id === clientId)?.slug ||
-        slugify(
-          clients.find((client) => client.id === clientId)?.name || clientId,
-        ),
+      slugify(
+        clients.find((client) => client.id === clientId)?.name || clientId,
+      ),
     )}`;
 
   return (
@@ -231,11 +231,10 @@ export function Home() {
                     <button
                       key={index}
                       onClick={() => heroApi?.scrollTo(index)}
-                      className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer border-0 ${
-                        currentSlide === index
+                      className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer border-0 ${currentSlide === index
                           ? "bg-white scale-110"
                           : "bg-white/40 hover:bg-white/60"
-                      }`}
+                        }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}
@@ -287,6 +286,7 @@ export function Home() {
         border border-white/30
         transition-all duration-300
         backdrop-blur-sm
+        cursor-pointer
       "
                   >
                     Learn More
@@ -306,6 +306,7 @@ export function Home() {
         border border-white/30
         transition-all duration-300
         backdrop-blur-sm
+        cursor-pointer
       "
                   >
                     View Portfolio
@@ -457,9 +458,8 @@ export function Home() {
               >
                 <div
                   ref={featuredTrackRef}
-                  className={`featured-work-track flex w-max${
-                    featuredWorkPaused ? " featured-work-paused" : ""
-                  }`}
+                  className={`featured-work-track flex w-max${featuredWorkPaused ? " featured-work-paused" : ""
+                    }`}
                 >
                   {[0, 1].map((copy) => (
                     <div
@@ -477,11 +477,15 @@ export function Home() {
                         >
                           <Card className="h-full cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-xl">
                             <div className="overflow-hidden">
-                              <img
-                                src={item.featuredImage}
-                                alt={item.title}
-                                className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              />
+                              {item.featuredImage ? (
+                                <img
+                                  src={item.featuredImage}
+                                  alt={item.title}
+                                  className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                              ) : (
+                                <div className="h-48 w-full bg-gradient-to-br from-brand-600 via-brand-500 to-slate-800" />
+                              )}
                             </div>
 
                             <CardContent className="pt-6">

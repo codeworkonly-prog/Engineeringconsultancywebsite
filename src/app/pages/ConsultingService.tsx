@@ -260,7 +260,7 @@ export function ConsultingService() {
         </section>
       )}
 
-      {/* Sectors We Serve */}
+      {/* Sectors We Serve
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -277,7 +277,7 @@ export function ConsultingService() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Why Choose Us */}
       <section className="py-16 bg-gray-50">
