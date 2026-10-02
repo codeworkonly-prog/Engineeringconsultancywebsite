@@ -73,17 +73,19 @@ export function PortfolioItemDetail({
 
   return (
     <div className="bg-white">
-      <section className="relative min-h-[520px] bg-slate-950 text-white">
+      <section className="relative bg-gradient-to-r from-brand-500 to-brand-700 text-white">
         {item.featuredImage && (
-          <img
+          <> <img
             src={item.featuredImage}
             alt={item.title}
-            className="absolute inset-0 h-full w-full object-cover opacity-35"
+            className="absolute inset-0 h-full w-full object-cover "
           />
+          <div className="absolute inset-0 bg-black/55"></div>
+          </>
+         
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/30" />
-
-        <div className="relative mx-auto flex min-h-[520px] max-w-7xl flex-col justify-end px-4 py-12 sm:px-6 lg:px-8">
+ 
+        <div className="relative mx-auto flex max-w-7xl flex-col justify-end px-4 py-12 sm:px-6 lg:px-8">
           <Link to={backLinks[item.type]}>
             <Button variant="secondary" size="sm" className="mb-8 w-fit">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -105,10 +107,10 @@ export function PortfolioItemDetail({
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
               {item.title}
             </h1>
-            <SanitizedHtml
-              html={item.shortDescription}
-              className="mt-5 max-w-3xl text-lg leading-8 text-slate-200 [&_a]:text-cyan-300 [&_a]:underline [&_strong]:text-white [&_em]:text-slate-200 [&_table]:text-sm [&_th]:text-slate-200 [&_td]:text-slate-200 [&_th]:border-slate-600 [&_td]:border-slate-600"
-            />
+            <div
+             
+              className="mt-5 max-w-3xl text-lg leading-8 text-white"
+            >{item.shortDescription}</div>
           </div>
         </div>
       </section>
