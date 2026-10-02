@@ -31,7 +31,8 @@ import project6 from "../../imports/project6.jpg";
 type ProjectStatus = "upcoming" | "ongoing" | "completed";
 
 export function Projects() {
-  const { projects, galleryImages, portfolio, clients, pageHeroImages } = useContent();
+  const { projects, galleryImages, portfolio, clients, pageHeroImages } =
+    useContent();
   const [view, setView] = useState<"grid" | "table">("grid");
   const [fySortOrder, setFySortOrder] = useState<"desc" | "asc">("desc");
   const [filters, setFilters] = useState<PortfolioFiltersState>({
@@ -377,7 +378,7 @@ export function Projects() {
                         </div>
                         <CardContent className="pt-6">
                           <div className="mb-3">
-                            <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full font-medium">
+                            <span className="px-3 py-1 bg-brand-100 text-brand-600 text-xs rounded-full font-medium capitalize">
                               {project.projectType}
                             </span>
                           </div>
