@@ -38,7 +38,7 @@ export function ImageUpload({
     }
 
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
-      toast.error("Maximum file size is 200MB");
+      toast.error("Maximum file size is 5MB");
       return;
     }
 
