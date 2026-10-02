@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { useContent } from '../contexts/ContentContext';
 import aboutUs from "../../imports/About_us.webp";
 import aboutUsHeader from "../../imports/aboutUsHeader.webp";
+import { PageHeroBackground } from '../components/PageHeroBackground';
 
 export function About() {
   const { teamMembers, pageHeroImages } = useContent();
@@ -21,49 +22,47 @@ export function About() {
   return (
     <div>
       {/* Header Section */}
-      <section
-        className="relative h-[420px] flex items-center text-white overflow-hidden"
-        style={{
-          backgroundImage: `url(${pageHeroImages?.about || aboutUsHeader})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center center",
-          backgroundRepeat: "no-repeat",
-        }}
-        aria-label="About Diksha Consulting engineering team in Nepal"
+
+      <PageHeroBackground
+        image={pageHeroImages?.['about'] || ""}
+        fallbackClassName="relative bg-gradient-to-r from-brand-500 to-brand-700 text-white/5"
       >
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/55"></div>
 
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              About Us
-            </h1>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
+          <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
+                About Us
+              </h1>
 
-            <p className="text-lg md:text-2xl text-gray-200 leading-relaxed mb-6">
-              A multidisciplinary engineering and management consulting firm
-              dedicated to excellence.
-            </p>
-          </div>
+              <p className="text-lg md:text-2xl text-gray-200 leading-relaxed mb-6">
+                A multidisciplinary engineering and management consulting firm
+                dedicated to excellence.
+              </p>
+            </div>
 
-          {/* Subsection Navigation */}
-          <div className="flex flex-wrap gap-4">
-            <button
-              onClick={() => scrollToSection('who-we-are')}
-              className="px-6 py-2 bg-white/10 hover:bg-white/20 cursor-pointer rounded-full text-white border border-white/30 transition-colors duration-200"
-            >
-              Who We Are
-            </button>
-            <button
-              onClick={() => scrollToSection('our-team')}
-              className="px-6 py-2 bg-white/10 hover:bg-white/20 cursor-pointer rounded-full text-white border border-white/30 transition-colors duration-200"
-            >
-              Our Team
-            </button>
+            {/* Subsection Navigation */}
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={() => scrollToSection('who-we-are')}
+                className="px-6 py-2 bg-white/10 hover:bg-white/20 cursor-pointer rounded-full text-white border border-white/30 transition-colors duration-200"
+              >
+                Who We Are
+              </button>
+              <button
+                onClick={() => scrollToSection('our-team')}
+                className="px-6 py-2 bg-white/10 hover:bg-white/20 cursor-pointer rounded-full text-white border border-white/30 transition-colors duration-200"
+              >
+                Our Team
+              </button>
+            </div>
           </div>
         </div>
-      </section>
+
+      </PageHeroBackground>
+
+
+
 
       {/* Who We Are Section */}
       <section
@@ -284,7 +283,7 @@ export function About() {
             </div>
           ) : (
             <>
-                {/* Leadership Member - Center Highlight */}
+              {/* Leadership Member - Center Highlight */}
               {leadershipMember && (
                 <div className="max-w-2xl mx-auto mb-16">
                   <Link to={`/team/${leadershipMember.slug}`}>

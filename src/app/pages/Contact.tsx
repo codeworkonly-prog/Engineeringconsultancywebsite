@@ -164,12 +164,16 @@ export function Contact() {
         image={pageHeroImages?.contact}
         fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl text-brand-50 max-w-3xl">
-            Get in touch with us for any inquiries or project consultations
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
+            <p className="text-xl text-brand-50 max-w-3xl">
+              Get in touch with us for any inquiries or project consultations
+            </p>
+          </div>
+
         </div>
+
       </PageHeroBackground>
 
       {/* Contact Section */}
@@ -404,11 +408,10 @@ export function Contact() {
                       type="submit"
                       disabled={!isFormValid || loading}
                       className={`w-full h-12 rounded-xl font-semibold text-white shadow-md transition-all duration-300 flex items-center justify-center gap-2
-    ${
-      isFormValid && !loading
-        ? "bg-green-500 hover:bg-green-600 hover:shadow-lg active:scale-[0.98]"
-        : "bg-brand-600 hover:bg-brand-700 opacity-80 cursor-not-allowed"
-    }`}
+    ${isFormValid && !loading
+                          ? "bg-green-500 hover:bg-green-600 hover:shadow-lg active:scale-[0.98]"
+                          : "bg-brand-600 hover:bg-brand-700 opacity-80 cursor-not-allowed"
+                        }`}
                     >
                       {loading ? (
                         <>

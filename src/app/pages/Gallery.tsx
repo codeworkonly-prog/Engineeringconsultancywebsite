@@ -12,6 +12,8 @@ const typeBadgeLabels: Record<PortfolioItem["type"], string> = {
 };
 
 export function Gallery() {
+
+  const { pageHeroImages } = useContent();
   const { portfolio } = useContent();
 
   // Only items that actually have photos appear in the gallery.
@@ -23,6 +25,7 @@ export function Gallery() {
   return (
     <div className="min-h-screen bg-slate-50">
       <PageHeroBackground
+        image={pageHeroImages?.gallery || ""}
         fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -31,8 +34,10 @@ export function Gallery() {
             Photos from our projects, consulting assignments, and training
             programs — grouped by work.
           </p>
-        </div>
+          </div>
+
       </PageHeroBackground>
+     
 
       {groups.length === 0 ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">

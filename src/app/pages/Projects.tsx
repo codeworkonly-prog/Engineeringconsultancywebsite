@@ -27,6 +27,7 @@ import project3 from "../../imports/project3.jpg";
 import project4 from "../../imports/project4.jpg";
 import project5 from "../../imports/project5.jpg";
 import project6 from "../../imports/project6.jpg";
+import { PageHeroBackground } from "../components/PageHeroBackground";
 
 type ProjectStatus = "upcoming" | "ongoing" | "completed";
 
@@ -223,83 +224,34 @@ export function Projects() {
   return (
     <div>
       {/* Hero */}
-      <section
-        className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white min-h-[580px] flex items-center"
-        style={
-          pageHeroImages?.projects
-            ? {
-                backgroundImage: `url(${pageHeroImages.projects})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center center",
-                backgroundRepeat: "no-repeat",
-              }
-            : undefined
-        }
+      <PageHeroBackground
+        image={pageHeroImages?.projects}
+        fallbackClassName="bg-gradient-to-r from-brand-500 to-brand-700 text-white py-16"
       >
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)
-            `,
-            backgroundSize: "60px 60px",
-          }}
-        />
-        <div className="absolute -left-20 top-0 bottom-0 w-[360px] bg-cyan-500/10 blur-[100px] pointer-events-none" />
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 h-[70%] w-[58%] hidden lg:grid grid-cols-3 gap-2 p-2">
-          {heroImages.slice(0, 6).map((src, i) => (
-            <div
-              key={i}
-              className="group relative overflow-hidden rounded-2xl shadow-lg"
-            >
-              <img
-                src={src}
-                alt={`Project ${i + 1}`}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-brand-900/20 transition-all duration-500 group-hover:bg-brand-900/10" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-            </div>
-          ))}
-        </div>
-        <div className="absolute inset-0 hidden lg:block bg-gradient-to-r from-brand-900/20 via-brand-900/50 to-transparent pointer-events-none" />
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 w-full">
-          <div className="max-w-lg">
-            <h1 className="text-5xl lg:text-[3.75rem] font-bold leading-[1.05] tracking-tight mb-6">
-              Projects Built
-              <br />
-              <span className="text-brand-200">Across Nepal</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-bold mb-4">
+              Projects Built Across Nepal
             </h1>
-            <p className="text-brand-200/70 text-base leading-relaxed max-w-sm">
-              Infrastructure, design-build, and contract projects delivered on
-              time and at scale across Nepal.
+
+            <p className="text-xl text-brand-50 max-w-3xl">
+              Infrastructure, design-build, and contract projects delivered on time
+              and at scale across Nepal.
             </p>
-            <div className="mt-10 flex items-stretch gap-10">
-              <div className="flex items-start gap-4">
-                <div className="w-px self-stretch bg-cyan-400 mt-1" />
-                <div>
-                  <div className="text-4xl font-bold">
-                    {projectItems.length}+
-                  </div>
-                  <div className="text-brand-300/60 text-sm mt-1">
-                    Projects Delivered
-                  </div>
-                </div>
+
+            <div className="mt-8 flex flex-wrap gap-10">
+              <div>
+                <p className="text-3xl font-bold">{projectItems.length}+</p>
+                <p className="mt-1 text-sm text-brand-100">
+                  Projects Delivered
+                </p>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-px self-stretch bg-white/20 mt-1" />
-                <div>
-                  <div className="text-4xl font-bold">14+</div>
-                  <div className="text-brand-300/60 text-sm mt-1">
-                    Districts Covered
-                  </div>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
-      </section>
+
+      </PageHeroBackground>
 
       {/* Projects Section */}
       <section className="py-16">
@@ -334,7 +286,7 @@ export function Projects() {
             extraControls={viewToggle}
             onUpdateFilters={updateFilters}
             onClearFilters={clearFilters}
-            onDownloadCsv={() => {}}
+            onDownloadCsv={() => { }}
           />
 
           {/* Content */}

@@ -112,6 +112,7 @@ export interface PageHeroImages {
   contact?: string;
   team?: string;
   companySector?: string;
+  gallery?: string;
 }
 
 export interface HomeFaq {

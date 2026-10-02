@@ -22,6 +22,7 @@ import {
 } from '../../services/portfolio.service';
 import { slugify } from '../../utils/slug';
 import { PortfolioFilters as PortfolioFiltersComponent } from '../components/portfolio/PortfolioFilters';
+import { PageHeroBackground } from '../components/PageHeroBackground';
 
 const PAGE_SIZE = 10;
 const COMPANY_START_BS_YEAR = 2072;
@@ -103,6 +104,7 @@ export function Portfolio() {
     client: undefined,
     search: '',
   });
+
 
   const filterValues = useMemo(() => getUniqueFilterValues(portfolio), [portfolio]);
 
@@ -253,32 +255,22 @@ export function Portfolio() {
 
   return (
     <div className="bg-slate-50">
-      <section
-        className="relative overflow-hidden bg-slate-950 text-white"
-        style={
-          pageHeroImages?.portfolio
-            ? {
-                backgroundImage: `url(${pageHeroImages.portfolio})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center center',
-                backgroundRepeat: 'no-repeat',
-              }
-            : undefined
-        }
-      >
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(14,165,233,0.24),transparent_38%),linear-gradient(45deg,rgba(16,185,129,0.16),transparent_45%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="max-w-4xl">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Our Portfolio
-            </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">
-              {yearsOfExperience}+ Years of Engineering Consultancy, Infrastructure Development,
+      
+
+      <PageHeroBackground
+      image={pageHeroImages?.['portfolio']  || ""}
+              fallbackClassName="relative bg-gradient-to-r from-brand-500 to-brand-700 text-white/5"
+            >
+             
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
+                <h1 className="text-4xl font-bold mb-4">Our Portfolio</h1>
+                <p className="text-xl text-brand-50 max-w-3xl">
+                 {yearsOfExperience}+ Years of Engineering Consultancy, Infrastructure Development,
               Project Management, and Capacity-Building Experience Across Nepal.
-            </p>
-          </div>
-        </div>
-      </section>
+                </p>
+              </div>
+              
+            </PageHeroBackground>
 
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
